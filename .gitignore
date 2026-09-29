@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# Data & Environment
+.env
+*.db
+*.sqlite
+
+# Node / OS
+node_modules/
+.DS_Store
+Thumbs.db
+
+# Tool Config
+.gemini/

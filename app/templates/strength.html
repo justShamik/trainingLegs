@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Strength & Conditioning - Personal Running Coach{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: var(--space-lg); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--space-md);">
+    <div>
+        <h1>RUNNER STRENGTH & CONDITIONING</h1>
+        <p style="color: var(--text-secondary);">Runner-specific resistance training, tendon resilience, and niggle-safe exercise selection (FR-4.1 - FR-4.5).</p>
+    </div>
+    <div style="display: flex; gap: var(--space-xs); flex-wrap: wrap;">
+        <form method="POST" action="/strength/generate">
+            <input type="hidden" name="phase" value="Base">
+            <button type="submit" style="background: {% if workout and workout.phase == 'Base' %}var(--accent-orange){% else %}var(--bg-surface-elevated){% endif %}; color: var(--text-primary); border: 1px solid var(--border-color); font-family: var(--font-display); font-size: 1.1rem; padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
+                🧱 Base Phase
+            </button>
+        </form>
+        <form method="POST" action="/strength/generate">
+            <input type="hidden" name="phase" value="Build">
+            <button type="submit" style="background: {% if workout and workout.phase == 'Build' %}var(--accent-orange){% else %}var(--bg-surface-elevated){% endif %}; color: var(--text-primary); border: 1px solid var(--border-color); font-family: var(--font-display); font-size: 1.1rem; padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
+                ⚡ Build Phase
+            </button>
+        </form>
+        <form method="POST" action="/strength/generate">
+            <input type="hidden" name="phase" value="Peak">
+            <button type="submit" style="background: {% if workout and workout.phase == 'Peak' %}var(--accent-orange){% else %}var(--bg-surface-elevated){% endif %}; color: var(--text-primary); border: 1px solid var(--border-color); font-family: var(--font-display); font-size: 1.1rem; padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
+                🚀 Peak Phase
+            </button>
+        </form>
+        <form method="POST" action="/strength/generate">
+            <input type="hidden" name="phase" value="Taper">
+            <button type="submit" style="background: {% if workout and workout.phase == 'Taper' %}var(--accent-orange){% else %}var(--bg-surface-elevated){% endif %}; color: var(--text-primary); border: 1px solid var(--border-color); font-family: var(--font-display); font-size: 1.1rem; padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
+                💤 Taper Phase
+            </button>
+        </form>
+    </div>
+</div>
+
+{% if workout and workout.safety_notices %}
+<!-- Safety Substitution Banner -->
+<div class="card" style="margin-bottom: var(--space-lg); border-left: 4px solid var(--status-warning); background: rgba(255, 170, 0, 0.08);">
+    <h3 style="color: var(--status-warning); margin: 0 0 6px 0; font-family: var(--font-display);">🛡️ INJURY & NIGGLE SAFETY FILTER ACTIVE</h3>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary); font-size: 0.95rem;">
+        {% for notice in workout.safety_notices %}
+        <li>{{ notice }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if workout %}
+<!-- Workout Overview Header Card -->
+<div class="card" style="margin-bottom: var(--space-lg); border-left: 4px solid var(--accent-orange); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div>
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 6px;">
+            <span class="badge-na" style="background: rgba(255,85,0,0.15); color: var(--accent-orange); border-color: var(--accent-orange);">
+                RUNNING PHASE: {{ workout.phase|upper }}
+            </span>
+            <span style="font-size: 0.9rem; color: var(--text-muted);">
+                ⏱️ {{ workout.total_duration_min }} MIN SESSION
+            </span>
+        </div>
+        <h3 style="margin: 0; color: var(--text-primary); font-family: var(--font-display); font-size: 1.6rem;">
+            {{ workout.focus_area }}
+        </h3>
+    </div>
+    <div style="display: flex; gap: 12px; align-items: center;">
+        {% if workout.status == 'Completed' %}
+        <span class="badge-na" style="background: rgba(0, 204, 136, 0.2); color: var(--status-success); border-color: var(--status-success); font-size: 1.1rem; padding: 6px 16px;">
+            ✓ COMPLETED
+        </span>
+        {% else %}
+        <form method="POST" action="/strength/update">
+            <input type="hidden" name="workout_id" value="{{ workout.db_id or workout.id }}">
+            <input type="hidden" name="status" value="Completed">
+            <button type="submit" style="background: var(--status-success); color: #fff; border: none; font-family: var(--font-display); font-size: 1.2rem; padding: 8px 20px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
+                ✓ Mark Workout Completed
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Exercise Cards List -->
+<div style="display: flex; flex-direction: column; gap: var(--space-md); margin-bottom: var(--space-xl);">
+    {% for ex in workout.exercises %}
+    <div class="card" style="display: grid; grid-template-columns: 200px 140px 160px 1fr; gap: var(--space-md); align-items: center; border-left: 3px solid var(--accent-orange);">
+        <div>
+            <div style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">
+                {{ ex.name }}
+            </div>
+            <span class="badge-na" style="background: rgba(255,255,255,0.08); color: var(--text-secondary); border-color: var(--border-color); font-size: 0.75rem; margin-top: 4px;">
+                {{ ex.category }}
+            </span>
+        </div>
+
+        <div>
+            <div style="font-family: var(--font-display); font-size: 1.4rem; color: var(--accent-orange);">
+                {{ ex.prescribed_sets }} SETS × {{ ex.prescribed_reps }}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+                Target Intensity: RPE {{ ex.prescribed_rpe }} / 10
+            </div>
+        </div>
+
+        <div>
+            <div style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 600;">
+                🛠️ {{ ex.equipment_needed }}
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">
+                Equipment
+            </div>
+        </div>
+
+        <div style="padding: 10px; background: var(--bg-surface-elevated); border-radius: var(--radius-sm); font-size: 0.88rem; color: var(--text-primary);">
+            <strong style="color: var(--accent-orange);">Form & Safety Cues:</strong> {{ ex.safety_cues }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card" style="text-align: center; padding: 40px;">
+    <h3>No Strength Workout Prescribed</h3>
+    <p style="color: var(--text-secondary);">Click one of the phase buttons above to generate a runner-specific S&C session.</p>
+</div>
+{% endif %}
+{% endblock %}

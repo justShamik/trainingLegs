@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Running Coach Chat - Personal Running Coach{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: var(--space-lg);">
+    <h1>AI RUNNING COACH CHAT</h1>
+    <p style="color: var(--text-secondary);">Ask questions grounded directly in your synced COROS training data and goal race targets.</p>
+</div>
+
+<!-- Sample Quick Questions -->
+<div style="margin-bottom: var(--space-md); display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+    <button type="button" class="btn-sample" onclick="askSample('What was my average pace and total volume over my recent runs?')">
+        📊 Recent Volume & Pace Analysis
+    </button>
+    <button type="button" class="btn-sample" onclick="askSample('Is my acute-to-chronic load ratio safe for my upcoming marathon goal?')">
+        📈 ACWR Load Safety Check
+    </button>
+    <button type="button" class="btn-sample" onclick="askSample('How has my sleep and HRV been trending this past week?')">
+        💤 Sleep & HRV Recovery Trend
+    </button>
+</div>
+
+<!-- Optional API Key Settings Header -->
+<details style="margin-bottom: var(--space-md); background: var(--bg-surface-elevated); padding: 10px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+    <summary style="font-size: 0.9rem; color: var(--text-secondary); cursor: pointer; font-weight: 600;">
+        🔑 Configure Gemini API Key (Optional for Live LLM Responses)
+    </summary>
+    <div style="margin-top: 10px; display: flex; gap: 8px;">
+        <input type="password" id="geminiApiKeyInput" placeholder="Paste your Gemini API key (e.g. AIzaSy...)" style="flex: 1; padding: 6px 12px; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px;">
+        <button type="button" onclick="saveApiKey()" style="background: var(--accent-orange); color: #fff; border: none; padding: 6px 14px; border-radius: 4px; font-weight: 600; cursor: pointer;">Save Key</button>
+    </div>
+</details>
+
+<!-- Chat Window -->
+<div class="card" style="height: 520px; display: flex; flex-direction: column; padding: 0; overflow: hidden;">
+    <!-- Messages Feed -->
+    <div id="chatFeed" style="flex: 1; padding: var(--space-md); overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-md);">
+        <div class="msg msg-coach">
+            <div class="msg-sender">AI COACH</div>
+            <div class="msg-text">Welcome! I am your AI Running Coach. I have analyzed your synced COROS data and goal profile. How can I help you today?</div>
+        </div>
+    </div>
+
+    <!-- Progress State Indicator (Hidden by Default) -->
+    <div id="loadingIndicator" style="display: none; padding: var(--space-sm) var(--space-md); background: var(--bg-surface-elevated); color: var(--accent-orange); font-family: var(--font-display); font-size: 1.1rem; border-top: 1px solid var(--border-color);">
+        ⚡ ANALYZING COROS TRAINING DATA & GENERATING RESPONSE...
+    </div>
+
+    <!-- Input Form -->
+    <form id="chatForm" onsubmit="submitQuestion(event)" style="display: flex; border-top: 1px solid var(--border-color); background: var(--bg-surface-elevated);">
+        <input type="text" id="userInput" placeholder="Ask your coach anything about your training data..." style="flex: 1; background: transparent; color: var(--text-primary); border: none; padding: var(--space-md); font-size: 1rem; outline: none;" required>
+        <button type="submit" id="sendBtn" style="background: var(--accent-orange); color: #fff; border: none; font-family: var(--font-display); font-size: 1.3rem; padding: 0 var(--space-lg); cursor: pointer; text-transform: uppercase;">
+            Send
+        </button>
+    </form>
+</div>
+
+<style>
+    .btn-sample {
+        background: var(--bg-surface-elevated);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-color);
+        padding: 8px 14px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+    }
+    .btn-sample:hover {
+        border-color: var(--accent-orange);
+        color: var(--text-primary);
+    }
+    .msg {
+        max-width: 85%;
+        padding: var(--space-md);
+        border-radius: var(--radius-md);
+        line-height: 1.5;
+    }
+    .msg-coach {
+        align-self: flex-start;
+        background: var(--bg-surface-elevated);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+    }
+    .msg-user {
+        align-self: flex-end;
+        background: var(--accent-orange);
+        color: #fff;
+    }
+    .msg-sender {
+        font-family: var(--font-display);
+        font-size: 1.0rem;
+        color: var(--accent-orange);
+        margin-bottom: 4px;
+        letter-spacing: 0.5px;
+    }
+    .msg-user .msg-sender {
+        color: rgba(255, 255, 255, 0.8);
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function saveApiKey() {
+        const key = document.getElementById('geminiApiKeyInput').value.trim();
+        if (!key) return;
+        const bodyData = new URLSearchParams({ gemini_api_key: key });
+        await fetch('/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: bodyData
+        });
+        alert('Gemini API Key saved successfully!');
+    }
+
+    function askSample(text) {
+        document.getElementById('userInput').value = text;
+        submitQuestion(new Event('submit'));
+    }
+
+    function appendMessage(sender, text, isUser = false) {
+        const feed = document.getElementById('chatFeed');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `msg ${isUser ? 'msg-user' : 'msg-coach'}`;
+        msgDiv.innerHTML = `<div class="msg-sender">${sender}</div><div class="msg-text">${text}</div>`;
+        feed.appendChild(msgDiv);
+        feed.scrollTop = feed.scrollHeight;
+    }
+
+    async function submitQuestion(e) {
+        if (e) e.preventDefault();
+        const input = document.getElementById('userInput');
+        const question = input.value.trim();
+        if (!question) return;
+
+        appendMessage('YOU', question, true);
+        input.value = '';
+
+        const loader = document.getElementById('loadingIndicator');
+        const sendBtn = document.getElementById('sendBtn');
+        loader.style.display = 'block';
+        sendBtn.disabled = true;
+
+        try {
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question })
+            });
+            const data = await res.json();
+            appendMessage('AI COACH', data.response || 'No response received.');
+        } catch (err) {
+            appendMessage('AI COACH', 'Error communicating with coach engine. Please try again.');
+        } finally {
+            loader.style.display = 'none';
+            sendBtn.disabled = false;
+        }
+    }
+</script>
+{% endblock %}

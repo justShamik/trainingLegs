@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Personal Running Coach{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: var(--space-lg); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--space-md);">
+    <div>
+        <h1>TRAINING DASHBOARD</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 4px;">Real-time performance metrics, recovery status, and activity history.</p>
+        <div style="font-size: 0.9rem; color: var(--accent-orange); font-weight: 600;">
+            📅 Last Synced with COROS: {{ summary.last_sync_display }}
+        </div>
+    </div>
+    <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+        <form method="POST" action="/sync">
+            <input type="hidden" name="full" value="0">
+            <button type="submit" style="background-color: var(--accent-orange); color: #fff; border: none; font-family: var(--font-display); font-size: 1.1rem; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
+                🔄 Sync Pending Data
+            </button>
+        </form>
+        <form method="POST" action="/sync">
+            <input type="hidden" name="full" value="1">
+            <button type="submit" style="background-color: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color); font-family: var(--font-display); font-size: 1.1rem; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
+                📅 Sync 365 Days History
+            </button>
+        </form>
+    </div>
+</div>
+
+{% if coros_auth and not coros_auth.is_authenticated %}
+<div class="card" style="margin-bottom: var(--space-lg); border-left: 4px solid var(--status-danger); background: rgba(255, 23, 68, 0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div>
+        <h4 style="color: var(--status-danger); margin: 0; font-family: var(--font-display);">🔑 COROS ACCOUNT NOT CONNECTED OR TOKEN EXPIRED</h4>
+        <p style="color: var(--text-secondary); margin: 4px 0 0 0; font-size: 0.9rem;">
+            {{ coros_auth.message }}
+        </p>
+    </div>
+    <form method="POST" action="/coros/login">
+        <button type="submit" style="background-color: var(--accent-orange); color: #fff; border: none; font-family: var(--font-display); font-size: 1rem; padding: 8px 18px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
+            🔑 Authenticate COROS via Browser
+        </button>
+    </form>
+</div>
+{% endif %}
+
+{% if sync_msg %}
+<div class="card" style="margin-bottom: var(--space-lg); border-left: 4px solid {% if sync_status == 'success' %}var(--status-success){% else %}var(--status-danger){% endif %}; background: {% if sync_status == 'success' %}rgba(0, 230, 118, 0.08){% else %}rgba(255, 23, 68, 0.08){% endif %};">
+    <div style="font-size: 0.95rem; color: var(--text-primary);">
+        <strong>Sync Result:</strong> {{ sync_msg }}
+    </div>
+</div>
+{% endif %}
+
+
+<!-- KPI Grid -->
+<div class="kpi-grid">
+    <div class="card">
+        <div class="card-header">Weekly Volume (Last 7 Days)</div>
+        <div class="card-value">{{ summary.weekly_volume_km }}<span class="card-unit">KM</span></div>
+        <div class="card-subtext">{{ summary.weekly_runs_count }} Sessions ({{ summary.weekly_duration_hrs }} hrs) in past 7 days</div>
+    </div>
+    <div class="card">
+        <div class="card-header">Weekly Elevation (Last 7 Days)</div>
+        <div class="card-value">{{ summary.weekly_elevation_m }}<span class="card-unit">M</span></div>
+        <div class="card-subtext">Total Vertical Gain (Last 7 Days)</div>
+    </div>
+    <div class="card">
+        <div class="card-header">Sleep Score (Latest Night)</div>
+        {% if summary.latest_sleep and summary.latest_sleep.sleep_score %}
+            <div class="card-value" style="color: var(--status-success);">{{ summary.latest_sleep.sleep_score }}<span class="card-unit">/100</span></div>
+            <div class="card-subtext">Single Night ({{ summary.latest_sleep.date }}): {{ (summary.latest_sleep.total_sleep_minutes / 60.0)|round(1) }} hrs total sleep</div>
+        {% else %}
+            <div class="card-value"><span class="badge-na">Not Available</span></div>
+            <div class="card-subtext">No recent sleep record</div>
+        {% endif %}
+    </div>
+    <div class="card">
+        <div class="card-header">Acute:Chronic Load (7d/28d Ratio)</div>
+        {% if summary.acwr %}
+            <div class="card-value" style="color: {% if summary.acwr > 1.3 %}var(--status-danger){% elif summary.acwr < 0.8 %}var(--status-warning){% else %}var(--status-success){% endif %};">
+                {{ summary.acwr }}
+            </div>
+            <div class="card-subtext">7-Day Acute / 28-Day Chronic Ratio (Optimal: 0.8 - 1.3)</div>
+        {% else %}
+            <div class="card-value"><span class="badge-na">Not Available</span></div>
+            <div class="card-subtext">Requires load data history</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Trend Charts Grid -->
+<h2>TRAINING & RECOVERY TRENDS</h2>
+<div class="charts-grid" style="margin-top: var(--space-md);">
+    <div class="chart-card">
+        <div class="chart-title"><h3>Weekly Volume & Distance (Last 12 Weeks)</h3></div>
+        <div style="height: 260px; position: relative;">
+            <canvas id="volumeChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-card">
+        <div class="chart-title"><h3>Sleep Duration & Quality (Last 30 Days)</h3></div>
+        <div style="height: 260px; position: relative;">
+            <canvas id="sleepChart"></canvas>
+        </div>
+    </div>
+    <div class="chart-card">
+        <div class="chart-title"><h3>HRV & Resting Heart Rate (Last 30 Days)</h3></div>
+        <div style="height: 260px; position: relative;">
+            <canvas id="physioChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities Table -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: var(--space-xl); margin-bottom: var(--space-md); flex-wrap: wrap; gap: 12px;">
+    <h2 style="margin: 0;">RECENT ACTIVITIES</h2>
+    <div style="display: flex; gap: 6px; align-items: center; background: var(--bg-surface-elevated); padding: 4px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+        <span style="font-size: 0.85rem; color: var(--text-muted); padding: 0 8px;">Window:</span>
+        <a href="/?days=7" style="padding: 4px 12px; border-radius: 4px; text-decoration: none; font-size: 0.85rem; font-weight: 600; {% if selected_days == 7 %}background: var(--accent-orange); color: #fff;{% else %}color: var(--text-secondary);{% endif %}">7 Days</a>
+        <a href="/?days=30" style="padding: 4px 12px; border-radius: 4px; text-decoration: none; font-size: 0.85rem; font-weight: 600; {% if selected_days == 30 or not selected_days %}background: var(--accent-orange); color: #fff;{% else %}color: var(--text-secondary);{% endif %}">30 Days (1 Mo)</a>
+        <a href="/?days=90" style="padding: 4px 12px; border-radius: 4px; text-decoration: none; font-size: 0.85rem; font-weight: 600; {% if selected_days == 90 %}background: var(--accent-orange); color: #fff;{% else %}color: var(--text-secondary);{% endif %}">90 Days</a>
+        <a href="/?days=0" style="padding: 4px 12px; border-radius: 4px; text-decoration: none; font-size: 0.85rem; font-weight: 600; {% if selected_days == 0 or selected_days >= 365 %}background: var(--accent-orange); color: #fff;{% else %}color: var(--text-secondary);{% endif %}">All Time</a>
+    </div>
+</div>
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Activity Name</th>
+                <th>Distance</th>
+                <th>Duration</th>
+                <th>Avg Pace</th>
+                <th>Avg HR</th>
+                <th>Elevation Gain</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if recent_activities %}
+                {% for act in recent_activities %}
+                <tr>
+                    <td>{{ act.date[:10] }}</td>
+                    <td><strong>{{ act.name or act.sport_type }}</strong></td>
+                    <td>{{ act.distance_km }} km</td>
+                    <td>{{ act.duration_min }} min</td>
+                    <td>{{ act.pace_str }}</td>
+                    <td>{% if act.avg_hr %}{{ act.avg_hr }} bpm{% else %}<span class="badge-na">N/A</span>{% endif %}</td>
+                    <td>{% if act.elevation_gain_m %}{{ act.elevation_gain_m|round(0) }} m{% else %}<span class="badge-na">N/A</span>{% endif %}</td>
+                    <td><a href="/activity/{{ act.id }}" class="nav-link" style="font-size: 0.9rem; color: var(--accent-orange);">View Details &rarr;</a></td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px;">No synced activities found for the selected window (showing default history). Perform a sync to populate data.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+    const trendsData = {{ trends | tojson }};
+    document.addEventListener('DOMContentLoaded', () => {
+        if (trendsData.weekly_volume) {
+            renderWeeklyVolumeChart('volumeChart', trendsData.weekly_volume);
+        }
+        if (trendsData.sleep_trend) {
+            renderSleepTrendChart('sleepChart', trendsData.sleep_trend);
+        }
+        if (trendsData.physio_trend) {
+            renderPhysioTrendChart('physioChart', trendsData.physio_trend);
+        }
+    });
+</script>
+{% endblock %}

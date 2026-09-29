@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal Running Coach - COROS Training Analysis & Performance Optimization Engine">
+    <title>{% block title %}Personal Running Coach{% endblock %}</title>
+    
+    <!-- Design System CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Chart.js for Trend Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header class="navbar">
+        <a href="/" class="nav-brand">
+            <div class="brand-icon"></div>
+            <div class="brand-title">RUNNING<span class="brand-accent">COACH</span></div>
+        </a>
+        <nav style="display: flex; align-items: center; gap: 16px;">
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+                <li><a href="/plan" class="nav-link {% if active_page == 'plan' %}active{% endif %}">Training Plan</a></li>
+                <li><a href="/strength" class="nav-link {% if active_page == 'strength' %}active{% endif %}">Strength & S&C</a></li>
+                <li><a href="/block-summary" class="nav-link {% if active_page == 'block_summary' %}active{% endif %}">Block Summary</a></li>
+                <li><a href="/profile" class="nav-link {% if active_page == 'profile' %}active{% endif %}">Goal Profile</a></li>
+                <li><a href="/chat" class="nav-link {% if active_page == 'chat' %}active{% endif %}">Coach Chat</a></li>
+            </ul>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                {% if coros_auth and coros_auth.is_authenticated %}
+                <span style="font-size: 0.8rem; background: rgba(0, 230, 118, 0.15); color: var(--status-success); border: 1px solid var(--status-success); padding: 4px 10px; border-radius: 12px; font-weight: 600;" title="{{ coros_auth.message }}">
+                    🟢 COROS Connected
+                </span>
+                {% else %}
+                <form method="POST" action="/coros/login" style="margin:0;">
+                    <button type="submit" style="font-size: 0.8rem; background: rgba(255, 23, 68, 0.15); color: var(--status-danger); border: 1px solid var(--status-danger); padding: 4px 10px; border-radius: 12px; font-weight: 600; cursor: pointer;" title="Click to open COROS login window">
+                        🔴 Connect COROS Account
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

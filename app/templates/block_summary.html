@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}4-Week Block Summary - Personal Running Coach{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: var(--space-lg); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--space-md);">
+    <div>
+        <h1>4-WEEK TRAINING BLOCK SUMMARY</h1>
+        <p style="color: var(--text-secondary);">Block-level performance assessment, volume compliance, and long-term adaptation analysis (FR-3.5).</p>
+    </div>
+</div>
+
+<!-- Active Block KPI Overview Grid -->
+<div class="kpi-grid" style="margin-bottom: var(--space-xl);">
+    <div class="kpi-card">
+        <div class="kpi-label">Block Prescribed Volume</div>
+        <div class="kpi-value" style="color: var(--accent-orange);">
+            {{ compliance.prescribed_total_km if compliance else '0.0' }} <span style="font-size: 1.1rem; color: var(--text-secondary);">KM</span>
+        </div>
+        <div class="kpi-subtitle">Total volume across active microcycle</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Completed Volume</div>
+        <div class="kpi-value" style="color: var(--status-success);">
+            {{ compliance.completed_total_km if compliance else '0.0' }} <span style="font-size: 1.1rem; color: var(--text-secondary);">KM</span>
+        </div>
+        <div class="kpi-subtitle">Actual volume executed</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Volume Compliance</div>
+        <div class="kpi-value" style="color: {% if compliance and compliance.volume_compliance_pct >= 85 %}var(--status-success){% elif compliance and compliance.volume_compliance_pct >= 70 %}var(--status-warning){% else %}var(--status-error){% endif %};">
+            {{ compliance.volume_compliance_pct if compliance else '0.0' }}%
+        </div>
+        <div class="kpi-subtitle">Target: >= 85% volume compliance</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">Session Execution</div>
+        <div class="kpi-value">
+            {{ compliance.completed_sessions if compliance else 0 }} / {{ compliance.total_sessions if compliance else 0 }}
+        </div>
+        <div class="kpi-subtitle">{{ compliance.session_compliance_pct if compliance else '0.0' }}% workout completion</div>
+    </div>
+</div>
+
+{% if overtraining and overtraining.is_flagged %}
+<!-- Fatigue & Risk Alert Card -->
+<div class="card" style="margin-bottom: var(--space-xl); border-left: 4px solid var(--status-error); background: rgba(255, 68, 68, 0.08);">
+    <h3 style="color: var(--status-error); margin-bottom: 8px;">⚠️ High Fatigue & Overtraining Risk Flagged</h3>
+    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+        {% for reason in overtraining.reasons %}
+        <li style="margin-bottom: 4px;">{{ reason }}</li>
+        {% endfor %}
+    </ul>
+    <p style="color: var(--text-secondary); margin-top: 10px; margin-bottom: 0;">
+        Recommended adjustment: Enforce mandatory deload week with {{ overtraining.recommended_adjustment_pct|abs }}% volume reduction.
+    </p>
+</div>
+{% endif %}
+
+<!-- Block Performance History -->
+<div class="card">
+    <h3 style="margin-bottom: var(--space-md); color: var(--accent-orange);">Historical Block Reports</h3>
+    {% if blocks %}
+    <div style="display: flex; flex-direction: column; gap: var(--space-md);">
+        {% for b in blocks %}
+        <div style="padding: 16px; background: var(--bg-surface-elevated); border-radius: var(--radius-md); border-left: 3px solid var(--accent-orange);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="margin: 0; font-family: var(--font-display); font-size: 1.4rem;">BLOCK {{ b.block_number }} ({{ b.start_date }} to {{ b.end_date }})</h4>
+                <span class="badge-na" style="background: rgba(0, 204, 136, 0.15); color: var(--status-success); border-color: var(--status-success);">
+                    COMPLIANCE: {{ b.compliance_pct }}%
+                </span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; font-size: 0.9rem; margin-bottom: 8px;">
+                <div><strong>Prescribed:</strong> {{ b.total_prescribed_km }} km</div>
+                <div><strong>Completed:</strong> {{ b.total_completed_km }} km</div>
+                <div><strong>Status:</strong> Completed</div>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 4px;"><strong>Achievements:</strong> {{ b.key_achievements }}</p>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 0;"><strong>Areas for Improvement:</strong> {{ b.areas_for_improvement }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: var(--text-secondary); font-size: 0.95rem;">
+        No historical 4-week blocks finalized yet. Block reports are automatically generated every 4 microcycles.
+    </p>
+    {% endif %}
+</div>
+{% endblock %}
