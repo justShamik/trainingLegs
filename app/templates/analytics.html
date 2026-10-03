@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %}Usage Analytics - Personal Running Coach{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="page-hero__text">
+        <span class="eyebrow eyebrow--accent">Analytics</span>
+        <h1 class="sc">USAGE ANALYTICS</h1>
+        <p class="lead">Self-hosted and private: stored only in your local coach.db. No cookies, no IP addresses, no chat text, nothing sent to third parties.</p>
+    </div>
+    <div class="segmented" role="group" aria-label="Analytics window">
+        {% for d in (7, 30, 90) %}
+        <a href="/analytics?days={{ d }}" class="segmented__item {% if days == d %}is-active active{% endif %}" data-track="analytics-window-{{ d }}">{{ d }}d</a>
+        {% endfor %}
+    </div>
+</section>
+
+<div class="kpi-grid" data-reveal-stagger="70">
+    <div class="card tone-peach"><div class="card-header">Sessions</div><div class="card-value" id="kpiSessions">{{ s.kpis.sessions }}</div><div class="card-subtext">last {{ days }} days</div></div>
+    <div class="card tone-sky"><div class="card-header">Page Views</div><div class="card-value" id="kpiViews">{{ s.kpis.page_views }}</div></div>
+    <div class="card tone-mint"><div class="card-header">Sync Success</div><div class="card-value">{% if s.kpis.sync_success_rate is not none %}{{ s.kpis.sync_success_rate }}<span class="card-unit">%</span>{% else %}--{% endif %}</div>
+        <div class="card-subtext">{{ s.kpis.sync_runs }} runs{% if s.kpis.avg_sync_s is not none %}, avg {{ s.kpis.avg_sync_s }}s{% endif %}</div></div>
+    <div class="card tone-rose"><div class="card-header">Errors</div><div class="card-value">{{ s.kpis.errors }}</div></div>
+    <div class="card tone-lavender"><div class="card-header">Avg Page Load</div><div class="card-value">{% if s.kpis.avg_page_load_ms is not none %}{{ s.kpis.avg_page_load_ms }}<span class="card-unit">ms</span>{% else %}--{% endif %}</div></div>
+</div>
+
+<div class="chart-card" style="margin-top: var(--space-lg);">
+    <div class="chart-title"><h3>Daily Activity (UTC days)</h3></div>
+    <div class="chart-canvas"><canvas id="dailyChart"></canvas></div>
+</div>
+
+<div class="grid-auto" style="margin-top: var(--space-lg);">
+    <div class="card">
+        <div class="card-header">Most Used Features</div>
+        {% if s.features %}
+        <table class="data-table"><tbody>
+            {% for f in s.features[:10] %}<tr><td>{{ f.feature }}</td><td>{{ f.count }}</td></tr>{% endfor %}
+        </tbody></table>
+        {% else %}<p style="color: var(--text-muted);">No feature usage recorded yet.</p>{% endif %}
+    </div>
+    <div class="card">
+        <div class="card-header">Feature Funnel</div>
+        {% set top = s.funnel[0].count or 1 %}
+        {% set tones = ['var(--pastel-peach)', 'var(--pastel-apricot)', 'var(--pastel-butter)', 'var(--pastel-mint)', 'var(--pastel-sky)', 'var(--pastel-lavender)', 'var(--pastel-rose)'] %}
+        {% for step in s.funnel %}
+        <div class="funnel-step" data-reveal>
+            <div class="funnel-step__row"><span>{{ step.step }}</span><span class="num">{{ step.count }}</span></div>
+            <div class="bar">
+                <div class="bar__fill" style="--tone: {{ tones[loop.index0 % 7] }}; width: {{ [100, (step.count * 100 / top)|round|int]|min }}%;"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card" style="margin-top: var(--space-lg);">
+    <div class="card-header">Per-Page Usage</div>
+    <div class="table-container">
+    <table class="data-table">
+        <thead><tr><th>Page</th><th>Views</th><th>Avg load (ms)</th><th>Avg time on page (s)</th></tr></thead>
+        <tbody>
+        {% for p in s.pages %}
+        <tr><td>{{ p.page }}</td><td>{{ p.views }}</td><td>{{ p.avg_load_ms if p.avg_load_ms is not none else '--' }}</td><td>{{ p.avg_time_s if p.avg_time_s is not none else '--' }}</td></tr>
+        {% else %}<tr><td colspan="4" class="empty">No page views recorded yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<div class="card" style="margin-top: var(--space-lg);">
+    <div class="card-header">Recent Errors</div>
+    <div class="table-container">
+    <table class="data-table">
+        <thead><tr><th>Time (local)</th><th>Page</th><th>Message</th></tr></thead>
+        <tbody>
+        {% for e in s.recent_errors %}
+        <tr><td><time class="utc-time" datetime="{{ e.ts }}">{{ e.ts }}</time></td><td>{{ e.page or '--' }}</td><td>{{ e.message }}</td></tr>
+        {% else %}<tr><td colspan="3" class="empty">No errors recorded.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+
+<div class="card" style="margin-top: var(--space-lg); display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+    <a href="/analytics/export.csv" class="btn btn-secondary btn-sm">Export CSV</a>
+    <a href="/analytics/export.json" class="btn btn-secondary btn-sm">Export JSON</a>
+    <form method="POST" action="/analytics/delete" style="margin:0;" onsubmit="return confirm('Delete ALL analytics data? This cannot be undone.');">
+        <button type="submit" id="deleteAnalytics" class="btn btn-danger btn-sm">Delete all analytics data</button>
+    </form>
+    <label style="color: var(--text-secondary); font-size:0.9rem; margin-left:auto; display: inline-flex; gap: 8px; align-items: center;">
+        <input type="checkbox" id="optOutToggle"> Disable analytics collection in this browser
+    </label>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+(function () {
+    try {
+        document.querySelectorAll('time.utc-time').forEach(function (t) {
+            var d = new Date(t.getAttribute('datetime'));
+            if (!isNaN(d)) t.textContent = d.toLocaleString();
+        });
+        var box = document.getElementById('optOutToggle');
+        if (box) {
+            box.checked = !!(window.analyticsOptedOut && window.analyticsOptedOut());
+            box.addEventListener('change', function () {
+                if (window.analyticsSetOptOut) window.analyticsSetOptOut(box.checked);
+            });
+        }
+        var daily = {{ s.daily|tojson }};
+        if (typeof Chart !== 'undefined' && document.getElementById('dailyChart')) {
+            var P = window.CoachPalette || { peach: '#ffb89a', sky: '#a6d0f5', grid: 'rgba(255,255,255,0.05)', tick: '#8b8b93', text: '#b3b3ba' };
+            var grid = { color: P.grid, drawTicks: false }, ticks = { color: P.tick, padding: 8 };
+            new Chart(document.getElementById('dailyChart').getContext('2d'), {
+                type: 'bar',
+                data: { labels: daily.map(function (d) { return d.date.slice(5); }),
+                    datasets: [
+                        { label: 'Page views', data: daily.map(function (d) { return d.page_views; }), backgroundColor: P.peach, borderRadius: 6, borderSkipped: false, maxBarThickness: 18 },
+                        { label: 'Actions', data: daily.map(function (d) { return d.actions; }), backgroundColor: P.sky, borderRadius: 6, borderSkipped: false, maxBarThickness: 18 }
+                    ] },
+                options: { responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: P.text, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 } } },
+                    scales: { x: { grid: { display: false }, border: { display: false }, ticks: ticks },
+                              y: { grid: grid, border: { display: false }, ticks: ticks, beginAtZero: true } } }
+            });
+        }
+    } catch (e) { /* fail silently */ }
+})();
+</script>
+{% endblock %}

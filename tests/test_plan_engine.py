@@ -79,7 +79,8 @@ def test_end_to_end_plan_generation_for_3_profiles():
     plan_10k = planner_10k.generate_plan()
     assert plan_10k["goal_distance"] == "10K"
     assert "Daniels" in plan_10k["methodology_name"]
-    assert len(plan_10k["sessions"]) == 7
+    assert len(plan_10k["sessions"]) == 35  # 5 weeks x 7 dated days
+    assert plan_10k["total_weeks"] == 5
 
     # 2. Marathon Goal Profile
     save_user_profile({

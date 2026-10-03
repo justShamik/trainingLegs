@@ -1,0 +1,2487 @@
+Daily Health Data — Last 365 days | Resting HR: 53 bpm | HRV Baseline: 42 ms
+Note: sleep entries are dated by their wake-up day.
+
+--- 20250930 ---
+Steps: 20,037 | Calories: 1,340 kcal | Exercise: 55 min | Floors: 6
+Stress: Avg 37
+Sleep Summary:
+  Total: 5h 42min | Deep: 1h 11min | Light: 2h 48min | REM: 1h 35min | Awake: 8 min
+  Sleep HR: Avg 56 bpm | Min 47 bpm | Max 66 bpm
+
+--- 20251001 ---
+Steps: 7,012 | Calories: 652 kcal | Exercise: 22 min | Floors: 5
+Stress: Avg 29
+Sleep Summary:
+  Total: 11h 21min | Deep: 1h 53min | Light: 6h 28min | REM: 1h 46min | Awake: 1h 14min
+  Sleep HR: Avg 54 bpm | Min 43 bpm | Max 64 bpm
+
+--- 20251002 ---
+Steps: 25,731 | Calories: 1,709 kcal | Exercise: 1h 29min | Floors: 2
+Stress: Avg 38
+Sleep Summary:
+  Total: 4h 0min | Deep: 1h 10min | Light: 2h 28min | REM: 18 min | Awake: 4 min
+  Sleep HR: Avg 52 bpm | Min 47 bpm | Max 62 bpm
+
+--- 20251003 ---
+Steps: 4,669 | Calories: 275 kcal | Exercise: 3 min | Floors: 2
+Stress: Avg 26
+Sleep Summary:
+  Total: 7h 15min | Deep: 1h 0min | Light: 4h 49min | REM: 1h 18min | Awake: 8 min
+  Sleep HR: Avg 56 bpm | Min 47 bpm | Max 66 bpm
+
+--- 20251004 ---
+Steps: 22,769 | Calories: 1,553 kcal | Exercise: 1h 33min | Floors: 3
+Stress: Avg 42
+Sleep Summary:
+  Total: 5h 20min | Deep: 1h 6min | Light: 3h 0min | REM: 59 min | Awake: 15 min
+  Sleep HR: Avg 57 bpm | Min 50 bpm | Max 76 bpm
+
+--- 20251005 ---
+Steps: 21,949 | Calories: 1,631 kcal | Exercise: 1h 19min | Floors: 21
+Stress: Avg 48
+Sleep Summary:
+  Total: 4h 59min | Deep: 38 min | Light: 2h 58min | REM: 1h 8min | Awake: 15 min
+  Sleep HR: Avg 59 bpm | Min 48 bpm | Max 69 bpm
+
+--- 20251006 ---
+Steps: 4,597 | Calories: 266 kcal | Exercise: 7 min
+Stress: Avg 36
+Sleep Summary:
+  Total: 6h 6min | Deep: 45 min | Light: 3h 34min | REM: 1h 30min | Awake: 17 min
+  Sleep HR: Avg 63 bpm | Min 53 bpm | Max 75 bpm
+
+--- 20251007 ---
+Steps: 9,308 | Calories: 357 kcal | Exercise: 6 min | Floors: 2
+Stress: Avg 38
+Sleep Summary:
+  Total: 5h 55min | Deep: 50 min | Light: 3h 32min | REM: 1h 19min | Awake: 14 min
+  Sleep HR: Avg 60 bpm | Min 50 bpm | Max 68 bpm
+
+--- 20251008 ---
+Steps: 10,875 | Calories: 826 kcal | Exercise: 42 min | Floors: 4
+Stress: Avg 45
+Sleep Summary:
+  Total: 5h 44min | Deep: 55 min | Light: 3h 34min | REM: 1h 2min | Awake: 13 min
+  Sleep HR: Avg 69 bpm | Min 61 bpm | Max 77 bpm
+
+--- 20251009 ---
+Steps: 6,023 | Calories: 352 kcal | Exercise: 3 min | Floors: 3
+Stress: Avg 31
+Sleep Summary:
+  Total: 10h 46min | Deep: 1h 1min | Light: 6h 40min | REM: 1h 42min | Awake: 1h 23min
+  Sleep HR: Avg 62 bpm | Min 49 bpm | Max 86 bpm
+
+--- 20251010 ---
+Steps: 8,490 | Calories: 523 kcal | Exercise: 8 min | Floors: 4
+Stress: Avg 31
+Sleep Summary:
+  Total: 2h 16min | Deep: 35 min | Light: 1h 1min | REM: 34 min | Awake: 6 min
+  Sleep HR: Avg 57 bpm | Min 54 bpm | Max 63 bpm
+
+--- 20251011 ---
+Steps: 3,181 | Calories: 313 kcal | Exercise: 4 min | Floors: 9
+Stress: Avg 27
+Sleep Summary:
+  Total: 8h 14min | Deep: 1h 41min | Light: 4h 42min | REM: 1h 30min | Awake: 21 min
+  Sleep HR: Avg 56 bpm | Min 50 bpm | Max 67 bpm
+
+--- 20251012 ---
+Steps: 31,370 | Calories: 2,310 kcal | Exercise: 2h 6min | Floors: 4
+Stress: Avg 42
+Sleep Summary:
+  Total: 4h 24min | Deep: 58 min | Light: 2h 38min | REM: 33 min | Awake: 15 min
+  Sleep HR: Avg 60 bpm | Min 54 bpm | Max 67 bpm
+
+--- 20251013 ---
+Steps: 3,047 | Calories: 262 kcal | Exercise: 3 min | Floors: 6
+Stress: Avg 24
+Sleep Summary:
+  Total: 7h 43min | Deep: 2h 26min | Light: 4h 15min | REM: 51 min | Awake: 11 min
+  Sleep HR: Avg 54 bpm | Min 47 bpm | Max 64 bpm
+
+--- 20251014 ---
+Steps: 3,622 | Calories: 287 kcal | Exercise: 0 min
+Stress: Avg 25
+Sleep Summary:
+  Total: 7h 39min | Deep: 2h 4min | Light: 3h 48min | REM: 1h 29min | Awake: 18 min
+  Sleep HR: Avg 53 bpm | Min 44 bpm | Max 63 bpm
+
+--- 20251015 ---
+Steps: 14,773 | Calories: 1,053 kcal | Exercise: 1h 25min | Floors: 5
+Stress: Avg 29
+Sleep Summary:
+  Total: 4h 1min | Deep: 57 min | Light: 2h 6min | REM: 48 min | Awake: 10 min
+  Sleep HR: Avg 48 bpm | Min 43 bpm | Max 60 bpm
+
+--- 20251016 ---
+Steps: 15,987 | Calories: 1,057 kcal | Exercise: 43 min | Floors: 12
+Stress: Avg 33
+Sleep Summary:
+  Total: 4h 0min | Deep: 1h 2min | Light: 2h 4min | REM: 49 min | Awake: 5 min
+  Sleep HR: Avg 50 bpm | Min 42 bpm | Max 59 bpm
+
+--- 20251017 ---
+Steps: 3,955 | Calories: 315 kcal | Exercise: 0 min | Floors: 6
+Stress: Avg 26
+Sleep Summary:
+  Total: 7h 46min | Deep: 1h 26min | Light: 4h 1min | REM: 1h 42min | Awake: 37 min
+  Sleep HR: Avg 54 bpm | Min 42 bpm | Max 70 bpm
+
+--- 20251018 ---
+Steps: 2,977 | Calories: 284 kcal | Exercise: 0 min | Floors: 14
+Stress: Avg 42
+Sleep Summary:
+  Total: 5h 0min | Deep: 1h 13min | Light: 3h 2min | REM: 36 min | Awake: 9 min
+  Sleep HR: Avg 74 bpm | Min 70 bpm | Max 92 bpm
+
+--- 20251019 ---
+Steps: 5,402 | Calories: 378 kcal | Exercise: 0 min | Floors: 6
+Stress: Avg 27
+Sleep Summary:
+  Total: 15h 10min | Deep: 4h 14min | Light: 6h 54min | REM: 3h 0min | Awake: 1h 2min
+  Sleep HR: Avg 56 bpm | Min 45 bpm | Max 80 bpm
+
+--- 20251020 ---
+Steps: 5,724 | Calories: 435 kcal | Exercise: 0 min | Floors: 8
+Stress: Avg 30
+Sleep Summary:
+  Total: 5h 7min | Deep: 1h 1min | Light: 2h 54min | REM: 48 min | Awake: 24 min
+  Sleep HR: Avg 53 bpm | Min 46 bpm | Max 60 bpm
+
+--- 20251021 ---
+Steps: 3,946 | Calories: 331 kcal | Exercise: 2 min | Floors: 6
+Stress: Avg 28
+Sleep Summary:
+  Total: 5h 12min | Deep: 1h 42min | Light: 2h 48min | REM: 30 min | Awake: 12 min
+  Sleep HR: Avg 58 bpm | Min 50 bpm | Max 69 bpm
+
+--- 20251022 ---
+Steps: 3,051 | Calories: 272 kcal | Exercise: 0 min | Floors: 6
+Stress: Avg 26
+Sleep Summary:
+  Total: 8h 6min | Deep: 1h 11min | Light: 4h 41min | REM: 2h 0min | Awake: 14 min
+  Sleep HR: Avg 51 bpm | Min 44 bpm | Max 69 bpm
+
+--- 20251023 ---
+Steps: 6,406 | Calories: 502 kcal | Exercise: 0 min | Floors: 5
+Stress: Avg 31
+Sleep Summary:
+  Total: 4h 5min | Deep: 49 min | Light: 2h 7min | REM: 13 min | Awake: 56 min
+  Sleep HR: Avg 51 bpm | Min 45 bpm | Max 64 bpm
+
+--- 20251024 ---
+Steps: 3,569 | Calories: 234 kcal | Exercise: 0 min | Floors: 5
+Stress: Avg 27
+Sleep Summary:
+  Total: 4h 58min | Deep: 47 min | Light: 2h 59min | REM: 1h 6min | Awake: 6 min
+  Sleep HR: Avg 54 bpm | Min 50 bpm | Max 63 bpm
+
+--- 20251025 ---
+Steps: 16,642 | Calories: 1,042 kcal | Exercise: 46 min | Floors: 11
+Stress: Avg 40
+Sleep Summary:
+  Total: 4h 25min | Deep: 52 min | Light: 2h 40min | REM: 41 min | Awake: 12 min
+  Sleep HR: Avg 53 bpm | Min 43 bpm | Max 64 bpm
+
+--- 20251026 ---
+Steps: 31,810 | Calories: 2,551 kcal | Exercise: 2h 41min | Floors: 8
+Stress: Avg 49
+Sleep Summary:
+  Total: 5h 21min | Deep: 1h 42min | Light: 3h 11min | REM: 23 min | Awake: 5 min
+  Sleep HR: Avg 59 bpm | Min 50 bpm | Max 70 bpm
+
+--- 20251027 ---
+Steps: 2,515 | Calories: 265 kcal | Exercise: 0 min | Floors: 3
+Stress: Avg 29
+Sleep Summary:
+  Total: 7h 31min | Deep: 1h 9min | Light: 4h 48min | REM: 1h 28min | Awake: 6 min
+  Sleep HR: Avg 63 bpm | Min 54 bpm | Max 74 bpm
+
+--- 20251028 ---
+Steps: 15,322 | Calories: 1,223 kcal | Exercise: 1h 25min
+Stress: Avg 37
+Sleep Summary:
+  Total: 7h 10min | Deep: 48 min | Light: 4h 30min | REM: 1h 38min | Awake: 14 min
+  Sleep HR: Avg 55 bpm | Min 49 bpm | Max 67 bpm
+
+--- 20251029 ---
+Steps: 1,717 | Calories: 156 kcal | Exercise: 0 min | Floors: 4
+Stress: Avg 24
+Sleep Summary:
+  Total: 9h 7min | Deep: 1h 40min | Light: 6h 8min | REM: 45 min | Awake: 34 min
+  Sleep HR: Avg 60 bpm | Min 53 bpm | Max 70 bpm
+
+--- 20251030 ---
+Steps: 14,524 | Calories: 1,183 kcal | Exercise: 1h 5min | Floors: 6
+Stress: Avg 38
+Sleep Summary:
+  Total: 3h 45min | Deep: 41 min | Light: 1h 52min | REM: 1h 5min | Awake: 7 min
+  Sleep HR: Avg 58 bpm | Min 49 bpm | Max 67 bpm
+
+--- 20251031 ---
+Steps: 3,223 | Calories: 285 kcal | Exercise: 4 min | Floors: 2
+Stress: Avg 24
+Sleep Summary:
+  Total: 7h 13min | Deep: 1h 20min | Light: 3h 41min | REM: 2h 3min | Awake: 9 min
+  Sleep HR: Avg 57 bpm | Min 50 bpm | Max 65 bpm
+
+--- 20251101 ---
+Steps: 27,907 | Calories: 1,983 kcal | Exercise: 2h 17min | Floors: 76
+Stress: Avg 40
+Sleep Summary:
+  Total: 4h 59min | Deep: 44 min | Light: 2h 33min | REM: 1h 33min | Awake: 9 min
+  Sleep HR: Avg 53 bpm | Min 49 bpm | Max 61 bpm
+
+--- 20251102 ---
+Steps: 8,911 | Calories: 684 kcal | Exercise: 8 min | Floors: 16
+Stress: Avg 34
+Sleep Summary:
+  Total: 6h 15min | Deep: 1h 32min | Light: 3h 26min | REM: 1h 10min | Awake: 7 min
+  Sleep HR: Avg 61 bpm | Min 50 bpm | Max 71 bpm
+
+--- 20251103 ---
+Steps: 5,342 | Calories: 382 kcal | Exercise: 7 min | Floors: 14
+Stress: Avg 28
+Sleep Summary:
+  Total: 4h 30min | Deep: 36 min | Light: 2h 51min | REM: 48 min | Awake: 15 min
+  Sleep HR: Avg 54 bpm | Min 43 bpm | Max 64 bpm
+
+--- 20251104 ---
+Steps: 10,434 | Calories: 754 kcal | Exercise: 42 min | Floors: 10
+Stress: Avg 30
+Sleep Summary:
+  Total: 5h 40min | Deep: 1h 13min | Light: 2h 50min | REM: 1h 27min | Awake: 10 min
+  Sleep HR: Avg 55 bpm | Min 48 bpm | Max 63 bpm
+
+--- 20251105 ---
+Steps: 2,113 | Calories: 223 kcal | Exercise: 1 min | Floors: 1
+Stress: Avg 21
+Sleep Summary:
+  Total: 14h 33min | Deep: 4h 14min | Light: 7h 18min | REM: 1h 48min | Awake: 1h 13min
+  Sleep HR: Avg 55 bpm | Min 43 bpm | Max 72 bpm
+
+--- 20251106 ---
+Steps: 4,443 | Calories: 314 kcal | Exercise: 1 min | Floors: 7
+Stress: Avg 28
+Sleep Summary:
+  Total: 5h 3min | Deep: 1h 17min | Light: 3h 19min | REM: 4 min | Awake: 23 min
+  Sleep HR: Avg 54 bpm | Min 47 bpm | Max 63 bpm
+
+--- 20251107 ---
+Steps: 15,547 | Calories: 1,015 kcal | Exercise: 1h 2min | Floors: 2
+Stress: Avg 30
+Sleep Summary:
+  Total: 6h 39min | Deep: 1h 43min | Light: 3h 19min | REM: 1h 26min | Awake: 11 min
+  Sleep HR: Avg 54 bpm | Min 46 bpm | Max 63 bpm
+
+--- 20251108 ---
+Steps: 1,534 | Calories: 187 kcal | Exercise: 1 min | Floors: 6
+Stress: Avg 31
+Sleep Summary:
+  Total: 4h 52min | Deep: 1h 23min | Light: 2h 35min | REM: 47 min | Awake: 7 min
+  Sleep HR: Avg 66 bpm | Min 56 bpm | Max 76 bpm
+
+--- 20251109 ---
+Steps: 35,018 | Calories: 2,697 kcal | Exercise: 2h 46min | Floors: 9
+Stress: Avg 45
+Sleep Summary:
+  Total: 3h 39min | Deep: 40 min | Light: 1h 55min | REM: 1h 2min | Awake: 2 min
+  Sleep HR: Avg 51 bpm | Min 45 bpm | Max 64 bpm
+
+--- 20251110 ---
+Steps: 2,739 | Calories: 217 kcal | Exercise: 2 min | Floors: 7
+Stress: Avg 24
+Sleep Summary:
+  Total: 9h 3min | Deep: 1h 38min | Light: 4h 59min | REM: 2h 14min | Awake: 12 min
+  Sleep HR: Avg 58 bpm | Min 49 bpm | Max 67 bpm
+
+--- 20251111 ---
+Steps: 10,238 | Calories: 805 kcal | Exercise: 1h 1min | Floors: 6
+Stress: Avg 29
+Sleep Summary:
+  Total: 8h 11min | Deep: 1h 12min | Light: 4h 20min | REM: 49 min | Awake: 1h 50min
+  Sleep HR: Avg 53 bpm | Min 45 bpm | Max 65 bpm
+
+--- 20251112 ---
+Steps: 5,156 | Calories: 472 kcal | Exercise: 24 min | Floors: 2
+Stress: Avg 24
+Sleep Summary:
+  Total: 7h 41min | Deep: 1h 51min | Light: 4h 12min | REM: 1h 23min | Awake: 15 min
+  Sleep HR: Avg 54 bpm | Min 44 bpm | Max 66 bpm
+
+--- 20251113 ---
+Steps: 4,709 | Calories: 301 kcal | Exercise: 4 min | Floors: 5
+Stress: Avg 26
+Sleep Summary:
+  Total: 7h 6min | Deep: 1h 36min | Light: 4h 16min | REM: 53 min | Awake: 21 min
+  Sleep HR: Avg 55 bpm | Min 46 bpm | Max 65 bpm
+
+--- 20251114 ---
+Steps: 12,371 | Calories: 758 kcal | Exercise: 50 min | Floors: 2
+Stress: Avg 26
+Sleep Summary:
+  Total: 8h 43min | Deep: 1h 8min | Light: 4h 22min | REM: 2h 53min | Awake: 20 min
+  Sleep HR: Avg 52 bpm | Min 44 bpm | Max 64 bpm
+
+--- 20251115 ---
+Steps: 14,456 | Calories: 1,237 kcal | Exercise: 1h 21min | Floors: 4
+Stress: Avg 31
+Sleep Summary:
+  Total: 5h 42min | Deep: 1h 16min | Light: 3h 4min | REM: 1h 19min | Awake: 3 min
+  Sleep HR: Avg 48 bpm | Min 40 bpm | Max 62 bpm
+
+--- 20251116 ---
+Steps: 17,651 | Calories: 1,207 kcal | Exercise: 1h 8min | Floors: 1
+Stress: Avg 30
+Sleep Summary:
+  Total: 3h 47min | Deep: 44 min | Light: 1h 57min | REM: 51 min | Awake: 15 min
+  Sleep HR: Avg 52 bpm | Min 43 bpm | Max 64 bpm
+
+--- 20251117 ---
+Steps: 8,401 | Calories: 427 kcal | Exercise: 6 min | Floors: 12
+Stress: Avg 28
+Sleep Summary:
+  Total: 6h 22min | Deep: 39 min | Light: 3h 21min | REM: 2h 12min | Awake: 10 min
+  Sleep HR: Avg 58 bpm | Min 49 bpm | Max 71 bpm
+
+--- 20251118 ---
+Steps: 15,118 | Calories: 1,037 kcal | Exercise: 1h 10min | Floors: 5
+Stress: Avg 31
+Sleep Summary:
+  Total: 7h 2min | Deep: 1h 29min | Light: 3h 15min | REM: 2h 7min | Awake: 11 min
+  Sleep HR: Avg 56 bpm | Min 49 bpm | Max 70 bpm
+
+--- 20251119 ---
+Steps: 4,909 | Calories: 302 kcal | Exercise: 3 min | Floors: 2
+Stress: Avg 24
+Sleep Summary:
+  Total: 8h 43min | Deep: 56 min | Light: 4h 54min | REM: 2h 37min | Awake: 16 min
+  Sleep HR: Avg 57 bpm | Min 49 bpm | Max 67 bpm
+
+--- 20251120 ---
+Steps: 12,901 | Calories: 991 kcal | Exercise: 1h 2min | Floors: 8
+Stress: Avg 30
+Sleep Summary:
+  Total: 6h 45min | Deep: 1h 34min | Light: 4h 1min | REM: 57 min | Awake: 13 min
+  Sleep HR: Avg 51 bpm | Min 42 bpm | Max 63 bpm
+
+--- 20251121 ---
+Steps: 3,499 | Calories: 286 kcal | Exercise: 0 min | Floors: 8
+Stress: Avg 24
+Sleep Summary:
+  Total: 4h 37min | Deep: 52 min | Light: 2h 33min | REM: 57 min | Awake: 15 min
+  Sleep HR: Avg 58 bpm | Min 52 bpm | Max 67 bpm
+
+--- 20251122 ---
+Steps: 3,285 | Calories: 241 kcal | Exercise: 1 min
+Stress: Avg 21
+Sleep Summary:
+  Total: 40 min | Deep: 0 min | Light: 35 min | REM: 0 min | Awake: 5 min
+  Sleep HR: Avg 49 bpm | Min 46 bpm | Max 54 bpm
+
+--- 20251123 ---
+Steps: 15,625 | Calories: 1,144 kcal | Exercise: 1h 8min | Floors: 11
+Stress: Avg 40
+Sleep Summary:
+  Total: 5h 0min | Deep: 1h 33min | Light: 2h 46min | REM: 34 min | Awake: 7 min
+  Sleep HR: Avg 64 bpm | Min 58 bpm | Max 74 bpm
+
+--- 20251124 ---
+Steps: 4,065 | Calories: 456 kcal | Exercise: 0 min | Floors: 10
+Stress: Avg 35
+
+--- 20251125 ---
+Steps: 11,306 | Calories: 970 kcal | Exercise: 59 min | Floors: 10
+Stress: Avg 34
+Sleep Summary:
+  Total: 2h 3min | Deep: 18 min | Light: 1h 4min | REM: 36 min | Awake: 5 min
+  Sleep HR: Avg 50 bpm | Min 42 bpm | Max 62 bpm
+
+--- 20251126 ---
+Steps: 1,811 | Calories: 208 kcal | Exercise: 0 min | Floors: 5
+Stress: Avg 36
+Sleep Summary:
+  Total: 8h 11min | Deep: 1h 1min | Light: 4h 51min | REM: 1h 50min | Awake: 29 min
+  Sleep HR: Avg 60 bpm | Min 52 bpm | Max 68 bpm
+
+--- 20251127 ---
+Steps: 2,114 | Calories: 210 kcal | Exercise: 0 min
+Stress: Avg 37
+Sleep Summary:
+  Total: 9h 10min | Deep: 1h 10min | Light: 4h 58min | REM: 2h 48min | Awake: 14 min
+  Sleep HR: Avg 70 bpm | Min 60 bpm | Max 82 bpm
+
+--- 20251128 ---
+Steps: 2,743 | Calories: 250 kcal | Exercise: 0 min | Floors: 7
+Stress: Avg 39
+Sleep Summary:
+  Total: 7h 34min | Deep: 1h 24min | Light: 3h 44min | REM: 1h 54min | Awake: 32 min
+  Sleep HR: Avg 58 bpm | Min 41 bpm | Max 89 bpm
+
+--- 20251129 ---
+Steps: 1,784 | Calories: 120 kcal | Exercise: 1 min
+Stress: Avg 32
+Sleep Summary:
+  Total: 6h 18min | Deep: 1h 19min | Light: 3h 55min | REM: 41 min | Awake: 23 min
+  Sleep HR: Avg 63 bpm | Min 55 bpm | Max 75 bpm
+
+--- 20251130 ---
+Steps: 8,983 | Calories: 498 kcal | Exercise: 4 min | Floors: 9
+Stress: Avg 37
+Sleep Summary:
+  Total: 4h 31min | Deep: 1h 1min | Light: 2h 17min | REM: 1h 8min | Awake: 5 min
+  Sleep HR: Avg 61 bpm | Min 56 bpm | Max 68 bpm
+
+--- 20251201 ---
+Steps: 2,601 | Calories: 265 kcal | Exercise: 0 min | Floors: 4
+Stress: Avg 30
+Sleep Summary:
+  Total: 8h 57min | Deep: 1h 36min | Light: 5h 19min | REM: 1h 48min | Awake: 14 min
+  Sleep HR: Avg 65 bpm | Min 55 bpm | Max 76 bpm
+
+--- 20251202 ---
+Steps: 15,759 | Calories: 1,335 kcal | Exercise: 1h 1min | Floors: 6
+Stress: Avg 43
+Sleep Summary:
+  Total: 3h 37min | Deep: 52 min | Light: 2h 23min | REM: 16 min | Awake: 6 min
+  Sleep HR: Avg 53 bpm | Min 46 bpm | Max 70 bpm
+
+--- 20251203 ---
+Steps: 2,506 | Calories: 215 kcal | Exercise: 0 min | Floors: 7
+Stress: Avg 27
+Sleep Summary:
+  Total: 3h 15min | Deep: 35 min | Light: 2h 23min | REM: 0 min | Awake: 17 min
+  Sleep HR: Avg 54 bpm | Min 48 bpm | Max 60 bpm
+
+--- 20251210 ---
+Steps: 2,722 | Calories: 231 kcal | Exercise: 0 min
+Stress: Avg 28
+Sleep Summary:
+  Total: 54 min | Deep: 17 min | Light: 28 min | REM: 0 min | Awake: 9 min
+  Sleep HR: Avg 53 bpm | Min 48 bpm | Max 57 bpm
+
+--- 20251211 ---
+Steps: 2,540 | Calories: 262 kcal | Exercise: 1 min | Floors: 8
+Stress: Avg 22
+Sleep Summary:
+  Total: 7h 37min | Deep: 1h 39min | Light: 4h 23min | REM: 50 min | Awake: 45 min
+  Sleep HR: Avg 55 bpm | Min 46 bpm | Max 64 bpm
+
+--- 20251212 ---
+Steps: 2,820 | Calories: 281 kcal | Exercise: 1 min | Floors: 4
+Stress: Avg 24
+Sleep Summary:
+  Total: 7h 17min | Deep: 2h 2min | Light: 3h 54min | REM: 1h 12min | Awake: 9 min
+  Sleep HR: Avg 55 bpm | Min 43 bpm | Max 67 bpm
+
+--- 20251213 ---
+Steps: 15,468 | Calories: 1,063 kcal | Exercise: 46 min | Floors: 5
+Stress: Avg 33
+Sleep Summary:
+  Total: 5h 50min | Deep: 1h 20min | Light: 2h 57min | REM: 1h 26min | Awake: 7 min
+  Sleep HR: Avg 53 bpm | Min 45 bpm | Max 63 bpm
+
+--- 20251214 ---
+Steps: 22,294 | Calories: 1,746 kcal | Exercise: 1h 53min | Floors: 4
+Stress: Avg 42
+Sleep Summary:
+  Total: 3h 38min | Deep: 41 min | Light: 1h 42min | REM: 31 min | Awake: 44 min
+  Sleep HR: Avg 59 bpm | Min 53 bpm | Max 66 bpm
+
+--- 20251215 ---
+Steps: 1,236 | Calories: 145 kcal | Exercise: 0 min
+Stress: Avg 24
+Sleep Summary:
+  Total: 8h 17min | Deep: 1h 48min | Light: 4h 18min | REM: 1h 45min | Awake: 26 min
+  Sleep HR: Avg 59 bpm | Min 48 bpm | Max 68 bpm
+
+--- 20251216 ---
+Steps: 12,995 | Calories: 850 kcal | Exercise: 43 min | Floors: 10
+Stress: Avg 34
+Sleep Summary:
+  Total: 7h 25min | Deep: 1h 37min | Light: 4h 9min | REM: 1h 16min | Awake: 23 min
+  Sleep HR: Avg 56 bpm | Min 49 bpm | Max 72 bpm
+
+--- 20251217 ---
+Steps: 4,877 | Calories: 364 kcal | Exercise: 1 min | Floors: 16
+Stress: Avg 28
+Sleep Summary:
+  Total: 8h 43min | Deep: 1h 12min | Light: 5h 15min | REM: 1h 20min | Awake: 56 min
+  Sleep HR: Avg 57 bpm | Min 47 bpm | Max 76 bpm
+
+--- 20251218 ---
+Steps: 5,236 | Calories: 355 kcal | Exercise: 0 min | Floors: 10
+Stress: Avg 28
+Sleep Summary:
+  Total: 7h 58min | Deep: 1h 33min | Light: 3h 47min | REM: 1h 22min | Awake: 1h 16min
+  Sleep HR: Avg 60 bpm | Min 48 bpm | Max 79 bpm
+
+--- 20251219 ---
+Steps: 7,872 | Calories: 536 kcal | Exercise: 29 min | Floors: 5
+Stress: Avg 30
+Sleep Summary:
+  Total: 5h 12min | Deep: 48 min | Light: 2h 53min | REM: 1h 14min | Awake: 17 min
+  Sleep HR: Avg 55 bpm | Min 48 bpm | Max 67 bpm
+
+--- 20251220 ---
+Steps: 8,947 | Calories: 422 kcal | Exercise: 1 min | Floors: 1
+Stress: Avg 34
+Sleep Summary:
+  Total: 8h 13min | Deep: 1h 42min | Light: 4h 27min | REM: 56 min | Awake: 1h 8min
+  Sleep HR: Avg 61 bpm | Min 54 bpm | Max 72 bpm
+
+--- 20251221 ---
+Steps: 36,433 | Calories: 2,754 kcal | Exercise: 2h 31min | Floors: 22
+Stress: Avg 50
+Sleep Summary:
+  Total: 5h 49min | Deep: 56 min | Light: 3h 13min | REM: 1h 24min | Awake: 16 min
+  Sleep HR: Avg 61 bpm | Min 53 bpm | Max 73 bpm
+
+--- 20251222 ---
+Steps: 3,493 | Calories: 235 kcal | Exercise: 0 min | Floors: 1
+Stress: Avg 30
+Sleep Summary:
+  Total: 4h 9min | Deep: 1h 12min | Light: 1h 39min | REM: 1h 8min | Awake: 10 min
+  Sleep HR: Avg 66 bpm | Min 57 bpm | Max 78 bpm
+
+--- 20251223 ---
+Steps: 16,428 | Calories: 1,278 kcal | Exercise: 1h 8min | Floors: 9
+Stress: Avg 33
+Sleep Summary:
+  Total: 8h 30min | Deep: 1h 57min | Light: 4h 54min | REM: 40 min | Awake: 59 min
+  Sleep HR: Avg 59 bpm | Min 47 bpm | Max 71 bpm
+
+--- 20251224 ---
+Steps: 2,783 | Calories: 810 kcal | Exercise: 59 min | Floors: 3
+Stress: Avg 34
+Sleep Summary:
+  Total: 8h 56min | Deep: 1h 35min | Light: 4h 31min | REM: 2h 45min | Awake: 5 min
+  Sleep HR: Avg 59 bpm | Min 43 bpm | Max 68 bpm
+
+--- 20251225 ---
+Steps: 19,367 | Calories: 1,539 kcal | Exercise: 1h 20min | Floors: 1
+Stress: Avg 42
+Sleep Summary:
+  Total: 6h 1min | Deep: 1h 36min | Light: 3h 13min | REM: 1h 1min | Awake: 11 min
+  Sleep HR: Avg 56 bpm | Min 50 bpm | Max 65 bpm
+
+--- 20251226 ---
+Steps: 3,423 | Calories: 292 kcal | Exercise: 0 min | Floors: 2
+Stress: Avg 34
+Sleep Summary:
+  Total: 5h 23min | Deep: 1h 14min | Light: 3h 15min | REM: 36 min | Awake: 18 min
+  Sleep HR: Avg 68 bpm | Min 60 bpm | Max 75 bpm
+
+--- 20251227 ---
+Steps: 12,890 | Calories: 808 kcal | Exercise: 39 min | Floors: 8
+Stress: Avg 35
+Sleep Summary:
+  Total: 5h 28min | Deep: 53 min | Light: 3h 24min | REM: 1h 3min | Awake: 8 min
+  Sleep HR: Avg 61 bpm | Min 51 bpm | Max 70 bpm
+
+--- 20251228 ---
+Steps: 4,510 | Calories: 301 kcal | Exercise: 0 min | Floors: 8
+Stress: Avg 33
+Sleep Summary:
+  Total: 7h 28min | Deep: 1h 17min | Light: 4h 37min | REM: 41 min | Awake: 53 min
+  Sleep HR: Avg 63 bpm | Min 48 bpm | Max 72 bpm
+
+--- 20251229 ---
+Steps: 27,195 | Calories: 2,111 kcal | Exercise: 2h 13min | Floors: 12
+Stress: Avg 40
+Sleep Summary:
+  Total: 7h 17min | Deep: 1h 29min | Light: 4h 21min | REM: 1h 10min | Awake: 17 min
+  Sleep HR: Avg 56 bpm | Min 45 bpm | Max 66 bpm
+
+--- 20251230 ---
+Steps: 2,552 | Calories: 166 kcal | Exercise: 1 min
+Stress: Avg 21
+Sleep Summary:
+  Total: 8h 38min | Deep: 1h 58min | Light: 4h 1min | REM: 2h 28min | Awake: 11 min
+  Sleep HR: Avg 58 bpm | Min 52 bpm | Max 70 bpm
+
+--- 20251231 ---
+Steps: 8,299 | Calories: 1,060 kcal | Exercise: 1h 18min | Floors: 7
+Stress: Avg 32
+Sleep Summary:
+  Total: 6h 45min | Deep: 1h 53min | Light: 3h 48min | REM: 54 min | Awake: 10 min
+  Sleep HR: Avg 56 bpm | Min 51 bpm | Max 69 bpm
+
+--- 20260101 ---
+Steps: 3,905 | Calories: 292 kcal | Exercise: 0 min | Floors: 1
+Stress: Avg 29
+Sleep Summary:
+  Total: 7h 14min | Deep: 1h 25min | Light: 4h 2min | REM: 1h 29min | Awake: 18 min
+  Sleep HR: Avg 63 bpm | Min 55 bpm | Max 75 bpm
+
+--- 20260102 ---
+Steps: 5,820 | Calories: 240 kcal | Exercise: 1 min | Floors: 4
+Stress: Avg 37
+Sleep Summary:
+  Total: 8h 33min | Deep: 1h 4min | Light: 4h 42min | REM: 2h 35min | Awake: 12 min
+  Sleep HR: Avg 68 bpm | Min 59 bpm | Max 79 bpm
+
+--- 20260103 ---
+Steps: 29,396 | Calories: 2,355 kcal | Exercise: 2h 24min | Floors: 10
+Stress: Avg 48
+Sleep Summary:
+  Total: 7h 4min | Deep: 1h 45min | Light: 4h 3min | REM: 1h 4min | Awake: 12 min
+  Sleep HR: Avg 61 bpm | Min 53 bpm | Max 69 bpm
+
+--- 20260104 ---
+Steps: 22,575 | Calories: 1,631 kcal | Exercise: 1h 44min | Floors: 1
+Stress: Avg 43
+Sleep Summary:
+  Total: 5h 47min | Deep: 25 min | Light: 3h 30min | REM: 1h 45min | Awake: 7 min
+  Sleep HR: Avg 65 bpm | Min 59 bpm | Max 79 bpm
+
+--- 20260105 ---
+Steps: 2,850 | Calories: 239 kcal | Exercise: 0 min
+Stress: Avg 26
+Sleep Summary:
+  Total: 8h 22min | Deep: 1h 46min | Light: 5h 15min | REM: 1h 5min | Awake: 16 min
+  Sleep HR: Avg 61 bpm | Min 53 bpm | Max 68 bpm
+
+--- 20260106 ---
+Steps: 7,495 | Calories: 747 kcal | Exercise: 1h 1min | Floors: 10
+Stress: Avg 32
+Sleep Summary:
+  Total: 7h 44min | Deep: 1h 9min | Light: 4h 8min | REM: 2h 14min | Awake: 13 min
+  Sleep HR: Avg 55 bpm | Min 40 bpm | Max 75 bpm
+
+--- 20260107 ---
+Steps: 16,488 | Calories: 1,290 kcal | Exercise: 1h 4min | Floors: 7
+Stress: Avg 31
+Sleep Summary:
+  Total: 5h 47min | Deep: 1h 33min | Light: 2h 46min | REM: 1h 13min | Awake: 15 min
+  Sleep HR: Avg 58 bpm | Min 47 bpm | Max 66 bpm
+
+--- 20260108 ---
+Steps: 5,284 | Calories: 319 kcal | Exercise: 1 min | Floors: 8
+Stress: Avg 33
+Sleep Summary:
+  Total: 6h 53min | Deep: 1h 25min | Light: 3h 47min | REM: 1h 26min | Awake: 15 min
+  Sleep HR: Avg 57 bpm | Min 48 bpm | Max 69 bpm
+
+--- 20260109 ---
+Steps: 13,501 | Calories: 1,034 kcal | Exercise: 1h 0min | Floors: 4
+Stress: Avg 31
+Sleep Summary:
+  Total: 4h 13min | Deep: 1h 8min | Light: 2h 41min | REM: 6 min | Awake: 18 min
+  Sleep HR: Avg 64 bpm | Min 60 bpm | Max 72 bpm
+
+--- 20260110 ---
+Steps: 4,787 | Calories: 232 kcal | Exercise: 0 min | Floors: 1
+Stress: Avg 23
+Sleep Summary:
+  Total: 9h 28min | Deep: 2h 30min | Light: 4h 28min | REM: 2h 15min | Awake: 15 min
+  Sleep HR: Avg 56 bpm | Min 41 bpm | Max 65 bpm
+
+--- 20260111 ---
+Steps: 20,732 | Calories: 1,625 kcal | Exercise: 1h 27min | Floors: 61
+Stress: Avg 39
+Sleep Summary:
+  Total: 3h 58min | Deep: 41 min | Light: 2h 3min | REM: 1h 4min | Awake: 10 min
+  Sleep HR: Avg 60 bpm | Min 54 bpm | Max 75 bpm
+
+--- 20260112 ---
+Steps: 3,057 | Calories: 261 kcal | Exercise: 0 min | Floors: 4
+Stress: Avg 26
+Sleep Summary:
+  Total: 6h 31min | Deep: 1h 11min | Light: 3h 21min | REM: 1h 52min | Awake: 7 min
+  Sleep HR: Avg 63 bpm | Min 55 bpm | Max 73 bpm
+
+--- 20260113 ---
+Steps: 5,019 | Calories: 385 kcal | Exercise: 2 min | Floors: 2
+Stress: Avg 28
+Sleep Summary:
+  Total: 6h 46min | Deep: 1h 51min | Light: 4h 0min | REM: 38 min | Awake: 17 min
+  Sleep HR: Avg 61 bpm | Min 50 bpm | Max 72 bpm
+
+--- 20260114 ---
+Steps: 5,565 | Calories: 310 kcal | Exercise: 1 min
+Stress: Avg 25
+Sleep Summary:
+  Total: 7h 9min | Deep: 1h 35min | Light: 4h 11min | REM: 1h 5min | Awake: 18 min
+  Sleep HR: Avg 62 bpm | Min 53 bpm | Max 74 bpm
+
+--- 20260115 ---
+Steps: 5,882 | Calories: 293 kcal | Exercise: 1 min | Floors: 2
+Stress: Avg 23
+Sleep Summary:
+  Total: 5h 13min | Deep: 48 min | Light: 2h 57min | REM: 1h 13min | Awake: 15 min
+  Sleep HR: Avg 57 bpm | Min 51 bpm | Max 68 bpm
+
+--- 20260116 ---
+Steps: 7,575 | Calories: 414 kcal | Exercise: 4 min
+Stress: Avg 30
+Sleep Summary:
+  Total: 1h 6min | Deep: 12 min | Light: 50 min | REM: 0 min | Awake: 4 min
+  Sleep HR: Avg 59 bpm | Min 55 bpm | Max 64 bpm
+
+--- 20260117 ---
+Steps: 12,180 | Calories: 960 kcal | Exercise: 48 min | Floors: 40
+Stress: Avg 45
+Sleep Summary:
+  Total: 8h 39min | Deep: 1h 59min | Light: 5h 13min | REM: 1h 15min | Awake: 12 min
+  Sleep HR: Avg 59 bpm | Min 50 bpm | Max 73 bpm
+
+--- 20260118 ---
+Steps: 61,991 | Calories: 4,456 kcal | Exercise: 5h 4min | Floors: 19
+Stress: Avg 63
+Sleep Summary:
+  Total: 5h 15min | Deep: 1h 8min | Light: 2h 16min | REM: 1h 45min | Awake: 6 min
+  Sleep HR: Avg 67 bpm | Min 51 bpm | Max 80 bpm
+
+--- 20260119 ---
+Steps: 6,847 | Calories: 416 kcal | Exercise: 1 min | Floors: 7
+Stress: Avg 31
+Sleep Summary:
+  Total: 5h 49min | Deep: 1h 22min | Light: 3h 8min | REM: 1h 17min | Awake: 2 min
+  Sleep HR: Avg 68 bpm | Min 61 bpm | Max 75 bpm
+
+--- 20260120 ---
+Steps: 9,241 | Calories: 372 kcal | Exercise: 7 min | Floors: 7
+Stress: Avg 30
+Sleep Summary:
+  Total: 6h 51min | Deep: 2h 9min | Light: 3h 42min | REM: 55 min | Awake: 5 min
+  Sleep HR: Avg 61 bpm | Min 46 bpm | Max 72 bpm
+
+--- 20260121 ---
+Steps: 2,787 | Calories: 223 kcal | Exercise: 0 min | Floors: 6
+Stress: Avg 22
+Sleep Summary:
+  Total: 9h 4min | Deep: 2h 22min | Light: 4h 53min | REM: 1h 28min | Awake: 21 min
+  Sleep HR: Avg 59 bpm | Min 50 bpm | Max 69 bpm
+
+--- 20260122 ---
+Steps: 5,222 | Calories: 262 kcal | Exercise: 4 min | Floors: 14
+Stress: Avg 23
+Sleep Summary:
+  Total: 6h 17min | Deep: 1h 16min | Light: 4h 3min | REM: 47 min | Awake: 11 min
+  Sleep HR: Avg 57 bpm | Min 50 bpm | Max 67 bpm
+
+--- 20260123 ---
+Steps: 3,043 | Calories: 273 kcal | Exercise: 2 min | Floors: 2
+Stress: Avg 34
+
+--- 20260124 ---
+Steps: 4,535 | Calories: 327 kcal | Exercise: 1 min
+Stress: Avg 32
+Sleep Summary:
+  Total: 8h 34min | Deep: 1h 47min | Light: 4h 18min | REM: 2h 15min | Awake: 14 min
+  Sleep HR: Avg 52 bpm | Min 41 bpm | Max 62 bpm
+
+--- 20260125 ---
+Steps: 3,719 | Calories: 331 kcal | Exercise: 1 min | Floors: 2
+Stress: Avg 37
+Sleep Summary:
+  Total: 3h 47min | Deep: 30 min | Light: 2h 22min | REM: 50 min | Awake: 5 min
+  Sleep HR: Avg 71 bpm | Min 61 bpm | Max 80 bpm
+
+--- 20260126 ---
+Steps: 3,271 | Calories: 244 kcal | Exercise: 1 min | Floors: 5
+Stress: Avg 25
+Sleep Summary:
+  Total: 7h 14min | Deep: 1h 16min | Light: 4h 15min | REM: 1h 35min | Awake: 8 min
+  Sleep HR: Avg 58 bpm | Min 47 bpm | Max 72 bpm
+
+--- 20260127 ---
+Steps: 2,205 | Calories: 150 kcal | Exercise: 0 min | Floors: 1
+Stress: Avg 27
+
+--- 20260128 ---
+Steps: 3,648 | Calories: 258 kcal | Exercise: 6 min | Floors: 7
+Stress: Avg 29
+Sleep Summary:
+  Total: 7h 29min | Deep: 1h 21min | Light: 4h 49min | REM: 1h 4min | Awake: 15 min
+  Sleep HR: Avg 56 bpm | Min 43 bpm | Max 71 bpm
+
+--- 20260129 ---
+Steps: 8,756 | Calories: 759 kcal | Exercise: 42 min | Floors: 4
+Stress: Avg 32
+Sleep Summary:
+  Total: 7h 48min | Deep: 57 min | Light: 5h 16min | REM: 1h 30min | Awake: 5 min
+  Sleep HR: Avg 55 bpm | Min 43 bpm | Max 66 bpm
+
+--- 20260130 ---
+Steps: 5,517 | Calories: 343 kcal | Exercise: 0 min | Floors: 1
+Stress: Avg 26
+Sleep Summary:
+  Total: 6h 56min | Deep: 1h 6min | Light: 4h 27min | REM: 1h 7min | Awake: 16 min
+  Sleep HR: Avg 58 bpm | Min 45 bpm | Max 74 bpm
+
+--- 20260131 ---
+Steps: 8,218 | Calories: 501 kcal | Exercise: 57 min | Floors: 4
+Stress: Avg 26
+Sleep Summary:
+  Total: 8h 54min | Deep: 2h 24min | Light: 4h 48min | REM: 1h 33min | Awake: 9 min
+  Sleep HR: Avg 56 bpm | Min 44 bpm | Max 72 bpm
+
+--- 20260201 ---
+Steps: 14,390 | Calories: 1,064 kcal | Exercise: 38 min | Floors: 10
+Stress: Avg 45
+Sleep Summary:
+  Total: 5h 52min | Deep: 1h 26min | Light: 3h 33min | REM: 43 min | Awake: 10 min
+  Sleep HR: Avg 57 bpm | Min 52 bpm | Max 64 bpm
+
+--- 20260202 ---
+Steps: 6,081 | Calories: 427 kcal | Exercise: 5 min
+Stress: Avg 26
+Sleep Summary:
+  Total: 8h 21min | Deep: 1h 52min | Light: 4h 25min | REM: 1h 21min | Awake: 43 min
+  Sleep HR: Avg 67 bpm | Min 51 bpm | Max 78 bpm
+
+--- 20260203 ---
+Steps: 10,623 | Calories: 786 kcal | Exercise: 38 min | Floors: 5
+Stress: Avg 31
+Sleep Summary:
+  Total: 7h 33min | Deep: 1h 24min | Light: 3h 51min | REM: 1h 41min | Awake: 37 min
+  Sleep HR: Avg 57 bpm | Min 51 bpm | Max 76 bpm
+
+--- 20260204 ---
+Steps: 2,745 | Calories: 284 kcal | Exercise: 0 min | Floors: 12
+Stress: Avg 20
+Sleep Summary:
+  Total: 8h 7min | Deep: 2h 22min | Light: 4h 30min | REM: 1h 10min | Awake: 5 min
+  Sleep HR: Avg 56 bpm | Min 49 bpm | Max 66 bpm
+
+--- 20260205 ---
+Steps: 15,833 | Calories: 1,243 kcal | Exercise: 1h 10min | Floors: 7
+Stress: Avg 34
+Sleep Summary:
+  Total: 6h 55min | Deep: 1h 35min | Light: 3h 47min | REM: 1h 9min | Awake: 24 min
+  Sleep HR: Avg 55 bpm | Min 49 bpm | Max 71 bpm
+
+--- 20260206 ---
+Steps: 1,734 | Calories: 192 kcal | Exercise: 0 min | Floors: 5
+Stress: Avg 29
+Sleep Summary:
+  Total: 1h 6min | Deep: 5 min | Light: 54 min | REM: 0 min | Awake: 7 min
+  Sleep HR: Avg 55 bpm | Min 47 bpm | Max 61 bpm
+
+--- 20260207 ---
+Steps: 23,155 | Calories: 1,662 kcal | Exercise: 1h 32min | Floors: 5
+Stress: Avg 35
+Sleep Summary:
+  Total: 5h 3min | Deep: 1h 10min | Light: 3h 37min | REM: 8 min | Awake: 8 min
+  Sleep HR: Avg 61 bpm | Min 52 bpm | Max 73 bpm
+
+--- 20260208 ---
+Steps: 6,378 | Calories: 372 kcal | Exercise: 4 min | Floors: 9
+Stress: Avg 23
+Sleep Summary:
+  Total: 8h 38min | Deep: 1h 38min | Light: 4h 13min | REM: 2h 37min | Awake: 10 min
+  Sleep HR: Avg 60 bpm | Min 50 bpm | Max 73 bpm
+
+--- 20260209 ---
+Steps: 4,529 | Calories: 352 kcal | Exercise: 3 min | Floors: 13
+Stress: Avg 24
+Sleep Summary:
+  Total: 6h 49min | Deep: 1h 12min | Light: 3h 46min | REM: 1h 2min | Awake: 49 min
+  Sleep HR: Avg 55 bpm | Min 46 bpm | Max 66 bpm
+
+--- 20260210 ---
+Steps: 12,408 | Calories: 894 kcal | Exercise: 38 min | Floors: 9
+Stress: Avg 40
+Sleep Summary:
+  Total: 6h 12min | Deep: 1h 25min | Light: 3h 36min | REM: 1h 8min | Awake: 3 min
+  Sleep HR: Avg 56 bpm | Min 49 bpm | Max 68 bpm
+
+--- 20260211 ---
+Steps: 5,765 | Calories: 330 kcal | Exercise: 0 min | Floors: 6
+Stress: Avg 27
+Sleep Summary:
+  Total: 9h 45min | Deep: 2h 12min | Light: 5h 25min | REM: 1h 13min | Awake: 55 min
+  Sleep HR: Avg 58 bpm | Min 51 bpm | Max 71 bpm
+
+--- 20260212 ---
+Steps: 5,045 | Calories: 412 kcal | Exercise: 5 min | Floors: 5
+Stress: Avg 34
+Sleep Summary:
+  Total: 7h 43min | Deep: 1h 53min | Light: 4h 34min | REM: 44 min | Awake: 32 min
+  Sleep HR: Avg 56 bpm | Min 49 bpm | Max 68 bpm
+
+--- 20260213 ---
+Steps: 20,626 | Calories: 1,424 kcal | Exercise: 55 min | Floors: 16
+Stress: Avg 55
+Sleep Summary:
+  Total: 4h 41min | Deep: 1h 23min | Light: 2h 49min | REM: 14 min | Awake: 15 min
+  Sleep HR: Avg 55 bpm | Min 48 bpm | Max 64 bpm
+
+--- 20260214 ---
+Steps: 2,602 | Calories: 217 kcal | Exercise: 0 min | Floors: 10
+Stress: Avg 43
+Sleep Summary:
+  Total: 3h 10min | Deep: 1h 3min | Light: 1h 20min | REM: 31 min | Awake: 16 min
+  Sleep HR: Avg 64 bpm | Min 57 bpm | Max 71 bpm
+
+--- 20260215 ---
+Steps: 18,516 | Calories: 1,489 kcal | Exercise: 1h 31min | Floors: 12
+Stress: Avg 41
+Sleep Summary:
+  Total: 6h 54min | Deep: 1h 14min | Light: 4h 28min | REM: 1h 6min | Awake: 6 min
+  Sleep HR: Avg 61 bpm | Min 55 bpm | Max 68 bpm
+
+--- 20260216 ---
+Steps: 1,833 | Calories: 179 kcal | Exercise: 2 min | Floors: 12
+Stress: Avg 31
+Sleep Summary:
+  Total: 8h 27min | Deep: 1h 54min | Light: 4h 31min | REM: 1h 51min | Awake: 11 min
+  Sleep HR: Avg 59 bpm | Min 51 bpm | Max 70 bpm
+
+--- 20260217 ---
+Steps: 919 | Calories: 91 kcal | Exercise: 0 min
+Stress: Avg 22
+Sleep Summary:
+  Total: 6h 24min | Deep: 1h 53min | Light: 3h 34min | REM: 49 min | Awake: 8 min
+  Sleep HR: Avg 56 bpm | Min 49 bpm | Max 68 bpm
+
+--- 20260218 ---
+Steps: 19,149 | Calories: 1,319 kcal | Exercise: 1h 14min | Floors: 12
+Stress: Avg 46
+Sleep Summary:
+  Total: 5h 28min | Deep: 48 min | Light: 3h 17min | REM: 1h 18min | Awake: 5 min
+  Sleep HR: Avg 55 bpm | Min 44 bpm | Max 67 bpm
+
+--- 20260219 ---
+Steps: 6,774 | Calories: 412 kcal | Exercise: 2 min | Floors: 5
+Stress: Avg 40
+Sleep Summary:
+  Total: 2h 42min | Deep: 34 min | Light: 1h 50min | REM: 12 min | Awake: 6 min
+  Sleep HR: Avg 73 bpm | Min 67 bpm | Max 82 bpm
+
+--- 20260220 ---
+Steps: 6,653 | Calories: 380 kcal | Exercise: 2 min | Floors: 8
+Stress: Avg 34
+
+--- 20260221 ---
+Steps: 8,363 | Calories: 398 kcal | Exercise: 0 min
+Stress: Avg 33
+Sleep Summary:
+  Total: 8h 27min | Deep: 1h 51min | Light: 4h 15min | REM: 2h 3min | Awake: 18 min
+  Sleep HR: Avg 62 bpm | Min 55 bpm | Max 73 bpm
+
+--- 20260222 ---
+Steps: 33,921 | Calories: 2,531 kcal | Exercise: 2h 15min | Floors: 1
+Stress: Avg 58
+Sleep Summary:
+  Total: 5h 29min | Deep: 1h 18min | Light: 2h 41min | REM: 1h 20min | Awake: 10 min
+  Sleep HR: Avg 66 bpm | Min 60 bpm | Max 74 bpm
+
+--- 20260223 ---
+Steps: 5,141 | Calories: 343 kcal | Exercise: 3 min | Floors: 11
+Stress: Avg 33
+Sleep Summary:
+  Total: 8h 36min | Deep: 1h 42min | Light: 5h 30min | REM: 1h 2min | Awake: 22 min
+  Sleep HR: Avg 63 bpm | Min 54 bpm | Max 71 bpm
+
+--- 20260224 ---
+Steps: 9,235 | Calories: 470 kcal | Exercise: 4 min
+Stress: Avg 34
+Sleep Summary:
+  Total: 5h 43min | Deep: 1h 58min | Light: 2h 36min | REM: 55 min | Awake: 14 min
+  Sleep HR: Avg 59 bpm | Min 51 bpm | Max 68 bpm
+
+--- 20260225 ---
+Steps: 7,284 | Calories: 425 kcal | Exercise: 3 min | Floors: 10
+Stress: Avg 30
+Sleep Summary:
+  Total: 5h 4min | Deep: 1h 3min | Light: 2h 36min | REM: 1h 2min | Awake: 23 min
+  Sleep HR: Avg 59 bpm | Min 53 bpm | Max 74 bpm
+
+--- 20260226 ---
+Steps: 11,013 | Calories: 589 kcal | Exercise: 4 min
+Stress: Avg 30
+Sleep Summary:
+  Total: 5h 34min | Deep: 1h 23min | Light: 2h 11min | REM: 1h 55min | Awake: 5 min
+  Sleep HR: Avg 59 bpm | Min 54 bpm | Max 66 bpm
+
+--- 20260227 ---
+Steps: 7,941 | Calories: 402 kcal | Exercise: 4 min
+Stress: Avg 27
+Sleep Summary:
+  Total: 7h 40min | Deep: 56 min | Light: 5h 8min | REM: 1h 24min | Awake: 12 min
+  Sleep HR: Avg 55 bpm | Min 47 bpm | Max 66 bpm
+
+--- 20260228 ---
+Steps: 7,288 | Calories: 443 kcal | Exercise: 3 min | Floors: 10
+Stress: Avg 28
+Sleep Summary:
+  Total: 5h 36min | Deep: 1h 8min | Light: 3h 2min | REM: 1h 13min | Awake: 13 min
+  Sleep HR: Avg 55 bpm | Min 46 bpm | Max 63 bpm
+
+--- 20260301 ---
+Steps: 7,827 | Calories: 546 kcal | Exercise: 5 min | Floors: 2
+Stress: Avg 37
+Sleep Summary:
+  Total: 7h 8min | Deep: 58 min | Light: 3h 44min | REM: 2h 0min | Awake: 26 min
+  Sleep HR: Avg 62 bpm | Min 49 bpm | Max 74 bpm
+
+--- 20260302 ---
+Steps: 9,676 | Calories: 481 kcal | Exercise: 4 min | Floors: 10
+Stress: Avg 30
+Sleep Summary:
+  Total: 5h 32min | Deep: 54 min | Light: 3h 27min | REM: 55 min | Awake: 16 min
+  Sleep HR: Avg 62 bpm | Min 56 bpm | Max 74 bpm
+
+--- 20260303 ---
+Steps: 9,564 | Calories: 561 kcal | Exercise: 1 min | Floors: 6
+Stress: Avg 28
+Sleep Summary:
+  Total: 6h 8min | Deep: 1h 24min | Light: 3h 15min | REM: 1h 21min | Awake: 8 min
+  Sleep HR: Avg 54 bpm | Min 48 bpm | Max 68 bpm
+
+--- 20260304 ---
+Steps: 8,297 | Calories: 577 kcal | Exercise: 0 min | Floors: 8
+Stress: Avg 35
+Sleep Summary:
+  Total: 7h 37min | Deep: 1h 52min | Light: 4h 30min | REM: 1h 4min | Awake: 11 min
+  Sleep HR: Avg 58 bpm | Min 48 bpm | Max 69 bpm
+
+--- 20260305 ---
+Steps: 9,363 | Calories: 565 kcal | Exercise: 7 min | Floors: 4
+Stress: Avg 37
+Sleep Summary:
+  Total: 10h 1min | Deep: 2h 14min | Light: 5h 5min | REM: 2h 0min | Awake: 42 min
+  Sleep HR: Avg 65 bpm | Min 55 bpm | Max 81 bpm
+
+--- 20260306 ---
+Steps: 6,984 | Calories: 405 kcal | Exercise: 1 min | Floors: 5
+Stress: Avg 29
+Sleep Summary:
+  Total: 3h 14min | Deep: 37 min | Light: 2h 26min | REM: 8 min | Awake: 3 min
+  Sleep HR: Avg 63 bpm | Min 59 bpm | Max 74 bpm
+
+--- 20260307 ---
+Steps: 6,508 | Calories: 494 kcal | Exercise: 0 min | Floors: 3
+Stress: Avg 39
+Sleep Summary:
+  Total: 5h 23min | Deep: 40 min | Light: 3h 20min | REM: 1h 10min | Awake: 13 min
+  Sleep HR: Avg 64 bpm | Min 55 bpm | Max 78 bpm
+
+--- 20260308 ---
+Steps: 8,235 | Calories: 638 kcal | Exercise: 0 min | Floors: 10
+Stress: Avg 31
+Sleep Summary:
+  Total: 10h 1min | Deep: 1h 53min | Light: 5h 56min | REM: 1h 41min | Awake: 31 min
+  Sleep HR: Avg 57 bpm | Min 48 bpm | Max 65 bpm
+
+--- 20260309 ---
+Steps: 4,534 | Calories: 259 kcal | Exercise: 1 min
+Stress: Avg 23
+Sleep Summary:
+  Total: 8h 30min | Deep: 2h 7min | Light: 4h 18min | REM: 1h 25min | Awake: 40 min
+  Sleep HR: Avg 56 bpm | Min 49 bpm | Max 65 bpm
+
+--- 20260310 ---
+Steps: 10,123 | Calories: 555 kcal | Exercise: 4 min
+Stress: Avg 27
+Sleep Summary:
+  Total: 6h 10min | Deep: 1h 3min | Light: 3h 45min | REM: 1h 14min | Awake: 8 min
+  Sleep HR: Avg 53 bpm | Min 47 bpm | Max 63 bpm
+
+--- 20260311 ---
+Steps: 9,749 | Calories: 467 kcal | Exercise: 4 min
+Stress: Avg 31
+Sleep Summary:
+  Total: 4h 49min | Deep: 58 min | Light: 3h 0min | REM: 44 min | Awake: 7 min
+  Sleep HR: Avg 63 bpm | Min 57 bpm | Max 74 bpm
+
+--- 20260312 ---
+Steps: 11,015 | Calories: 544 kcal | Exercise: 2 min
+Stress: Avg 29
+Sleep Summary:
+  Total: 6h 9min | Deep: 1h 24min | Light: 3h 41min | REM: 49 min | Awake: 15 min
+  Sleep HR: Avg 54 bpm | Min 33 bpm | Max 62 bpm
+
+--- 20260313 ---
+Steps: 8,905 | Calories: 517 kcal | Exercise: 2 min
+Stress: Avg 27
+Sleep Summary:
+  Total: 7h 27min | Deep: 2h 4min | Light: 3h 48min | REM: 1h 26min | Awake: 9 min
+  Sleep HR: Avg 56 bpm | Min 49 bpm | Max 67 bpm
+
+--- 20260314 ---
+Steps: 13,615 | Calories: 745 kcal | Exercise: 6 min
+Stress: Avg 30
+Sleep Summary:
+  Total: 5h 3min | Deep: 1h 19min | Light: 2h 6min | REM: 1h 26min | Awake: 12 min
+  Sleep HR: Avg 60 bpm | Min 48 bpm | Max 71 bpm
+
+--- 20260315 ---
+Steps: 7,270 | Calories: 458 kcal | Exercise: 2 min | Floors: 4
+Stress: Avg 31
+Sleep Summary:
+  Total: 5h 57min | Deep: 1h 16min | Light: 3h 22min | REM: 1h 14min | Awake: 5 min
+  Sleep HR: Avg 56 bpm | Min 51 bpm | Max 64 bpm
+
+--- 20260316 ---
+Steps: 14,062 | Calories: 900 kcal | Exercise: 29 min | Floors: 4
+Stress: Avg 30
+Sleep Summary:
+  Total: 5h 33min | Deep: 1h 32min | Light: 3h 5min | REM: 49 min | Awake: 7 min
+  Sleep HR: Avg 51 bpm | Min 44 bpm | Max 59 bpm
+
+--- 20260317 ---
+Steps: 12,296 | Calories: 589 kcal | Exercise: 1 min
+Stress: Avg 30
+Sleep Summary:
+  Total: 6h 0min | Deep: 1h 40min | Light: 2h 52min | REM: 47 min | Awake: 41 min
+  Sleep HR: Avg 53 bpm | Min 47 bpm | Max 62 bpm
+
+--- 20260318 ---
+Steps: 12,723 | Calories: 660 kcal | Exercise: 6 min
+Stress: Avg 29
+Sleep Summary:
+  Total: 5h 6min | Deep: 1h 23min | Light: 2h 41min | REM: 52 min | Awake: 10 min
+  Sleep HR: Avg 54 bpm | Min 48 bpm | Max 71 bpm
+
+--- 20260319 ---
+Steps: 9,448 | Calories: 466 kcal | Exercise: 1 min | Floors: 17
+Stress: Avg 27
+Sleep Summary:
+  Total: 7h 32min | Deep: 1h 56min | Light: 3h 50min | REM: 1h 13min | Awake: 33 min
+  Sleep HR: Avg 54 bpm | Min 42 bpm | Max 67 bpm
+
+--- 20260320 ---
+Steps: 4,694 | Calories: 262 kcal | Exercise: 0 min | Floors: 3
+Stress: Avg 23
+Sleep Summary:
+  Total: 7h 3min | Deep: 58 min | Light: 4h 19min | REM: 1h 1min | Awake: 45 min
+  Sleep HR: Avg 58 bpm | Min 48 bpm | Max 66 bpm
+
+--- 20260321 ---
+Steps: 13,532 | Calories: 712 kcal | Exercise: 4 min | Floors: 6
+Stress: Avg 31
+Sleep Summary:
+  Total: 6h 33min | Deep: 53 min | Light: 3h 59min | REM: 1h 14min | Awake: 27 min
+  Sleep HR: Avg 52 bpm | Min 45 bpm | Max 64 bpm
+
+--- 20260322 ---
+Steps: 7,097 | Calories: 465 kcal | Exercise: 6 min | Floors: 3
+Stress: Avg 28
+Sleep Summary:
+  Total: 7h 41min | Deep: 2h 22min | Light: 4h 30min | REM: 42 min | Awake: 7 min
+  Sleep HR: Avg 58 bpm | Min 50 bpm | Max 67 bpm
+
+--- 20260323 ---
+Steps: 14,556 | Calories: 987 kcal | Exercise: 41 min | Floors: 7
+Stress: Avg 39
+Sleep Summary:
+  Total: 4h 43min | Deep: 1h 21min | Light: 3h 13min | REM: 0 min | Awake: 9 min
+  Sleep HR: Avg 55 bpm | Min 48 bpm | Max 63 bpm
+
+--- 20260324 ---
+Steps: 9,668 | Calories: 526 kcal | Exercise: 8 min
+Stress: Avg 29
+Sleep Summary:
+  Total: 8h 20min | Deep: 2h 10min | Light: 4h 42min | REM: 0 min | Awake: 1h 28min
+  Sleep HR: Avg 57 bpm | Min 51 bpm | Max 67 bpm
+
+--- 20260325 ---
+Steps: 5,005 | Calories: 304 kcal | Exercise: 1 min | Floors: 5
+Stress: Avg 30
+Sleep Summary:
+  Total: 9h 39min | Deep: 1h 54min | Light: 5h 33min | REM: 1h 33min | Awake: 39 min
+  Sleep HR: Avg 59 bpm | Min 48 bpm | Max 69 bpm
+
+--- 20260326 ---
+Steps: 15,011 | Calories: 1,084 kcal | Exercise: 44 min | Floors: 2
+Stress: Avg 39
+Sleep Summary:
+  Total: 5h 43min | Deep: 47 min | Light: 3h 49min | REM: 1h 3min | Awake: 4 min
+  Sleep HR: Avg 55 bpm | Min 49 bpm | Max 72 bpm
+
+--- 20260327 ---
+Steps: 11,139 | Calories: 630 kcal | Exercise: 1 min
+Stress: Avg 30
+Sleep Summary:
+  Total: 6h 34min | Deep: 1h 20min | Light: 3h 43min | REM: 1h 17min | Awake: 14 min
+  Sleep HR: Avg 57 bpm | Min 49 bpm | Max 64 bpm
+
+--- 20260328 ---
+Steps: 18,785 | Calories: 1,095 kcal | Exercise: 55 min | Floors: 12
+Stress: Avg 44
+Sleep Summary:
+  Total: 5h 29min | Deep: 40 min | Light: 3h 17min | REM: 1h 23min | Awake: 9 min
+  Sleep HR: Avg 60 bpm | Min 52 bpm | Max 70 bpm
+
+--- 20260329 ---
+Steps: 6,773 | Calories: 434 kcal | Exercise: 3 min | Floors: 8
+Stress: Avg 30
+Sleep Summary:
+  Total: 10h 16min | Deep: 2h 14min | Light: 5h 57min | REM: 1h 49min | Awake: 16 min
+  Sleep HR: Avg 56 bpm | Min 48 bpm | Max 65 bpm
+
+--- 20260330 ---
+Steps: 14,721 | Calories: 1,127 kcal | Exercise: 32 min | Floors: 8
+Stress: Avg 46
+Sleep Summary:
+  Total: 6h 1min | Deep: 1h 29min | Light: 2h 54min | REM: 1h 30min | Awake: 8 min
+  Sleep HR: Avg 62 bpm | Min 48 bpm | Max 78 bpm
+
+--- 20260331 ---
+Steps: 12,462 | Calories: 744 kcal | Exercise: 10 min
+Stress: Avg 29
+Sleep Summary:
+  Total: 6h 20min | Deep: 1h 30min | Light: 3h 48min | REM: 40 min | Awake: 22 min
+  Sleep HR: Avg 54 bpm | Min 46 bpm | Max 64 bpm
+
+--- 20260401 ---
+Steps: 15,617 | Calories: 1,205 kcal | Exercise: 36 min | Floors: 17
+Stress: Avg 42
+Sleep Summary:
+  Total: 5h 46min | Deep: 59 min | Light: 3h 10min | REM: 1h 30min | Awake: 7 min
+  Sleep HR: Avg 56 bpm | Min 49 bpm | Max 64 bpm
+
+--- 20260402 ---
+Steps: 11,329 | Calories: 681 kcal | Exercise: 11 min
+Stress: Avg 32
+Sleep Summary:
+  Total: 6h 34min | Deep: 54 min | Light: 3h 41min | REM: 1h 48min | Awake: 11 min
+  Sleep HR: Avg 54 bpm | Min 48 bpm | Max 63 bpm
+
+--- 20260403 ---
+Steps: 7,504 | Calories: 579 kcal | Exercise: 0 min
+Stress: Avg 30
+Sleep Summary:
+  Total: 8h 1min | Deep: 1h 21min | Light: 4h 47min | REM: 1h 25min | Awake: 28 min
+  Sleep HR: Avg 57 bpm | Min 48 bpm | Max 69 bpm
+
+--- 20260404 ---
+Steps: 4,541 | Calories: 571 kcal | Exercise: 0 min
+Stress: Avg 28
+Sleep Summary:
+  Total: 8h 14min | Deep: 2h 8min | Light: 4h 34min | REM: 1h 8min | Awake: 24 min
+  Sleep HR: Avg 56 bpm | Min 48 bpm | Max 67 bpm
+
+--- 20260405 ---
+Steps: 20,011 | Calories: 1,431 kcal | Exercise: 1h 6min | Floors: 19
+Stress: Avg 43
+Sleep Summary: (Score: 44)
+  Total: 4h 25min | Awake: 54 min
+  Deep: 1h 7min | Light: 2h 29min | REM: 49 min
+
+--- 20260406 ---
+Steps: 5,871 | Calories: 360 kcal | Exercise: 0 min | Floors: 16
+Stress: Avg 32
+Sleep Summary: (Score: 74)
+  Total: 9h 0min | Awake: 47 min
+  Deep: 1h 41min | Light: 4h 28min | REM: 2h 12min
+
+--- 20260407 ---
+Steps: 9,208 | Calories: 523 kcal | Exercise: 16 min
+Stress: Avg 34
+Sleep Summary: (Score: 95)
+  Total: 6h 56min | Awake: 11 min
+  Deep: 1h 6min | Light: 3h 58min | REM: 1h 22min
+
+--- 20260408 ---
+Steps: 10,465 | Calories: 566 kcal | Exercise: 7 min | Floors: 6
+Stress: Avg 38
+Sleep Summary: (Score: 72)
+  Total: 5h 38min | Awake: 5 min
+  Deep: 1h 5min | Light: 2h 59min | REM: 1h 2min
+
+--- 20260409 ---
+Steps: 22,424 | Calories: 1,384 kcal | Exercise: 1h 13min | Floors: 14
+Stress: Avg 39
+Sleep Summary: (Score: 63)
+  Total: 7h 5min | Awake: 11 min
+  Deep: 2h 29min | Light: 4h 18min | REM: 18 min
+
+--- 20260410 ---
+Steps: 9,503 | Calories: 528 kcal | Exercise: 6 min | Floors: 10
+Stress: Avg 35
+Sleep Summary: (Score: 85)
+  Total: 7h 46min | Awake: 29 min
+  Deep: 1h 32min | Light: 4h 35min | REM: 1h 39min
+
+--- 20260411 ---
+Steps: 12,318 | Calories: 1,171 kcal | Exercise: 1h 1min | Floors: 16
+Stress: Avg 38
+Sleep Summary: (Score: 78)
+  Total: 8h 25min | Awake: 11 min
+  Deep: 53 min | Light: 4h 31min | REM: 1h 19min
+
+--- 20260412 ---
+Steps: 8,009 | Calories: 624 kcal | Exercise: 0 min | Floors: 10
+Stress: Avg 36
+Sleep Summary: (Score: 95)
+  Total: 6h 47min | Awake: 5 min
+  Deep: 45 min | Light: 2h 34min | REM: 1h 3min
+
+--- 20260413 ---
+Steps: 29,077 | Calories: 1,961 kcal | Exercise: 2h 0min | Floors: 3
+Stress: Avg 44
+Sleep Summary: (Score: 93)
+  Total: 6h 32min | Awake: 7 min
+  Deep: 49 min | Light: 3h 1min | REM: 1h 3min
+
+--- 20260414 ---
+Steps: 8,662 | Calories: 479 kcal | Exercise: 0 min
+Stress: Avg 35
+Sleep Summary: (Score: 56)
+  Total: 4h 30min | Awake: 12 min
+  Deep: 44 min | Light: 2h 27min | REM: 31 min
+
+--- 20260415 ---
+Steps: 6,785 | Calories: 417 kcal | Exercise: 1 min
+Stress: Avg 30
+Sleep Summary: (Score: 93)
+  Total: 9h 47min | Awake: 6 min
+  Deep: 1h 53min | Light: 4h 29min | REM: 2h 54min
+
+--- 20260416 ---
+Steps: 9,563 | Calories: 552 kcal | Exercise: 5 min
+Stress: Avg 34
+Sleep Summary: (Score: 78)
+  Total: 8h 13min | Awake: 13 min
+  Deep: 59 min | Light: 4h 46min | REM: 1h 38min
+
+--- 20260417 ---
+Steps: 7,839 | Calories: 470 kcal | Exercise: 3 min
+Stress: Avg 33
+Sleep Summary: (Score: 78)
+  Total: 7h 26min | Awake: 11 min
+  Deep: 50 min | Light: 2h 46min | REM: 1h 58min
+
+--- 20260418 ---
+Steps: 12,192 | Calories: 808 kcal | Exercise: 17 min | Floors: 12
+Stress: Avg 38
+Sleep Summary: (Score: 97)
+  Total: 6h 39min | Awake: 8 min
+  Deep: 1h 19min | Light: 3h 49min | REM: 1h 31min
+
+--- 20260419 ---
+Steps: 23,233 | Calories: 1,744 kcal | Exercise: 1h 40min | Floors: 8
+Stress: Avg 44
+Sleep Summary: (Score: 69)
+  Total: 5h 38min | Awake: 15 min
+  Deep: 59 min | Light: 3h 26min | REM: 1h 13min
+
+--- 20260420 ---
+Steps: 9,715 | Calories: 696 kcal | Exercise: 2 min | Floors: 3
+Stress: Avg 37
+Sleep Summary: (Score: 92)
+  Total: 7h 6min | Awake: 17 min
+  Deep: 1h 34min | Light: 3h 24min | REM: 1h 21min
+
+--- 20260421 ---
+Steps: 20,438 | Calories: 1,420 kcal | Exercise: 1h 1min | Floors: 24
+Stress: Avg 44
+Sleep Summary:
+  Total: 3h 46min | Awake: 0 min
+  Deep: 0 min | Light: 0 min | REM: 0 min
+
+--- 20260422 ---
+Steps: 8,951 | Calories: 689 kcal | Exercise: 15 min | Floors: 16
+Stress: Avg 40
+Sleep Summary: (Score: 61)
+  Total: 8h 24min | Awake: 1h 3min
+  Deep: 1h 57min | Light: 4h 54min | REM: 1h 33min
+
+--- 20260423 ---
+Steps: 19,496 | Calories: 1,345 kcal | Exercise: 1h 0min | Floors: 5
+Stress: Avg 45
+Sleep Summary: (Score: 53)
+  Total: 4h 58min | Awake: 14 min
+  Deep: 1h 12min | Light: 3h 0min | REM: 46 min
+
+--- 20260424 ---
+Steps: 8,465 | Calories: 584 kcal | Exercise: 3 min | Floors: 7
+Stress: Avg 35
+Sleep Summary: (Score: 88)
+  Total: 7h 46min | Awake: 24 min
+  Deep: 1h 16min | Light: 4h 14min | REM: 1h 7min
+
+--- 20260425 ---
+Steps: 20,313 | Calories: 1,817 kcal | Exercise: 1h 55min | Floors: 6
+Stress: Avg 47
+Sleep Summary: (Score: 92)
+  Total: 6h 4min | Awake: 12 min
+  Deep: 1h 13min | Light: 3h 50min | REM: 1h 1min
+
+--- 20260426 ---
+Steps: 8,536 | Calories: 610 kcal | Exercise: 0 min
+Stress: Avg 40
+Sleep Summary: (Score: 68)
+  Total: 7h 19min | Awake: 13 min
+  Deep: 2h 2min | Light: 4h 51min | REM: 26 min
+
+--- 20260427 ---
+Steps: 7,804 | Calories: 468 kcal | Exercise: 10 min | Floors: 3
+Stress: Avg 41
+
+--- 20260428 ---
+Steps: 16,986 | Calories: 1,082 kcal | Exercise: 45 min | Floors: 14
+Stress: Avg 36
+Sleep Summary: (Score: 56)
+  Total: 5h 0min | Awake: 12 min
+  Deep: 1h 1min | Light: 2h 18min | REM: 1h 41min
+
+--- 20260429 ---
+Steps: 8,862 | Calories: 559 kcal | Exercise: 6 min
+Stress: Avg 29
+Sleep Summary: (Score: 97)
+  Total: 8h 54min | Awake: 14 min
+  Deep: 1h 32min | Light: 3h 52min | REM: 1h 35min
+
+--- 20260430 ---
+Steps: 20,913 | Calories: 1,326 kcal | Exercise: 55 min | Floors: 9
+Stress: Avg 39
+Sleep Summary: (Score: 59)
+  Total: 4h 39min | Awake: 10 min
+  Deep: 54 min | Light: 2h 44min | REM: 1h 1min
+
+--- 20260501 ---
+Steps: 4,238 | Calories: 335 kcal | Exercise: 0 min
+Stress: Avg 29
+Sleep Summary: (Score: 84)
+  Total: 9h 9min | Awake: 32 min
+  Deep: 2h 4min | Light: 4h 54min | REM: 2h 11min
+
+--- 20260502 ---
+Steps: 6,288 | Calories: 434 kcal | Exercise: 5 min
+Stress: Avg 33
+Sleep Summary: (Score: 84)
+  Total: 9h 4min | Awake: 24 min
+  Deep: 1h 48min | Light: 3h 52min | REM: 45 min
+
+--- 20260503 ---
+Steps: 13,882 | Calories: 1,115 kcal | Exercise: 54 min | Floors: 9
+Stress: Avg 40
+Sleep Summary: (Score: 84)
+  Total: 6h 39min | Awake: 22 min
+  Deep: 1h 29min | Light: 4h 21min | REM: 49 min
+
+--- 20260504 ---
+Steps: 5,286 | Calories: 531 kcal | Exercise: 1 min | Floors: 19
+Stress: Avg 33
+Sleep Summary: (Score: 54)
+  Total: 4h 55min | Awake: 12 min
+  Deep: 1h 19min | Light: 2h 10min | REM: 1h 26min
+
+--- 20260505 ---
+Steps: 18,603 | Calories: 1,255 kcal | Exercise: 58 min | Floors: 1
+Stress: Avg 38
+Sleep Summary: (Score: 80)
+  Total: 5h 56min | Awake: 6 min
+  Deep: 59 min | Light: 2h 55min | REM: 2h 2min
+
+--- 20260506 ---
+Steps: 17,016 | Calories: 1,117 kcal | Exercise: 1h 6min | Floors: 13
+Stress: Avg 35
+Sleep Summary:
+  Total: 3h 23min | Awake: 0 min
+  Deep: 0 min | Light: 0 min | REM: 0 min
+
+--- 20260507 ---
+Steps: 6,889 | Calories: 527 kcal | Exercise: 0 min | Floors: 13
+Stress: Avg 30
+Sleep Summary: (Score: 44)
+  Total: 5h 54min | Awake: 1h 9min
+  Deep: 39 min | Light: 3h 30min | REM: 46 min
+
+--- 20260508 ---
+Steps: 9,143 | Calories: 482 kcal | Exercise: 4 min | Floors: 3
+Stress: Avg 35
+Sleep Summary: (Score: 61)
+  Total: 8h 51min | Awake: 1h 3min
+  Deep: 1h 54min | Light: 5h 44min | REM: 1h 13min
+
+--- 20260509 ---
+Steps: 3,011 | Calories: 222 kcal | Exercise: 2 min
+Stress: Avg 28
+Sleep Summary: (Score: 58)
+  Total: 11h 32min | Awake: 38 min
+  Deep: 2h 1min | Light: 5h 48min | REM: 45 min
+
+--- 20260510 ---
+Steps: 20,493 | Calories: 1,600 kcal | Exercise: 1h 24min | Floors: 25
+Stress: Avg 44
+Sleep Summary: (Score: 40)
+  Total: 4h 30min | Awake: 25 min
+  Deep: 1h 19min | Light: 2h 58min | REM: 13 min
+
+--- 20260511 ---
+Steps: 6,732 | Calories: 571 kcal | Exercise: 4 min | Floors: 15
+Stress: Avg 32
+Sleep Summary: (Score: 91)
+  Total: 6h 53min | Awake: 18 min
+  Deep: 1h 53min | Light: 3h 24min | REM: 1h 36min
+
+--- 20260512 ---
+Steps: 17,842 | Calories: 1,325 kcal | Exercise: 1h 1min | Floors: 14
+Stress: Avg 38
+Sleep Summary: (Score: 64)
+  Total: 5h 24min | Awake: 8 min
+  Deep: 1h 16min | Light: 2h 38min | REM: 55 min
+
+--- 20260513 ---
+Steps: 6,330 | Calories: 450 kcal | Exercise: 3 min | Floors: 2
+Stress: Avg 32
+Sleep Summary: (Score: 98)
+  Total: 7h 43min | Awake: 10 min
+  Deep: 1h 30min | Light: 4h 20min | REM: 1h 53min
+
+--- 20260514 ---
+Steps: 6,999 | Calories: 494 kcal | Exercise: 3 min | Floors: 3
+Stress: Avg 30
+Sleep Summary: (Score: 94)
+  Total: 8h 19min | Awake: 14 min
+  Deep: 1h 51min | Light: 5h 15min | REM: 1h 13min
+
+--- 20260515 ---
+Steps: 4,458 | Calories: 404 kcal | Exercise: 1 min | Floors: 17
+Stress: Avg 31
+Sleep Summary: (Score: 92)
+  Total: 8h 5min | Awake: 20 min
+  Deep: 1h 28min | Light: 5h 5min | REM: 1h 32min
+
+--- 20260516 ---
+Steps: 5,869 | Calories: 633 kcal | Exercise: 39 min | Floors: 3
+Stress: Avg 36
+Sleep Summary: (Score: 66)
+  Total: 7h 51min | Awake: 10 min
+  Deep: 2h 1min | Light: 5h 24min | REM: 26 min
+
+--- 20260517 ---
+Steps: 23,159 | Calories: 1,716 kcal | Exercise: 1h 35min | Floors: 15
+Stress: Avg 42
+Sleep Summary: (Score: 54)
+  Total: 5h 10min | Awake: 18 min
+  Deep: 1h 14min | Light: 2h 59min | REM: 57 min
+
+--- 20260518 ---
+Steps: 5,445 | Calories: 458 kcal | Exercise: 4 min
+Stress: Avg 29
+Sleep Summary: (Score: 50)
+  Total: 6h 27min | Awake: 1h 10min
+  Deep: 1h 27min | Light: 4h 15min | REM: 45 min
+
+--- 20260519 ---
+Steps: 8,997 | Calories: 766 kcal | Exercise: 19 min | Floors: 13
+Stress: Avg 33
+Sleep Summary: (Score: 53)
+  Total: 5h 11min | Awake: 18 min
+  Deep: 1h 44min | Light: 2h 51min | REM: 36 min
+
+--- 20260520 ---
+Steps: 2,680 | Calories: 232 kcal | Exercise: 2 min | Floors: 13
+Stress: Avg 23
+Sleep Summary: (Score: 99)
+  Total: 6h 59min | Awake: 4 min
+  Deep: 1h 40min | Light: 3h 46min | REM: 1h 33min
+
+--- 20260521 ---
+Steps: 1,812 | Calories: 205 kcal | Exercise: 0 min | Floors: 7
+Stress: Avg 24
+Sleep Summary: (Score: 76)
+  Total: 7h 44min | Awake: 13 min
+  Deep: 56 min | Light: 3h 34min | REM: 1h 57min
+
+--- 20260522 ---
+Steps: 12,433 | Calories: 974 kcal | Exercise: 38 min | Floors: 8
+Stress: Avg 33
+Sleep Summary: (Score: 93)
+  Total: 6h 17min | Awake: 13 min
+  Deep: 1h 10min | Light: 3h 49min | REM: 1h 18min
+
+--- 20260523 ---
+Steps: 22,398 | Calories: 1,696 kcal | Exercise: 1h 25min | Floors: 9
+Stress: Avg 46
+Sleep Summary: (Score: 72)
+  Total: 7h 0min | Awake: 12 min
+  Deep: 1h 16min | Light: 3h 45min | REM: 24 min
+
+--- 20260524 ---
+Steps: 4,906 | Calories: 541 kcal | Exercise: 18 min | Floors: 4
+Stress: Avg 35
+Sleep Summary: (Score: 96)
+  Total: 7h 21min | Awake: 8 min
+  Deep: 1h 56min | Light: 4h 14min | REM: 1h 11min
+
+--- 20260525 ---
+Steps: 14,389 | Calories: 1,093 kcal | Exercise: 46 min | Floors: 17
+Stress: Avg 38
+Sleep Summary: (Score: 58)
+  Total: 5h 3min | Awake: 6 min
+  Deep: 1h 7min | Light: 2h 31min | REM: 46 min
+
+--- 20260526 ---
+Steps: 4,532 | Calories: 355 kcal | Exercise: 1 min
+Stress: Avg 29
+Sleep Summary: (Score: 73)
+  Total: 7h 19min | Awake: 29 min
+  Deep: 1h 30min | Light: 4h 12min | REM: 36 min
+
+--- 20260527 ---
+Steps: 20,333 | Calories: 1,539 kcal | Exercise: 1h 20min | Floors: 14
+Stress: Avg 43
+Sleep Summary: (Score: 42)
+  Total: 4h 31min | Awake: 48 min
+  Deep: 1h 5min | Light: 2h 10min | REM: 26 min
+
+--- 20260528 ---
+Steps: 4,584 | Calories: 453 kcal | Exercise: 0 min
+Stress: Avg 28
+Sleep Summary: (Score: 85)
+  Total: 8h 23min | Awake: 29 min
+  Deep: 1h 36min | Light: 3h 50min | REM: 1h 42min
+
+--- 20260529 ---
+Steps: 14,684 | Calories: 1,119 kcal | Exercise: 48 min | Floors: 15
+Stress: Avg 40
+Sleep Summary: (Score: 56)
+  Total: 4h 50min | Awake: 6 min
+  Deep: 1h 27min | Light: 2h 46min | REM: 37 min
+
+--- 20260530 ---
+Steps: 4,524 | Calories: 333 kcal | Exercise: 2 min | Floors: 8
+Stress: Avg 28
+Sleep Summary: (Score: 56)
+  Total: 9h 29min | Awake: 1h 14min
+  Deep: 2h 32min | Light: 4h 36min | REM: 2h 21min
+
+--- 20260531 ---
+Steps: 17,790 | Calories: 1,318 kcal | Exercise: 1h 15min | Floors: 14
+Stress: Avg 41
+Sleep Summary: (Score: 45)
+  Total: 5h 28min | Awake: 18 min
+  Deep: 1h 7min | Light: 4h 12min | REM: 9 min
+
+--- 20260601 ---
+Steps: 5,456 | Calories: 491 kcal | Exercise: 2 min | Floors: 5
+Stress: Avg 30
+Sleep Summary: (Score: 73)
+  Total: 5h 54min | Awake: 34 min
+  Deep: 1h 28min | Light: 3h 19min | REM: 1h 7min
+
+--- 20260602 ---
+Steps: 7,468 | Calories: 638 kcal | Exercise: 16 min | Floors: 11
+Stress: Avg 31
+Sleep Summary: (Score: 92)
+  Total: 6h 34min | Awake: 17 min
+  Deep: 1h 45min | Light: 3h 17min | REM: 59 min
+
+--- 20260603 ---
+Steps: 14,914 | Calories: 1,177 kcal | Exercise: 1h 4min | Floors: 4
+Stress: Avg 37
+Sleep Summary: (Score: 53)
+  Total: 4h 42min | Awake: 15 min
+  Deep: 1h 9min | Light: 2h 48min | REM: 45 min
+
+--- 20260604 ---
+Steps: 6,531 | Calories: 431 kcal | Exercise: 2 min | Floors: 12
+Stress: Avg 27
+Sleep Summary: (Score: 82)
+  Total: 5h 54min | Awake: 7 min
+  Deep: 1h 9min | Light: 3h 4min | REM: 1h 41min
+
+--- 20260605 ---
+Steps: 5,491 | Calories: 392 kcal | Exercise: 3 min
+Stress: Avg 31
+Sleep Summary: (Score: 90)
+  Total: 7h 59min | Awake: 12 min
+  Deep: 1h 59min | Light: 3h 54min | REM: 1h 8min
+
+--- 20260606 ---
+Steps: 7,009 | Calories: 525 kcal | Exercise: 12 min | Floors: 9
+Stress: Avg 35
+Sleep Summary: (Score: 56)
+  Total: 4h 52min | Awake: 7 min
+  Deep: 1h 9min | Light: 2h 37min | REM: 39 min
+
+--- 20260607 ---
+Steps: 4,002 | Calories: 297 kcal | Exercise: 3 min
+Stress: Avg 25
+Sleep Summary: (Score: 52)
+  Total: 9h 14min | Awake: 1h 38min
+  Deep: 1h 50min | Light: 3h 44min | REM: 1h 32min
+
+--- 20260608 ---
+Steps: 3,186 | Calories: 308 kcal | Exercise: 2 min | Floors: 5
+Stress: Avg 28
+Sleep Summary: (Score: 93)
+  Total: 6h 5min | Awake: 4 min
+  Deep: 38 min | Light: 2h 10min | REM: 37 min
+
+--- 20260609 ---
+Steps: 12,015 | Calories: 738 kcal | Exercise: 14 min
+Stress: Avg 33
+Sleep Summary: (Score: 61)
+  Total: 5h 14min | Awake: 6 min
+  Deep: 1h 17min | Light: 2h 33min | REM: 49 min
+
+--- 20260610 ---
+Steps: 12,411 | Calories: 744 kcal | Exercise: 15 min | Floors: 15
+Stress: Avg 36
+Sleep Summary: (Score: 98)
+  Total: 7h 36min | Awake: 7 min
+  Deep: 1h 20min | Light: 4h 20min | REM: 1h 23min
+
+--- 20260611 ---
+Steps: 9,417 | Calories: 572 kcal | Exercise: 1 min | Floors: 22
+Stress: Avg 41
+Sleep Summary: (Score: 34)
+  Total: 4h 9min | Awake: 1h 10min
+  Deep: 34 min | Light: 1h 59min | REM: 36 min
+
+--- 20260612 ---
+Steps: 8,591 | Calories: 518 kcal | Exercise: 0 min | Floors: 6
+Stress: Avg 34
+Sleep Summary: (Score: 28)
+  Total: 4h 46min | Awake: 1h 20min
+  Deep: 1h 1min | Light: 3h 2min | REM: 16 min
+
+--- 20260613 ---
+Steps: 1,605 | Calories: 175 kcal | Exercise: 0 min | Floors: 3
+Stress: Avg 35
+Sleep Summary: (Score: 90)
+  Total: 8h 11min | Awake: 16 min
+  Deep: 1h 24min | Light: 4h 34min | REM: 2h 13min
+
+--- 20260614 ---
+Steps: 6,644 | Calories: 412 kcal | Exercise: 3 min | Floors: 20
+Stress: Avg 34
+Sleep Summary: (Score: 81)
+  Total: 5h 53min | Awake: 7 min
+  Deep: 1h 9min | Light: 3h 39min | REM: 1h 5min
+
+--- 20260615 ---
+Steps: 3,259 | Calories: 267 kcal | Exercise: 2 min
+Stress: Avg 32
+Sleep Summary: (Score: 86)
+  Total: 5h 58min | Awake: 7 min
+  Deep: 1h 16min | Light: 3h 4min | REM: 44 min
+
+--- 20260616 ---
+Steps: 13,277 | Calories: 732 kcal | Exercise: 15 min | Floors: 12
+Stress: Avg 33
+Sleep Summary: (Score: 55)
+  Total: 5h 41min | Awake: 12 min
+  Deep: 1h 35min | Light: 3h 52min | REM: 14 min
+
+--- 20260617 ---
+Steps: 12,178 | Calories: 608 kcal | Exercise: 2 min | Floors: 16
+Stress: Avg 44
+
+--- 20260618 ---
+Steps: 5,370 | Calories: 299 kcal | Exercise: 1 min | Floors: 4
+Stress: Avg 29
+Sleep Summary: (Score: 94)
+  Total: 6h 54min | Awake: 12 min
+  Deep: 1h 14min | Light: 3h 35min | REM: 51 min
+
+--- 20260619 ---
+Steps: 6,901 | Calories: 463 kcal | Exercise: 1 min | Floors: 17
+Stress: Avg 31
+Sleep Summary: (Score: 56)
+  Total: 4h 43min | Awake: 6 min
+  Deep: 1h 16min | Light: 2h 53min | REM: 34 min
+
+--- 20260620 ---
+Steps: 12,400 | Calories: 1,059 kcal | Exercise: 50 min | Floors: 13
+Stress: Avg 40
+Sleep Summary: (Score: 58)
+  Total: 4h 48min | Awake: 9 min
+  Deep: 1h 5min | Light: 2h 10min | REM: 59 min
+
+--- 20260621 ---
+Steps: 11,415 | Calories: 820 kcal | Exercise: 23 min | Floors: 12
+Stress: Avg 44
+Sleep Summary: (Score: 43)
+  Total: 3h 12min | Awake: 14 min
+  Deep: 46 min | Light: 2h 26min | REM: 0 min
+
+--- 20260622 ---
+Steps: 2,295 | Calories: 206 kcal | Exercise: 0 min | Floors: 4
+Stress: Avg 28
+Sleep Summary: (Score: 75)
+  Total: 8h 28min | Awake: 16 min
+  Deep: 1h 46min | Light: 4h 55min | REM: 41 min
+
+--- 20260623 ---
+Steps: 6,975 | Calories: 492 kcal | Exercise: 0 min | Floors: 12
+Stress: Avg 30
+Sleep Summary: (Score: 58)
+  Total: 5h 6min | Awake: 12 min
+  Deep: 1h 32min | Light: 2h 34min | REM: 1h 0min
+
+--- 20260624 ---
+Steps: 5,730 | Calories: 445 kcal | Exercise: 1 min
+Stress: Avg 27
+Sleep Summary: (Score: 96)
+  Total: 7h 0min | Awake: 5 min
+  Deep: 53 min | Light: 1h 39min | REM: 32 min
+
+--- 20260625 ---
+Steps: 5,573 | Calories: 547 kcal | Exercise: 2 min | Floors: 7
+Stress: Avg 31
+Sleep Summary: (Score: 54)
+  Total: 5h 46min | Awake: 1h 6min
+  Deep: 1h 14min | Light: 2h 42min | REM: 1h 6min
+
+--- 20260626 ---
+Steps: 2,350 | Calories: 174 kcal | Exercise: 1 min
+Stress: Avg 29
+Sleep Summary:
+  Total: 5h 0min | Awake: 0 min
+  Deep: 0 min | Light: 0 min | REM: 0 min
+
+--- 20260627 ---
+Steps: 12,698 | Calories: 964 kcal | Exercise: 36 min | Floors: 16
+Stress: Avg 42
+Sleep Summary:
+  Total: 1h 31min | Awake: 0 min
+  Deep: 0 min | Light: 0 min | REM: 0 min
+
+--- 20260628 ---
+Steps: 2,281 | Calories: 230 kcal | Exercise: 0 min | Floors: 11
+Stress: Avg 33
+Sleep Summary: (Score: 95)
+  Total: 7h 41min | Awake: 13 min
+  Deep: 2h 7min | Light: 4h 7min | REM: 1h 27min
+
+--- 20260629 ---
+Steps: 6,115 | Calories: 569 kcal | Exercise: 0 min
+Stress: Avg 43
+
+--- 20260630 ---
+Steps: 5,261 | Calories: 481 kcal | Exercise: 3 min | Floors: 10
+Stress: Avg 32
+Sleep Summary: (Score: 75)
+  Total: 5h 43min | Awake: 5 min
+  Deep: 1h 10min | Light: 3h 27min | REM: 1h 6min
+
+--- 20260701 ---
+Steps: 5,250 | Calories: 640 kcal | Exercise: 20 min | Floors: 6
+Stress: Avg 37
+Sleep Summary: (Score: 56)
+  Total: 5h 38min | Awake: 59 min
+  Deep: 1h 27min | Light: 2h 42min | REM: 1h 29min
+
+--- 20260702 ---
+Steps: 3,088 | Calories: 261 kcal | Exercise: 2 min | Floors: 12
+Stress: Avg 36
+Sleep Summary: (Score: 54)
+  Total: 7h 49min | Awake: 36 min
+  Deep: 1h 46min | Light: 4h 27min | REM: 14 min
+
+--- 20260703 ---
+Steps: 6,904 | Calories: 550 kcal | Exercise: 2 min | Floors: 25
+Stress: Avg 35
+Sleep Summary:
+  Total: 5h 16min | Awake: 0 min
+  Deep: 0 min | Light: 0 min | REM: 0 min
+
+--- 20260704 ---
+Steps: 6,288 | Calories: 408 kcal | Exercise: 2 min | Floors: 16
+Stress: Avg 37
+Sleep Summary: (Score: 51)
+  Total: 5h 49min | Awake: 35 min
+  Deep: 1h 26min | Light: 4h 7min | REM: 16 min
+
+--- 20260705 ---
+Steps: 6,346 | Calories: 415 kcal | Exercise: 1 min | Floors: 12
+Stress: Avg 42
+Sleep Summary: (Score: 70)
+  Total: 6h 29min | Awake: 33 min
+  Deep: 58 min | Light: 3h 6min | REM: 26 min
+
+--- 20260706 ---
+Steps: 4,127 | Calories: 334 kcal | Exercise: 0 min | Floors: 11
+Stress: Avg 34
+Sleep Summary: (Score: 85)
+  Total: 7h 35min | Awake: 24 min
+  Deep: 1h 37min | Light: 4h 49min | REM: 1h 9min
+
+--- 20260707 ---
+Steps: 12,429 | Calories: 1,050 kcal | Exercise: 41 min | Floors: 17
+Stress: Avg 38
+Sleep Summary: (Score: 78)
+  Total: 5h 52min | Awake: 13 min
+  Deep: 1h 7min | Light: 2h 40min | REM: 1h 9min
+
+--- 20260708 ---
+Steps: 7,250 | Calories: 443 kcal | Exercise: 2 min
+Stress: Avg 33
+Sleep Summary: (Score: 92)
+  Total: 6h 14min | Awake: 8 min
+  Deep: 1h 16min | Light: 3h 2min | REM: 46 min
+
+--- 20260709 ---
+Steps: 16,618 | Calories: 1,040 kcal | Exercise: 44 min | Floors: 22
+Stress: Avg 37
+Sleep Summary: (Score: 66)
+  Total: 5h 29min | Awake: 8 min
+  Deep: 58 min | Light: 2h 22min | REM: 1h 15min
+
+--- 20260710 ---
+Steps: 4,656 | Calories: 451 kcal | Exercise: 5 min | Floors: 2
+Stress: Avg 34
+Sleep Summary: (Score: 97)
+  Total: 7h 32min | Awake: 7 min
+  Deep: 1h 12min | Light: 2h 35min | REM: 1h 38min
+
+--- 20260711 ---
+Steps: 19,322 | Calories: 1,557 kcal | Exercise: 1h 26min | Floors: 26
+Stress: Avg 46
+Sleep Summary: (Score: 36)
+  Total: 4h 24min | Awake: 49 min
+  Deep: 47 min | Light: 3h 2min | REM: 35 min
+
+--- 20260712 ---
+Steps: 2,280 | Calories: 204 kcal | Exercise: 2 min | Floors: 6
+Stress: Avg 35
+Sleep Summary: (Score: 93)
+  Total: 9h 13min | Awake: 17 min
+  Deep: 2h 7min | Light: 4h 44min | REM: 1h 17min
+
+--- 20260713 ---
+Steps: 2,915 | Calories: 245 kcal | Exercise: 1 min | Floors: 1
+Stress: Avg 29
+Sleep Summary: (Score: 91)
+  Total: 6h 26min | Awake: 17 min
+  Deep: 1h 13min | Light: 4h 14min | REM: 59 min
+
+--- 20260714 ---
+Steps: 12,242 | Calories: 803 kcal | Exercise: 35 min | Floors: 8
+Stress: Avg 33
+Sleep Summary: (Score: 44)
+  Total: 4h 28min | Awake: 52 min
+  Deep: 52 min | Light: 2h 26min | REM: 39 min
+
+--- 20260715 ---
+Steps: 6,008 | Calories: 336 kcal | Exercise: 0 min | Floors: 3
+Stress: Avg 28
+Sleep Summary: (Score: 77)
+  Total: 5h 52min | Awake: 11 min
+  Deep: 1h 12min | Light: 2h 38min | REM: 54 min
+
+--- 20260716 ---
+Steps: 7,833 | Calories: 434 kcal | Exercise: 1 min | Floors: 1
+Stress: Avg 33
+Sleep Summary: (Score: 77)
+  Total: 5h 57min | Awake: 30 min
+  Deep: 59 min | Light: 3h 5min | REM: 46 min
+
+--- 20260717 ---
+Steps: 1,559 | Calories: 131 kcal | Exercise: 0 min | Floors: 3
+Stress: Avg 26
+Sleep Summary: (Score: 76)
+  Total: 8h 44min | Awake: 44 min
+  Deep: 1h 46min | Light: 5h 10min | REM: 1h 48min
+
+--- 20260718 ---
+Steps: 4,209 | Calories: 306 kcal | Exercise: 0 min | Floors: 9
+Stress: Avg 31
+Sleep Summary: (Score: 53)
+  Total: 6h 45min | Awake: 1h 15min
+  Deep: 1h 53min | Light: 3h 52min | REM: 1h 0min
+
+--- 20260719 ---
+Steps: 3,369 | Calories: 284 kcal | Exercise: 0 min | Floors: 13
+Stress: Avg 31
+Sleep Summary: (Score: 89)
+  Total: 10h 2min | Awake: 10 min
+  Deep: 1h 37min | Light: 5h 29min | REM: 1h 41min
+
+--- 20260720 ---
+Steps: 2,453 | Calories: 248 kcal | Exercise: 0 min
+Stress: Avg 37
+Sleep Summary: (Score: 24)
+  Total: 4h 37min | Awake: 1h 32min
+  Deep: 1h 13min | Light: 3h 24min | REM: 0 min
+
+--- 20260721 ---
+Steps: 6,918 | Calories: 383 kcal | Exercise: 4 min | Floors: 8
+Stress: Avg 24
+Sleep Summary: (Score: 67)
+  Total: 7h 16min | Awake: 46 min
+  Deep: 1h 0min | Light: 4h 25min | REM: 52 min
+
+--- 20260722 ---
+Steps: 4,246 | Calories: 284 kcal | Exercise: 0 min | Floors: 2
+Stress: Avg 33
+Sleep Summary:
+  Total: 49 min | Awake: 0 min
+  Deep: 0 min | Light: 0 min | REM: 0 min
+
+--- 20260723 ---
+Steps: 15,985 | Calories: 1,036 kcal | Exercise: 52 min | Floors: 6
+Stress: Avg 36
+Sleep Summary: (Score: 61)
+  Total: 5h 11min | Awake: 5 min
+  Deep: 57 min | Light: 3h 1min | REM: 1h 13min
+
+--- 20260724 ---
+Steps: 1,941 | Calories: 196 kcal | Exercise: 0 min | Floors: 5
+Stress: Avg 22
+Sleep Summary: (Score: 91)
+  Total: 6h 45min | Awake: 17 min
+  Deep: 1h 8min | Light: 4h 17min | REM: 1h 20min
+
+--- 20260725 ---
+Steps: 4,790 | Calories: 282 kcal | Exercise: 1 min
+Stress: Avg 27
+Sleep Summary: (Score: 94)
+  Total: 6h 33min | Awake: 6 min
+  Deep: 1h 46min | Light: 2h 45min | REM: 1h 0min
+
+--- 20260726 ---
+Steps: 3,996 | Calories: 333 kcal | Exercise: 0 min | Floors: 6
+Stress: Avg 33
+Sleep Summary:
+  Total: 1h 59min | Awake: 0 min
+  Deep: 0 min | Light: 0 min | REM: 0 min
+
+--- 20260727 ---
+Steps: 6,922 | Calories: 399 kcal | Exercise: 3 min | Floors: 6
+Stress: Avg 27
+Sleep Summary:
+  Total: 6h 48min | Deep: 1h 15min | Light: 3h 19min | REM: 1h 59min | Awake: 15 min
+  Sleep HR: Avg 49 bpm | Min 42 bpm | Max 66 bpm
+
+--- 20260728 ---
+Steps: 13,562 | Calories: 1,188 kcal | Exercise: 1h 1min | Floors: 2
+Stress: Avg 39
+Sleep Summary:
+  Total: 5h 21min | Deep: 1h 18min | Light: 3h 1min | REM: 54 min | Awake: 8 min
+  Sleep HR: Avg 50 bpm | Min 44 bpm | Max 62 bpm
+
+--- 20260729 ---
+Steps: 16,288 | Calories: 1,225 kcal | Exercise: 1h 5min | Floors: 5
+Stress: Avg 36
+Sleep Summary: (Score: 87)
+  Total: 6h 11min | Awake: 13 min
+  Deep: 1h 28min | Light: 2h 51min | REM: 56 min
+
+--- 20260730 ---
+Steps: 1,591 | Calories: 134 kcal | Exercise: 1 min | Floors: 3
+Stress: Avg 25
+Sleep Summary: (Score: 84)
+  Total: 5h 58min | Awake: 13 min
+  Deep: 1h 15min | Light: 3h 5min | REM: 1h 38min
+
+--- 20260731 ---
+Steps: 13,513 | Calories: 1,180 kcal | Exercise: 59 min | Floors: 5
+Stress: Avg 37
+Sleep Summary: (Score: 60)
+  Total: 5h 11min | Awake: 8 min
+  Deep: 1h 2min | Light: 3h 20min | REM: 49 min
+
+--- 20260801 ---
+Steps: 5,586 | Calories: 452 kcal | Exercise: 3 min | Floors: 23
+Stress: Avg 36
+Sleep Summary:
+  Total: 6h 56min | Deep: 1h 28min | Light: 4h 17min | REM: 1h 1min | Awake: 10 min
+  Sleep HR: Avg 58 bpm | Min 32 bpm | Max 73 bpm
+
+--- 20260802 ---
+Steps: 23,531 | Calories: 1,805 kcal | Exercise: 1h 42min | Floors: 7
+Stress: Avg 44
+Sleep Summary:
+  Total: 4h 19min | Deep: 1h 10min | Light: 2h 1min | REM: 1h 4min | Awake: 4 min
+  Sleep HR: Avg 63 bpm | Min 51 bpm | Max 76 bpm
+
+--- 20260803 ---
+Steps: 3,694 | Calories: 240 kcal | Exercise: 0 min | Floors: 10
+Stress: Avg 30
+Sleep Summary:
+  Total: 6h 19min | Deep: 1h 24min | Light: 3h 47min | REM: 1h 1min | Awake: 7 min
+  Sleep HR: Avg 58 bpm | Min 52 bpm | Max 65 bpm
+
+--- 20260804 ---
+Steps: 7,000 | Calories: 522 kcal | Exercise: 1 min | Floors: 9
+Stress: Avg 35
+Sleep Summary:
+  Total: 5h 24min | Deep: 1h 22min | Light: 3h 19min | REM: 39 min | Awake: 4 min
+  Sleep HR: Avg 55 bpm | Min 49 bpm | Max 68 bpm
+
+--- 20260805 ---
+Steps: 20,520 | Calories: 1,491 kcal | Exercise: 1h 6min | Floors: 12
+Stress: Avg 38
+Sleep Summary:
+  Total: 5h 25min | Deep: 1h 33min | Light: 3h 4min | REM: 35 min | Awake: 13 min
+  Sleep HR: Avg 55 bpm | Min 51 bpm | Max 65 bpm
+
+--- 20260806 ---
+Steps: 6,653 | Calories: 347 kcal | Exercise: 4 min
+Stress: Avg 27
+Sleep Summary:
+  Total: 7h 18min | Deep: 1h 25min | Light: 4h 28min | REM: 1h 7min | Awake: 18 min
+  Sleep HR: Avg 53 bpm | Min 47 bpm | Max 64 bpm
+
+--- 20260807 ---
+Steps: 13,178 | Calories: 1,030 kcal | Exercise: 53 min | Floors: 9
+Stress: Avg 37
+Sleep Summary:
+  Total: 5h 40min | Deep: 1h 27min | Light: 3h 19min | REM: 45 min | Awake: 9 min
+  Sleep HR: Avg 54 bpm | Min 47 bpm | Max 71 bpm
+
+--- 20260808 ---
+Steps: 9,589 | Calories: 662 kcal | Exercise: 33 min | Floors: 10
+Stress: Avg 37
+Sleep Summary:
+  Total: 6h 34min | Deep: 1h 17min | Light: 3h 27min | REM: 1h 44min | Awake: 6 min
+  Sleep HR: Avg 57 bpm | Min 51 bpm | Max 65 bpm
+
+--- 20260809 ---
+Steps: 19,090 | Calories: 1,477 kcal | Exercise: 1h 4min | Floors: 2
+Stress: Avg 47
+Sleep Summary:
+  Total: 4h 37min | Deep: 56 min | Light: 2h 16min | REM: 1h 19min | Awake: 6 min
+  Sleep HR: Avg 63 bpm | Min 57 bpm | Max 81 bpm
+
+--- 20260810 ---
+Steps: 4,056 | Calories: 320 kcal | Exercise: 1 min | Floors: 10
+Stress: Avg 29
+Sleep Summary:
+  Total: 7h 31min | Deep: 1h 45min | Light: 4h 7min | REM: 1h 30min | Awake: 9 min
+  Sleep HR: Avg 60 bpm | Min 50 bpm | Max 68 bpm
+
+--- 20260811 ---
+Steps: 16,696 | Calories: 1,185 kcal | Exercise: 51 min | Floors: 8
+Stress: Avg 31
+Sleep Summary:
+  Total: 5h 24min | Deep: 1h 30min | Light: 3h 11min | REM: 6 min | Awake: 37 min
+  Sleep HR: Avg 50 bpm | Min 43 bpm | Max 61 bpm
+
+--- 20260812 ---
+Steps: 18,583 | Calories: 1,573 kcal | Exercise: 1h 17min | Floors: 6
+Stress: Avg 40
+Sleep Summary:
+  Total: 5h 16min | Deep: 1h 10min | Light: 2h 29min | REM: 1h 29min | Awake: 8 min
+  Sleep HR: Avg 48 bpm | Min 40 bpm | Max 62 bpm
+
+--- 20260813 ---
+Steps: 8,794 | Calories: 793 kcal | Exercise: 41 min | Floors: 15
+Stress: Avg 32
+Sleep Summary:
+  Total: 7h 6min | Deep: 1h 20min | Light: 4h 38min | REM: 1h 1min | Awake: 7 min
+  Sleep HR: Avg 58 bpm | Min 49 bpm | Max 70 bpm
+
+--- 20260814 ---
+Steps: 6,167 | Calories: 321 kcal | Exercise: 0 min | Floors: 9
+Stress: Avg 28
+Sleep Summary:
+  Total: 6h 26min | Deep: 1h 32min | Light: 3h 39min | REM: 1h 8min | Awake: 7 min
+  Sleep HR: Avg 56 bpm | Min 48 bpm | Max 66 bpm
+
+--- 20260815 ---
+Steps: 32,897 | Calories: 2,510 kcal | Exercise: 2h 21min | Floors: 3
+Stress: Avg 46
+Sleep Summary:
+  Total: 4h 59min | Deep: 1h 3min | Light: 3h 48min | REM: 0 min | Awake: 8 min
+  Sleep HR: Avg 59 bpm | Min 51 bpm | Max 70 bpm
+
+--- 20260816 ---
+Steps: 4,362 | Calories: 336 kcal | Exercise: 1 min
+Stress: Avg 27
+Sleep Summary:
+  Total: 8h 40min | Deep: 2h 11min | Light: 4h 28min | REM: 1h 53min | Awake: 8 min
+  Sleep HR: Avg 54 bpm | Min 48 bpm | Max 61 bpm
+
+--- 20260817 ---
+Steps: 7,429 | Calories: 515 kcal | Exercise: 14 min | Floors: 16
+Stress: Avg 31
+Sleep Summary:
+  Total: 6h 13min | Deep: 1h 17min | Light: 4h 4min | REM: 17 min | Awake: 35 min
+  Sleep HR: Avg 55 bpm | Min 47 bpm | Max 76 bpm
+
+--- 20260818 ---
+Steps: 17,195 | Calories: 1,155 kcal | Exercise: 59 min | Floors: 13
+Stress: Avg 33
+Sleep Summary:
+  Total: 5h 24min | Deep: 1h 26min | Light: 2h 32min | REM: 1h 14min | Awake: 12 min
+  Sleep HR: Avg 50 bpm | Min 41 bpm | Max 58 bpm
+
+--- 20260819 ---
+Steps: 16,617 | Calories: 1,475 kcal | Exercise: 1h 16min | Floors: 7
+Stress: Avg 35
+Sleep Summary:
+  Total: 6h 2min | Deep: 1h 27min | Light: 2h 46min | REM: 1h 38min | Awake: 11 min
+  Sleep HR: Avg 51 bpm | Min 41 bpm | Max 64 bpm
+
+--- 20260820 ---
+Steps: 5,729 | Calories: 481 kcal | Exercise: 3 min | Floors: 3
+Stress: Avg 26
+Sleep Summary:
+  Total: 7h 26min | Deep: 1h 52min | Light: 4h 2min | REM: 1h 18min | Awake: 14 min
+  Sleep HR: Avg 54 bpm | Min 42 bpm | Max 63 bpm
+
+--- 20260821 ---
+Steps: 16,291 | Calories: 1,204 kcal | Exercise: 1h 0min | Floors: 16
+Stress: Avg 35
+Sleep Summary:
+  Total: 4h 57min | Deep: 1h 23min | Light: 2h 40min | REM: 51 min | Awake: 3 min
+  Sleep HR: Avg 51 bpm | Min 44 bpm | Max 69 bpm
+
+--- 20260822 ---
+Steps: 5,214 | Calories: 620 kcal | Exercise: 16 min | Floors: 22
+Stress: Avg 31
+Sleep Summary:
+  Total: 8h 33min | Deep: 1h 53min | Light: 4h 0min | REM: 2h 30min | Awake: 10 min
+  Sleep HR: Avg 51 bpm | Min 45 bpm | Max 69 bpm
+
+--- 20260823 ---
+Steps: 25,216 | Calories: 2,040 kcal | Exercise: 1h 57min | Floors: 7
+Stress: Avg 42
+Sleep Summary:
+  Total: 7h 1min | Deep: 1h 20min | Light: 3h 9min | REM: 2h 22min | Awake: 10 min
+  Sleep HR: Avg 59 bpm | Min 50 bpm | Max 70 bpm
+
+--- 20260824 ---
+Steps: 6,136 | Calories: 442 kcal | Exercise: 0 min | Floors: 6
+Stress: Avg 26
+Sleep Summary:
+  Total: 7h 11min | Deep: 1h 33min | Light: 4h 22min | REM: 1h 0min | Awake: 16 min
+  Sleep HR: Avg 53 bpm | Min 44 bpm | Max 64 bpm
+
+--- 20260825 ---
+Steps: 17,664 | Calories: 1,172 kcal | Exercise: 1h 3min | Floors: 18
+Stress: Avg 33
+Sleep Summary:
+  Total: 4h 17min | Deep: 57 min | Light: 2h 5min | REM: 1h 6min | Awake: 9 min
+  Sleep HR: Avg 52 bpm | Min 45 bpm | Max 61 bpm
+
+--- 20260826 ---
+Steps: 17,865 | Calories: 1,300 kcal | Exercise: 1h 1min | Floors: 17
+Stress: Avg 38
+Sleep Summary:
+  Total: 6h 8min | Deep: 58 min | Light: 3h 22min | REM: 1h 38min | Awake: 10 min
+  Sleep HR: Avg 54 bpm | Min 48 bpm | Max 65 bpm
+
+--- 20260827 ---
+Steps: 2,650 | Calories: 174 kcal | Exercise: 0 min | Floors: 2
+Stress: Avg 27
+Sleep Summary:
+  Total: 7h 24min | Deep: 2h 3min | Light: 4h 2min | REM: 1h 7min | Awake: 12 min
+  Sleep HR: Avg 55 bpm | Min 46 bpm | Max 65 bpm
+
+--- 20260828 ---
+Steps: 24,682 | Calories: 1,989 kcal | Exercise: 2h 1min | Floors: 14
+Stress: Avg 43
+Sleep Summary:
+  Total: 6h 18min | Deep: 1h 15min | Light: 2h 59min | REM: 1h 51min | Awake: 13 min
+  Sleep HR: Avg 61 bpm | Min 53 bpm | Max 73 bpm
+
+--- 20260829 ---
+Steps: 1,793 | Calories: 114 kcal | Exercise: 0 min
+Stress: Avg 31
+Sleep Summary:
+  Total: 3h 24min | Deep: 52 min | Light: 1h 49min | REM: 37 min | Awake: 6 min
+  Sleep HR: Avg 60 bpm | Min 54 bpm | Max 66 bpm
+
+--- 20260831 ---
+Steps: 3,438 | Calories: 225 kcal | Exercise: 1 min | Floors: 3
+Stress: Avg 25
+Sleep Summary:
+  Total: 7h 17min | Deep: 2h 27min | Light: 3h 53min | REM: 32 min | Awake: 25 min
+  Sleep HR: Avg 55 bpm | Min 46 bpm | Max 65 bpm
+
+--- 20260901 ---
+Steps: 18,266 | Calories: 1,316 kcal | Exercise: 48 min | Floors: 13
+Stress: Avg 36
+Sleep Summary:
+  Total: 6h 35min | Deep: 1h 31min | Light: 3h 28min | REM: 1h 19min | Awake: 17 min
+  Sleep HR: Avg 51 bpm | Min 43 bpm | Max 73 bpm
+
+--- 20260902 ---
+Steps: 24,857 | Calories: 1,963 kcal | Exercise: 1h 40min | Floors: 4
+Stress: Avg 41
+Sleep Summary:
+  Total: 4h 57min | Deep: 1h 3min | Light: 2h 22min | REM: 1h 22min | Awake: 10 min
+  Sleep HR: Avg 53 bpm | Min 47 bpm | Max 60 bpm
+
+--- 20260903 ---
+Steps: 12,659 | Calories: 659 kcal | Exercise: 4 min | Floors: 13
+Stress: Avg 30
+Sleep Summary:
+  Total: 7h 12min | Deep: 2h 9min | Light: 4h 7min | REM: 44 min | Awake: 12 min
+  Sleep HR: Avg 53 bpm | Min 47 bpm | Max 65 bpm
+
+--- 20260904 ---
+Steps: 17,226 | Calories: 1,255 kcal | Exercise: 1h 11min | Floors: 6
+Stress: Avg 35
+Sleep Summary:
+  Total: 6h 7min | Deep: 1h 57min | Light: 3h 24min | REM: 38 min | Awake: 8 min
+  Sleep HR: Avg 54 bpm | Min 45 bpm | Max 61 bpm
+
+--- 20260905 ---
+Steps: 5,398 | Calories: 305 kcal | Exercise: 0 min | Floors: 9
+Stress: Avg 32
+Sleep Summary:
+  Total: 7h 25min | Deep: 1h 12min | Light: 4h 25min | REM: 1h 44min | Awake: 4 min
+  Sleep HR: Avg 56 bpm | Min 49 bpm | Max 65 bpm
+
+--- 20260906 ---
+Steps: 26,341 | Calories: 1,773 kcal | Exercise: 1h 45min | Floors: 12
+Stress: Avg 44
+Sleep Summary:
+  Total: 4h 46min | Deep: 44 min | Light: 2h 26min | REM: 1h 17min | Awake: 19 min
+  Sleep HR: Avg 59 bpm | Min 54 bpm | Max 69 bpm
+
+--- 20260907 ---
+Steps: 9,965 | Calories: 601 kcal | Exercise: 1 min | Floors: 16
+Stress: Avg 34
+Sleep Summary:
+  Total: 3h 38min | Deep: 1h 0min | Light: 1h 38min | REM: 56 min | Awake: 4 min
+  Sleep HR: Avg 67 bpm | Min 58 bpm | Max 75 bpm
+
+--- 20260908 ---
+Steps: 20,939 | Calories: 1,301 kcal | Exercise: 58 min | Floors: 4
+Stress: Avg 35
+Sleep Summary:
+  Total: 5h 10min | Deep: 1h 41min | Light: 2h 49min | REM: 35 min | Awake: 5 min
+  Sleep HR: Avg 51 bpm | Min 46 bpm | Max 60 bpm
+
+--- 20260909 ---
+Steps: 17,720 | Calories: 1,337 kcal | Exercise: 1h 4min | Floors: 5
+Stress: Avg 35
+Sleep Summary:
+  Total: 5h 6min | Deep: 1h 31min | Light: 2h 34min | REM: 51 min | Awake: 10 min
+  Sleep HR: Avg 54 bpm | Min 50 bpm | Max 64 bpm
+
+--- 20260910 ---
+Steps: 3,815 | Calories: 282 kcal | Exercise: 0 min
+Stress: Avg 29
+Sleep Summary:
+  Total: 7h 2min | Deep: 1h 5min | Light: 3h 51min | REM: 1h 10min | Awake: 56 min
+  Sleep HR: Avg 55 bpm | Min 47 bpm | Max 79 bpm
+
+--- 20260911 ---
+Steps: 12,099 | Calories: 925 kcal | Exercise: 42 min | Floors: 5
+Stress: Avg 34
+Sleep Summary:
+  Total: 7h 40min | Deep: 2h 7min | Light: 3h 58min | REM: 1h 12min | Awake: 23 min
+  Sleep HR: Avg 56 bpm | Min 48 bpm | Max 65 bpm
+
+--- 20260912 ---
+Steps: 6,057 | Calories: 740 kcal | Exercise: 55 min
+Stress: Avg 33
+Sleep Summary:
+  Total: 7h 58min | Deep: 1h 11min | Light: 4h 27min | REM: 1h 16min | Awake: 1h 4min
+  Sleep HR: Avg 54 bpm | Min 47 bpm | Max 65 bpm
+
+--- 20260913 ---
+Steps: 23,717 | Calories: 1,874 kcal | Exercise: 1h 38min | Floors: 44
+Stress: Avg 41
+Sleep Summary:
+  Total: 4h 46min | Deep: 1h 8min | Light: 3h 16min | REM: 20 min | Awake: 2 min
+  Sleep HR: Avg 57 bpm | Min 38 bpm | Max 63 bpm
+
+--- 20260914 ---
+Steps: 7,100 | Calories: 495 kcal | Exercise: 1 min | Floors: 11
+Stress: Avg 29
+Sleep Summary:
+  Total: 6h 15min | Deep: 1h 28min | Light: 2h 45min | REM: 1h 54min | Awake: 8 min
+  Sleep HR: Avg 58 bpm | Min 50 bpm | Max 66 bpm
+
+--- 20260915 ---
+Steps: 16,438 | Calories: 1,183 kcal | Exercise: 47 min | Floors: 22
+Stress: Avg 33
+Sleep Summary:
+  Total: 5h 55min | Deep: 1h 11min | Light: 3h 5min | REM: 1h 26min | Awake: 13 min
+  Sleep HR: Avg 50 bpm | Min 43 bpm | Max 61 bpm
+
+--- 20260916 ---
+Steps: 7,811 | Calories: 647 kcal | Exercise: 21 min | Floors: 28
+Stress: Avg 29
+Sleep Summary:
+  Total: 6h 12min | Deep: 1h 48min | Light: 3h 14min | REM: 35 min | Awake: 35 min
+  Sleep HR: Avg 53 bpm | Min 48 bpm | Max 64 bpm
+
+--- 20260917 ---
+Steps: 4,520 | Calories: 301 kcal | Exercise: 1 min | Floors: 4
+Stress: Avg 28
+Sleep Summary:
+  Total: 9h 50min | Deep: 1h 37min | Light: 5h 27min | REM: 1h 35min | Awake: 1h 11min
+  Sleep HR: Avg 52 bpm | Min 46 bpm | Max 72 bpm
+
+--- 20260918 ---
+Steps: 4,603 | Calories: 274 kcal | Exercise: 3 min | Floors: 2
+Stress: Avg 26
+Sleep Summary:
+  Total: 8h 31min | Deep: 2h 19min | Light: 4h 43min | REM: 1h 21min | Awake: 8 min
+  Sleep HR: Avg 55 bpm | Min 45 bpm | Max 64 bpm
+
+--- 20260919 ---
+Steps: 5,397 | Calories: 292 kcal | Exercise: 0 min | Floors: 15
+Stress: Avg 27
+Sleep Summary:
+  Total: 6h 26min | Deep: 1h 25min | Light: 3h 45min | REM: 1h 9min | Awake: 7 min
+  Sleep HR: Avg 60 bpm | Min 49 bpm | Max 70 bpm
+
+--- 20260920 ---
+Steps: 18,969 | Calories: 1,548 kcal | Exercise: 1h 0min | Floors: 13
+Stress: Avg 41
+Sleep Summary:
+  Total: 4h 56min | Deep: 1h 21min | Light: 2h 13min | REM: 1h 14min | Awake: 8 min
+  Sleep HR: Avg 56 bpm | Min 48 bpm | Max 63 bpm
+
+--- 20260921 ---
+Steps: 10,026 | Calories: 490 kcal | Exercise: 4 min | Floors: 9
+Stress: Avg 31
+Sleep Summary:
+  Total: 7h 38min | Deep: 1h 47min | Light: 3h 30min | REM: 2h 13min | Awake: 8 min
+  Sleep HR: Avg 58 bpm | Min 50 bpm | Max 67 bpm
+
+--- 20260922 ---
+Steps: 16,402 | Calories: 1,134 kcal | Exercise: 45 min | Floors: 4
+Stress: Avg 37
+Sleep Summary:
+  Total: 5h 20min | Deep: 59 min | Light: 3h 50min | REM: 11 min | Awake: 20 min
+  Sleep HR: Avg 50 bpm | Min 45 bpm | Max 60 bpm
+
+--- 20260923 ---
+Steps: 6,235 | Calories: 427 kcal | Exercise: 1 min
+Stress: Avg 28
+Sleep Summary:
+  Total: 46 min | Deep: 6 min | Light: 34 min | REM: 0 min | Awake: 6 min
+  Sleep HR: Avg 49 bpm | Min 47 bpm | Max 53 bpm
+
+--- 20260924 ---
+Steps: 6,027 | Calories: 688 kcal | Exercise: 42 min | Floors: 2
+Stress: Avg 33
+Sleep Summary:
+  Total: 8h 3min | Deep: 1h 33min | Light: 4h 19min | REM: 1h 56min | Awake: 15 min
+  Sleep HR: Avg 51 bpm | Min 43 bpm | Max 63 bpm
+
+--- 20260925 ---
+Steps: 3,120 | Calories: 252 kcal | Exercise: 0 min
+Stress: Avg 32
+Sleep Summary:
+  Total: 2h 17min | Deep: 30 min | Light: 1h 35min | REM: 0 min | Awake: 12 min
+  Sleep HR: Avg 66 bpm | Min 59 bpm | Max 72 bpm
+
+--- 20260926 ---
+Steps: 1,168 | Calories: 82 kcal | Exercise: 1 min | Floors: 1
+Stress: Avg 21
+Sleep Summary:
+  Total: 10h 3min | Deep: 2h 43min | Light: 5h 3min | REM: 1h 50min | Awake: 27 min
+  Sleep HR: Avg 56 bpm | Min 45 bpm | Max 70 bpm
+
+--- 20260927 ---
+Steps: 5,989 | Calories: 429 kcal | Exercise: 0 min
+Stress: Avg 35
+Sleep Summary:
+  Total: 6h 36min | Deep: 1h 21min | Light: 3h 58min | REM: 1h 11min | Awake: 6 min
+  Sleep HR: Avg 52 bpm | Min 45 bpm | Max 65 bpm
+
+--- 20260928 ---
+Steps: 5,476 | Calories: 345 kcal | Exercise: 1 min | Floors: 1
+Stress: Avg 27
+Sleep Summary:
+  Total: 7h 4min | Deep: 1h 19min | Light: 4h 21min | REM: 54 min | Awake: 30 min
+  Sleep HR: Avg 56 bpm | Min 48 bpm | Max 66 bpm
+
+--- 20260929 ---
+Steps: 10,593 | Calories: 859 kcal | Exercise: 54 min
+Stress: Avg 36
+Sleep Summary:
+  Total: 4h 55min | Deep: 1h 20min | Light: 3h 22min | REM: 7 min | Awake: 6 min
+  Sleep HR: Avg 57 bpm | Min 49 bpm | Max 71 bpm

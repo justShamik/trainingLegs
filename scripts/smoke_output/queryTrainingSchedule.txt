@@ -1,0 +1,12 @@
+ARGS: {"startDate": "20260929", "endDate": "20261006"}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Training Schedule\\n========================\\n\\n2026-09-29\\nCountdown Intervals\\nStandalone workout (scheduled from the workout library)\\nidInPlan: 122\\nDistance: 9.44 km\\nEstimated Time: 1:10:00\\nLoad: 122 TL\\nTo view or modify this workout, use queryScheduledWorkoutDetails then updateScheduledWorkout with this date and idInPlan. To reschedule or remove it, use the COROS app.\\n\\n2026-09-30\\nAerobic Power Run\\nStandalone workout (scheduled from the workout library)\\nidInPlan: 121\\nDistance: 10.00 km\\nEstimated Time: 1:09:25\\nLoad: 145 TL\\nTo view or modify this workout, use queryScheduledWorkoutDetails then updateScheduledWorkout with this date and idInPlan. To reschedule or remove it, use the COROS app.\""
+    }
+  ],
+  "isError": false
+}

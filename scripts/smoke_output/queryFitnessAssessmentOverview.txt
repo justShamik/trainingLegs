@@ -1,0 +1,12 @@
+ARGS: {}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Fitness Assessment Overview\\n========================\\n\\nVO2max: 46\\nRunning Level: 73\\nThreshold Pace: 5:12 /km\\n5 km Prediction: 24:58\\n10 km Prediction: 52:13\\nHalf Marathon Prediction: 1:57:51\\nMarathon Prediction: 4:10:28\""
+    }
+  ],
+  "isError": false
+}

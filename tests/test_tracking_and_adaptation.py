@@ -54,26 +54,32 @@ def test_post_run_feedback_generation():
 
 
 def test_auto_match_activities_to_sessions(temp_db):
-    """Verify auto-matching completed COROS activities to plan sessions (FR-3.1)."""
+    """Verify auto-matching completed COROS activities to plan sessions by date (FR-3.1)."""
+    from datetime import date
+
+    today = date(2026, 9, 30)  # Wednesday; plan week 1 = Mon 28 Sep - Sun 4 Oct
+    plan = TrainingPlanner(db_path=temp_db).generate_plan(today=today)
+    save_training_plan(plan, db_path=temp_db)
+
+    # A run on a past day of the current week, sized like that day's prescribed session
+    target = next(s for s in get_active_training_plan(db_path=temp_db)["sessions"]
+                  if s.get("distance_km") and s["session_date"] <= "2026-09-29")
     conn = get_db_connection(temp_db)
     conn.execute("""
         INSERT INTO activities (id, date, sport_type, name, distance_m, duration_s, avg_pace_s_km, avg_hr)
-        VALUES ('act_run_01', '2026-09-21', 'Run', 'Morning Easy Run', 10200.0, 3400.0, 333.0, 142)
-    """)
+        VALUES ('act_run_01', ?, 'Run', 'Morning Easy Run', ?, 3400.0, 333.0, 142)
+    """, (target["session_date"] + "T07:00:00Z", target["distance_km"] * 1000.0))
     conn.commit()
     conn.close()
 
-    planner = TrainingPlanner(db_path=temp_db)
-    plan = planner.generate_plan()
-    save_training_plan(plan, db_path=temp_db)
-
-    matched_count = auto_match_activities_to_sessions(db_path=temp_db)
+    matched_count = auto_match_activities_to_sessions(db_path=temp_db, today=today)
     assert matched_count >= 1
 
     active_plan = get_active_training_plan(db_path=temp_db)
     completed_sessions = [s for s in active_plan["sessions"] if s.get("status") == "Completed"]
     assert len(completed_sessions) >= 1
     assert completed_sessions[0]["matched_activity_id"] == "act_run_01"
+    assert completed_sessions[0]["session_date"] == target["session_date"]
 
 
 def test_weekly_compliance_calculation(temp_db):

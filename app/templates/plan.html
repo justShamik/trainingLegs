@@ -1,221 +1,276 @@
 {% extends 'base.html' %}
 
-{% block title %}Weekly Training Plan - Personal Running Coach{% endblock %}
+{% block title %}5-Week Training Plan - Personal Running Coach{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: var(--space-lg); display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--space-md);">
-    <div>
-        <h1>PRESCRIBED TRAINING PLAN & TRACKING</h1>
-        <p style="color: var(--text-secondary);">Evidence-based schedule with automated execution feedback and weekly compliance tracking.</p>
+<section class="page-hero" data-parallax="0.12">
+    <div class="page-hero__text">
+        <span class="eyebrow eyebrow--accent">Training plan</span>
+        <h1 class="sc">PRESCRIBED TRAINING PLAN & TRACKING</h1>
+        <p class="lead">Evidence-based schedule with automated execution feedback and weekly compliance tracking.</p>
     </div>
-    <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+    <div class="page-hero__actions">
         <form method="POST" action="/session/auto-match">
-            <button type="submit" style="background-color: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color); font-family: var(--font-display); font-size: 1.1rem; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
-                🔗 Auto-Match COROS Runs
-            </button>
+            <button type="submit" class="btn btn-secondary">Auto-Match COROS Runs</button>
         </form>
         <form method="POST" action="/plan/generate">
             <input type="hidden" name="is_deload" value="0">
-            <button type="submit" style="background-color: var(--accent-orange); color: #fff; border: none; font-family: var(--font-display); font-size: 1.1rem; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
-                ⚡ Generate Build Week
-            </button>
+            <button type="submit" class="btn btn-primary">Generate Build Week</button>
         </form>
         <form method="POST" action="/plan/generate">
             <input type="hidden" name="is_deload" value="1">
-            <button type="submit" style="background-color: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color); font-family: var(--font-display); font-size: 1.1rem; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
-                💤 Generate Deload Week
-            </button>
+            <button type="submit" class="btn btn-secondary">Generate Deload Week</button>
         </form>
         {% if plan %}
         <form method="POST" action="/plan/discard" onsubmit="return confirm('Are you sure you want to discard the current training plan?');">
-            <button type="submit" style="background-color: rgba(255, 23, 68, 0.15); color: var(--status-danger); border: 1px solid var(--status-danger); font-family: var(--font-display); font-size: 1.1rem; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
-                🗑️ Discard Plan
-            </button>
+            <button type="submit" class="btn btn-danger">Discard Plan</button>
         </form>
         {% endif %}
     </div>
-</div>
+</section>
 
 {% if overtraining and overtraining.is_flagged %}
 <!-- Fatigue & Risk Alert Card -->
-<div class="card" style="margin-bottom: var(--space-lg); border-left: 4px solid var(--status-error); background: rgba(255, 68, 68, 0.08);">
-    <div style="display: flex; align-items: center; justify-content: space-between;">
-        <h3 style="color: var(--status-error); margin: 0; font-family: var(--font-display);">⚠️ OVERTRAINING RISK DETECTED</h3>
-        <span class="badge-na" style="background: rgba(255, 68, 68, 0.2); color: var(--status-error); border-color: var(--status-error);">
-            RISK LEVEL: {{ overtraining.risk_level }}
-        </span>
+<div class="callout callout--danger">
+    <div style="flex: 1; min-width: 0;">
+        <div class="row-between">
+            <h3 class="callout__title sc">OVERTRAINING RISK DETECTED</h3>
+            <span class="chip chip--danger">RISK LEVEL: {{ overtraining.risk_level }}</span>
+        </div>
+        <ul>
+            {% for reason in overtraining.reasons %}
+            <li>{{ reason }}</li>
+            {% endfor %}
+        </ul>
+        <p style="margin-top: 8px;">
+            <strong style="color: var(--text-primary);">Adaptive Action:</strong> Next generated plan will automatically reduce volume by {{ overtraining.recommended_adjustment_pct|abs }}% for recovery.
+        </p>
     </div>
-    <ul style="margin: var(--space-xs) 0 0 0; padding-left: 20px; color: var(--text-primary); font-size: 0.95rem;">
-        {% for reason in overtraining.reasons %}
-        <li>{{ reason }}</li>
-        {% endfor %}
-    </ul>
-    <p style="color: var(--text-secondary); margin-top: 8px; margin-bottom: 0; font-size: 0.9rem;">
-        <strong>Adaptive Action:</strong> Next generated plan will automatically reduce volume by {{ overtraining.recommended_adjustment_pct|abs }}% for recovery.
-    </p>
 </div>
 {% endif %}
 
 {% if plan %}
-<!-- Compliance KPI Card -->
-<div class="kpi-grid" style="margin-bottom: var(--space-lg);">
-    <div class="kpi-card">
-        <div class="kpi-label">Volume Compliance</div>
-        <div class="kpi-value" style="color: {% if compliance and compliance.volume_compliance_pct >= 85 %}var(--status-success){% elif compliance and compliance.volume_compliance_pct >= 70 %}var(--status-warning){% else %}var(--status-error){% endif %};">
-            {{ compliance.volume_compliance_pct if compliance else '100.0' }}%
+<style>.week-body[hidden] { display: none !important; }</style>
+<!-- Plan period banner -->
+<div class="card" id="plan-period" style="margin-bottom: var(--space-md); padding: 18px 24px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+    <span class="eyebrow eyebrow--accent eyebrow--plain">Period</span>
+    <span style="font-family: var(--font-display); font-size: 1.12rem; font-weight: 500; letter-spacing: -0.015em;">{{ plan_vm.period_text }}</span>
+</div>
+{% if plan_vm.notice %}
+<div class="callout plan-notice plan-notice-{{ plan_vm.notice.level }} {% if plan_vm.notice.level == 'ended' %}callout--danger{% else %}callout--warning{% endif %}" style="align-items: center;">
+    <span style="color: var(--text-primary);">{{ plan_vm.notice.text }}</span>
+    <form method="POST" action="/plan/generate">
+        <input type="hidden" name="is_deload" value="0">
+        <button type="submit" class="btn btn-primary">Generate New 5-Week Plan</button>
+    </form>
+</div>
+{% endif %}
+<!-- Compliance KPI Card (current week by default; whole plan in subtitles) -->
+{% set vol_pct = compliance.volume_compliance_pct if compliance else 100 %}
+{% set ses_pct = compliance.session_compliance_pct if compliance else 100 %}
+<div class="kpi-grid" style="margin-bottom: var(--space-lg);" data-reveal-stagger="80">
+    <div class="kpi-card kpi--with-dial tone-peach">
+        <div class="kpi__body">
+            <div class="kpi-label">Volume Compliance (Week {{ compliance.week_number or 1 }})</div>
+            <div class="kpi-value" style="color: {% if compliance and compliance.volume_compliance_pct >= 85 %}var(--status-success){% elif compliance and compliance.volume_compliance_pct >= 70 %}var(--status-warning){% else %}var(--status-error){% endif %};">
+                {{ compliance.volume_compliance_pct if compliance else '100.0' }}%
+            </div>
+            <div class="kpi-subtitle">
+                {{ compliance.completed_total_km if compliance else '0.0' }} / {{ compliance.prescribed_total_km if compliance else plan.total_volume_km }} km this week
+            </div>
+            <div class="kpi-subtitle">Whole plan: {{ compliance.plan_completed_total_km }} / {{ compliance.plan_prescribed_total_km }} km ({{ compliance.plan_volume_compliance_pct }}%)</div>
         </div>
-        <div class="kpi-subtitle">
-            {{ compliance.completed_total_km if compliance else '0.0' }} / {{ compliance.prescribed_total_km if compliance else plan.total_volume_km }} KM
+        <div class="dial dial--sm tone-peach" data-pct="{{ vol_pct }}" aria-hidden="true">
+            <span class="dial__label">Volume</span>
         </div>
     </div>
-    <div class="kpi-card">
-        <div class="kpi-label">Session Compliance</div>
-        <div class="kpi-value">
-            {{ compliance.session_compliance_pct if compliance else '100.0' }}%
+    <div class="kpi-card kpi--with-dial tone-sky">
+        <div class="kpi__body">
+            <div class="kpi-label">Session Compliance (Week {{ compliance.week_number or 1 }})</div>
+            <div class="kpi-value">
+                {{ compliance.session_compliance_pct if compliance else '100.0' }}%
+            </div>
+            <div class="kpi-subtitle">
+                {{ compliance.completed_sessions if compliance else 0 }} / {{ compliance.total_sessions if compliance else 0 }} Workouts Executed this week
+            </div>
+            <div class="kpi-subtitle">Whole plan: {{ compliance.plan_completed_sessions }} / {{ compliance.plan_total_sessions }} ({{ compliance.plan_session_compliance_pct }}%)</div>
         </div>
-        <div class="kpi-subtitle">
-            {{ compliance.completed_sessions if compliance else 0 }} / {{ compliance.total_sessions if compliance else 0 }} Workouts Executed
+        <div class="dial dial--sm tone-sky" data-pct="{{ ses_pct }}" aria-hidden="true">
+            <span class="dial__label">Sessions</span>
         </div>
     </div>
-    <div class="kpi-card">
+    <div class="kpi-card tone-mint">
         <div class="kpi-label">Workouts Status</div>
-        <div class="kpi-value" style="font-size: 1.4rem; font-family: var(--font-body);">
+        <div class="kpi-value" style="font-size: 1.6rem; font-weight: 400; display: flex; gap: 14px; flex-wrap: wrap;">
             <span style="color: var(--status-success);">✓ {{ compliance.completed_sessions if compliance else 0 }}</span>
-            {% if compliance and compliance.modified_sessions %}<span style="color: var(--status-warning);"> • ~{{ compliance.modified_sessions }}</span>{% endif %}
-            {% if compliance and compliance.skipped_sessions %}<span style="color: var(--status-error);"> • ✗ {{ compliance.skipped_sessions }}</span>{% endif %}
+            {% if compliance and compliance.modified_sessions %}<span style="color: var(--status-warning);">~{{ compliance.modified_sessions }}</span>{% endif %}
+            {% if compliance and compliance.skipped_sessions %}<span style="color: var(--status-error);">✗ {{ compliance.skipped_sessions }}</span>{% endif %}
         </div>
         <div class="kpi-subtitle">Completed / Modified / Skipped</div>
     </div>
 </div>
 
 <!-- Methodology & Overview Card -->
-<div class="card" style="margin-bottom: var(--space-lg); border-left: 4px solid var(--accent-orange);">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xs); flex-wrap: wrap; gap: 8px;">
-        <span class="badge-na" style="background: rgba(255,85,0,0.15); color: var(--accent-orange); border-color: var(--accent-orange);">
-            METHODOLOGY: {{ plan.methodology_name }}
-        </span>
-        <span style="font-family: var(--font-display); font-size: 1.3rem; color: var(--text-primary);">
-            TARGET VOLUME: <strong style="color: var(--accent-orange);">{{ plan.total_volume_km }} KM</strong>
-            {% if plan.is_deload %}<span style="color: var(--status-warning);"> (DELOAD)</span>{% endif %}
+<div class="card tone-orange" style="margin-bottom: var(--space-2xl);">
+    <div class="row-between" style="margin-bottom: 12px;">
+        <span class="chip chip--orange chip--raw"><span class="sc">METHODOLOGY:</span> {{ plan.methodology_name }}</span>
+        <span class="sc" style="font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; color: var(--text-secondary);">
+            {% set cur = plan_vm.weeks[plan_vm.current_week - 1] %}
+            TARGET VOLUME (WEEK {{ cur.number }}): <strong style="color: var(--accent-orange); font-weight: 600;">{{ cur.volume_km }} KM</strong>
+            {% if plan.is_deload and cur.number == 1 %}<span style="color: var(--status-warning);"> (DELOAD)</span>{% endif %}
         </span>
     </div>
-    <p style="color: var(--text-secondary); margin-top: var(--space-xs); margin-bottom: 0;">
-        <strong>Rationale:</strong> {{ plan.methodology_rationale }}
+    <p style="color: var(--text-secondary); max-width: 80ch;">
+        <strong style="color: var(--text-primary); font-weight: 500;">Rationale:</strong> {{ plan.methodology_rationale }}
     </p>
 </div>
 
 <!-- Sessions List Grid -->
-<div style="display: flex; flex-direction: column; gap: var(--space-md); margin-bottom: var(--space-xl);">
-    {% for sess in plan.sessions %}
-    <div class="card" style="display: flex; flex-direction: column; gap: 12px; {% if sess.session_type in ['Threshold', 'VO2max', 'Long Run', 'Vert/Time-on-Feet'] %}border-left: 3px solid var(--accent-orange);{% endif %}">
-        <div style="display: grid; grid-template-columns: 80px 180px 140px 200px 1fr auto; gap: var(--space-md); align-items: center;">
+<div class="section-head">
+    <div>
+        <span class="eyebrow">Schedule</span>
+        <h2>Five weeks, day by day</h2>
+    </div>
+</div>
+<div class="stack" style="margin-bottom: var(--space-xl);">
+    {% for w in plan_vm.weeks %}
+    {% set week_open = w.is_current or (plan_vm.ended and loop.last) %}
+    <div class="week-section stack" data-week="{{ w.number }}">
+        <button type="button" class="week-toggle {% if w.is_current %}is-current{% endif %}" aria-expanded="{{ 'true' if week_open else 'false' }}" aria-controls="week-body-{{ w.number }}">
+            <span class="week-toggle__title">Week {{ w.number }}{% if w.is_current %} (current){% endif %} - {{ w.range_label }} - {{ w.volume_km }} km</span>
+            <span class="week-toggle__meta">
+                {{ w.kind }}
+                {% if w.delta_pct is not none %} &middot; <span class="week-delta" style="color: {% if w.delta_pct > 0 %}var(--pastel-peach){% elif w.delta_pct < 0 %}var(--status-warning){% else %}var(--text-muted){% endif %};">{{ '%+.1f'|format(w.delta_pct) }}% vs previous week</span>{% endif %}
+                &middot; {{ w.runs_done }}/{{ w.runs_total }} runs done
+                <span class="week-caret">{{ '▾' if week_open else '▸' }}</span>
+            </span>
+        </button>
+        <div class="week-body stack" id="week-body-{{ w.number }}" {% if not week_open %}hidden{% endif %}>
+    {% for sess in w.sessions %}
+    <div class="card session-card {% if sess.session_type in ['Threshold', 'VO2max', 'Long Run', 'Vert/Time-on-Feet'] %}is-key{% endif %} {% if sess.is_today %}is-today{% endif %}" {% if sess.is_today %}id="today-session"{% endif %}>
+        <div class="session-grid">
             <div>
-                <div style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--text-primary);">{{ sess.day_of_week }}</div>
+                <div class="session-date">{{ sess.date_label }}</div>
+                {% if sess.is_today %}<span class="chip chip--orange" style="margin-top: 6px;">TODAY</span>{% endif %}
             </div>
             <div>
-                <div style="font-family: var(--font-display); font-size: 1.3rem; color: var(--text-primary);">{{ sess.session_type }}</div>
-                <div style="font-size: 0.85rem; color: var(--text-muted);">Session Type</div>
+                <div class="stat-main">{{ sess.session_type }}</div>
+                <div class="stat-label">Session Type</div>
             </div>
             <div>
-                <div style="font-family: var(--font-display); font-size: 1.4rem; color: var(--accent-orange);">
-                    {% if sess.distance_km %}{{ sess.distance_km }} KM{% else %}REST{% endif %}
+                <div class="stat-main stat-main--accent">
+                    {% if sess.distance_km %}{{ sess.distance_km }} km{% else %}Rest{% endif %}
                 </div>
-                <div style="font-size: 0.85rem; color: var(--text-muted);">
-                    {% if sess.duration_min %}{{ sess.duration_min|int }} MIN{% else %}0 MIN{% endif %}
+                <div class="stat-label">
+                    {% if sess.duration_min %}{{ sess.duration_min|int }} min{% else %}0 min{% endif %}
                 </div>
             </div>
+            {% set tgt = sess.target_pace_or_hr | describe_target %}
             <div>
-                <div style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600;">
-                    {% if 'Heart Rate Focus' in sess.target_pace_or_hr %}
-                    ❤️ <span style="color: #ff5252;">{{ sess.target_pace_or_hr }}</span>
-                    {% elif 'Pace Focus' in sess.target_pace_or_hr %}
-                    ⏱️ <span style="color: var(--accent-orange);">{{ sess.target_pace_or_hr }}</span>
-                    {% else %}
-                    {{ sess.target_pace_or_hr }}
-                    {% endif %}
-                </div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">Target Focus & Range</div>
-            </div>
-            <div>
-                <div style="font-size: 0.9rem; color: var(--text-primary);">{{ sess.stated_purpose }}</div>
-            </div>
-            <div>
-                {% if sess.status == 'Completed' %}
-                <span class="badge-na" style="background: rgba(0,204,136,0.15); color: var(--status-success); border-color: var(--status-success);">✓ COMPLETED</span>
-                {% elif sess.status == 'Modified' %}
-                <span class="badge-na" style="background: rgba(255,170,0,0.15); color: var(--status-warning); border-color: var(--status-warning);">~ MODIFIED</span>
-                {% elif sess.status == 'Skipped' %}
-                <span class="badge-na" style="background: rgba(255,68,68,0.15); color: var(--status-error); border-color: var(--status-error);">✗ SKIPPED</span>
+                {% if tgt.focus == 'Heart Rate' %}
+                <span class="chip chip--rose">HEART RATE FOCUS</span>
+                <div class="stat-main stat-main--hr" style="margin-top: 6px;">{{ tgt.range }}</div>
+                {% elif tgt.focus == 'Pace' %}
+                <span class="chip chip--peach">PACE FOCUS</span>
+                <div class="stat-main stat-main--pace" style="margin-top: 6px;">{{ tgt.range }}</div>
                 {% else %}
-                <span class="badge-na" style="background: rgba(255,255,255,0.1); color: var(--text-muted); border-color: var(--border-color);">PENDING</span>
+                <div style="font-size: 0.95rem; color: var(--text-primary); font-weight: 500;">{{ tgt.range }}</div>
+                {% endif %}
+                {% if tgt.detail %}<div class="stat-detail">{{ tgt.detail }}</div>{% endif %}
+                <div class="stat-label">Target Focus & Range</div>
+            </div>
+            <div class="session-purpose">
+                <div style="font-size: 0.9rem; color: var(--text-secondary);">{{ sess.stated_purpose }}</div>
+            </div>
+            <div class="session-status">
+                {% if sess.status == 'Completed' %}
+                <span class="chip chip--success">✓ COMPLETED</span>
+                {% elif sess.status == 'Modified' %}
+                <span class="chip chip--warning">~ MODIFIED</span>
+                {% elif sess.status == 'Skipped' %}
+                <span class="chip chip--danger">✗ SKIPPED</span>
+                {% else %}
+                <span class="chip chip--neutral">PENDING</span>
                 {% endif %}
             </div>
         </div>
 
         {% if sess.adherence_rating %}
-        <div style="padding: 8px 12px; background: rgba(0, 204, 136, 0.1); border-radius: var(--radius-sm); border-left: 3px solid var(--status-success); font-size: 0.9rem; font-weight: 600; color: var(--text-primary);">
-            🎯 Workout Adherence Rating: <span>{{ sess.adherence_rating }}</span>
+        <div class="note" style="font-weight: 500;">
+            Workout Adherence Rating: <span style="color: var(--status-success);">{{ sess.adherence_rating }}</span>
         </div>
         {% endif %}
 
         {% if sess.post_run_feedback %}
-        <div style="padding: 10px 14px; background: rgba(0, 204, 136, 0.08); border-radius: var(--radius-sm); border-left: 3px solid var(--status-success); font-size: 0.9rem; color: var(--text-primary);">
-            <strong>Post-Run Feedback:</strong> {{ sess.post_run_feedback }}
+        <div class="note" style="--tone: var(--pastel-sky);">
+            <strong style="font-weight: 600;">Post-Run Feedback:</strong> {{ sess.post_run_feedback }}
         </div>
         {% endif %}
 
         <!-- Inline Update Controls -->
         {% if sess.session_type != 'Rest' %}
-        <details style="margin-top: 4px;">
-            <summary style="font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; text-transform: uppercase; font-weight: 600;">
-                ✏️ Log / Update Workout Status
-            </summary>
-            <form method="POST" action="/session/update" style="margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; background: var(--bg-surface-elevated); padding: 14px; border-radius: var(--radius-sm);">
+        <details class="disclosure">
+            <summary>Log / Update Workout Status</summary>
+            <form method="POST" action="/session/update" class="panel log-form disclosure__body">
                 <input type="hidden" name="session_id" value="{{ sess.id }}">
                 <input type="hidden" name="session_type" value="{{ sess.session_type }}">
-                
-                <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted); display: block;">Status</label>
-                    <select name="status" style="width: 100%; padding: 6px; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px;">
+
+                <div class="field">
+                    <label>Status</label>
+                    <select name="status">
                         <option value="Completed" {% if sess.status == 'Completed' %}selected{% endif %}>Completed</option>
                         <option value="Modified" {% if sess.status == 'Modified' %}selected{% endif %}>Modified</option>
                         <option value="Skipped" {% if sess.status == 'Skipped' %}selected{% endif %}>Skipped</option>
                     </select>
                 </div>
 
-                <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted); display: block;">Actual Distance (KM)</label>
-                    <input type="number" step="0.1" name="actual_distance_km" value="{{ sess.actual_distance_km or sess.distance_km or '' }}" style="width: 100%; padding: 6px; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px;">
+                <div class="field">
+                    <label>Actual Distance (km)</label>
+                    <input type="number" step="0.1" name="actual_distance_km" value="{{ sess.actual_distance_km or sess.distance_km or '' }}">
                 </div>
 
-                <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted); display: block;">Actual Duration (Min)</label>
-                    <input type="number" step="1" name="actual_duration_min" value="{{ sess.actual_duration_min or sess.duration_min or '' }}" style="width: 100%; padding: 6px; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px;">
+                <div class="field">
+                    <label>Actual Duration (min)</label>
+                    <input type="number" step="1" name="actual_duration_min" value="{{ sess.actual_duration_min or sess.duration_min or '' }}">
                 </div>
 
-                <div>
-                    <label style="font-size: 0.8rem; color: var(--text-muted); display: block;">Actual Avg HR</label>
-                    <input type="number" name="actual_avg_hr" value="{{ sess.actual_avg_hr or '' }}" placeholder="e.g. 145" style="width: 100%; padding: 6px; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px;">
+                <div class="field">
+                    <label>Actual Avg HR</label>
+                    <input type="number" name="actual_avg_hr" value="{{ sess.actual_avg_hr or '' }}" placeholder="e.g. 145">
                 </div>
 
-                <div style="grid-column: 1 / -1;">
-                    <label style="font-size: 0.8rem; color: var(--text-muted); display: block;">Notes / Reason if modified or skipped</label>
-                    <input type="text" name="user_notes" value="{{ sess.user_notes or '' }}" placeholder="e.g. Felt tight calf, cut run 2km short" style="width: 100%; padding: 6px; background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px;">
+                <div class="field span-all">
+                    <label>Notes / Reason if modified or skipped</label>
+                    <input type="text" name="user_notes" value="{{ sess.user_notes or '' }}" placeholder="e.g. Felt tight calf, cut run 2km short">
                 </div>
 
-                <div style="grid-column: 1 / -1; text-align: right;">
-                    <button type="submit" style="background: var(--accent-orange); color: #fff; border: none; padding: 6px 16px; border-radius: 4px; font-weight: 600; cursor: pointer;">Save Status</button>
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary btn-sm">Save Status</button>
                 </div>
             </form>
         </details>
         {% endif %}
     </div>
     {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
 </div>
+<script>
+document.querySelectorAll('.week-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        var body = document.getElementById(btn.getAttribute('aria-controls'));
+        var open = body.hasAttribute('hidden');
+        if (open) { body.removeAttribute('hidden'); } else { body.setAttribute('hidden', ''); }
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.querySelector('.week-caret').textContent = open ? '▾' : '▸';
+    });
+});
+</script>
 {% else %}
-<div class="card" style="text-align: center; padding: 40px;">
-    <h3 style="margin-bottom: 12px;">No Active Training Plan Generated</h3>
-    <p style="color: var(--text-secondary); margin-bottom: 20px;">Click the button above to generate a weekly running plan tailored to your profile.</p>
+<div class="card card--center">
+    <h3 style="margin-bottom: 12px; font-family: var(--font-serif); font-size: 2rem; font-weight: 400;">No Active Training Plan Generated</h3>
+    <p style="color: var(--text-secondary); max-width: 52ch; margin: 0 auto;">Click a generate button above to create a dated 5-week running plan (current week + next 4) tailored to your profile.</p>
 </div>
 {% endif %}
 {% endblock %}

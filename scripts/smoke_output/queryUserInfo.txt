@@ -1,0 +1,12 @@
+ARGS: {}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"User Profile Information\\n========================\\n\\nHeight: 178.0 cm\\nWeight: 80.6 kg\\nBirthday: 1993-02-18 (Age: 33)\\nGender: Male\\nNickname: Shamik\""
+    }
+  ],
+  "isError": false
+}

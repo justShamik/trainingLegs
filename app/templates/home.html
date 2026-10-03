@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% import '_sync_controls.html' as sc %}
+
+{% block title %}Home - Personal Running Coach{% endblock %}
+
+{% block content %}
+{%- macro hmm(minutes) -%}{{ '%d:%02d' % ((minutes|int) // 60, (minutes|int) % 60) }}{%- endmacro -%}
+{%- macro thousands(n) -%}{{ '{:,}'.format(n|round|int) }}{%- endmacro -%}
+{%- set here = '/' -%}
+{%- set connected = sync.state == 'connected' -%}
+
+<!-- ===================================================================== Hero -->
+<section class="page-hero home-hero" data-parallax="0.1">
+    <div class="page-hero__text">
+        <span class="eyebrow eyebrow--accent" id="homeDate" data-date="{{ today.date }}">{{ date_display or today.date }}</span>
+        <h1 id="homeGreeting" class="home-hero__greeting">Hello</h1>
+        <p class="lead">Your day at a glance: last night's sleep, today's movement, and the races on your radar.</p>
+    </div>
+</section>
+
+{{ sc.sync_overlay() }}
+
+<!-- ============================================================== Sync panel -->
+<section class="card home-sync home-sync--{{ sync.state }}" id="syncPanel" data-state="{{ sync.state }}" data-reveal>
+    <div class="home-sync__info">
+        <span class="eyebrow eyebrow--plain">COROS sync</span>
+        <div class="row">
+            {% if sync.state == 'connected' %}
+            <span class="chip chip--mint chip--lg chip--raw home-sync__pill" id="tokenStatus">
+                <span class="status-dot" aria-hidden="true"></span>Token valid{% if sync.token_expires_at %} · expires <span data-utc="{{ sync.token_expires_at }}" data-format="date">{{ sync.token_expires_at[:10] }}</span>{% endif %}
+            </span>
+            {% elif sync.state == 'expired' %}
+            <span class="chip chip--butter chip--lg chip--raw home-sync__pill" id="tokenStatus">
+                <span class="status-dot" aria-hidden="true"></span>Token expired — reconnect
+            </span>
+            {% else %}
+            <span class="chip chip--rose chip--lg chip--raw home-sync__pill" id="tokenStatus">
+                <span class="status-dot" aria-hidden="true"></span>COROS not connected
+            </span>
+            {% endif %}
+        </div>
+        <dl class="home-sync__meta">
+            <div>
+                <dt>Last synced</dt>
+                <dd><span id="homeLastSync" class="num" {% if sync.last_sync_iso %}data-utc="{{ sync.last_sync_iso }}"{% endif %}>{{ sync.last_sync_iso[:16].replace('T', ' ') ~ ' UTC' if sync.last_sync_iso else 'Never' }}</span></dd>
+            </div>
+            <div>
+                <dt>Last result</dt>
+                <dd id="homeLastResult">
+                    {% if sync.last_sync_status %}
+                        {% set ok = sync.last_sync_status|upper == 'SUCCESS' %}
+                        <span class="chip {{ 'chip--mint' if ok else 'chip--rose' }}">{{ 'Succeeded' if ok else 'Failed' }}</span>
+                        {% if sync.last_sync_type %}<span class="text-muted">{{ sync.last_sync_type|lower }}</span>{% endif %}
+                        {% if not ok and sync.last_attempt_iso %}<span class="text-muted">· <span data-utc="{{ sync.last_attempt_iso }}">{{ sync.last_attempt_iso }}</span></span>{% endif %}
+                    {% else %}
+                        <span class="text-muted">No sync attempts yet</span>
+                    {% endif %}
+                </dd>
+            </div>
+        </dl>
+        {% if sync.last_sync_status and sync.last_sync_status|upper != 'SUCCESS' and sync.last_sync_message %}
+        <p class="home-sync__note text-muted">{{ sync.last_sync_message }}</p>
+        {% endif %}
+    </div>
+    <div class="home-sync__actions">
+        <div class="home-sync__buttons">
+            {{ sc.sync_forms(prefix='home', next=here, locked=not connected,
+                             lock_reason='Connect your COROS account to sync') }}
+        </div>
+        {% if not connected %}
+        <div class="home-sync__connect">
+            <p class="text-secondary" id="syncLockedReason">
+                {% if sync.state == 'expired' %}Your COROS token has expired. Reconnect to enable syncing.{% else %}Connect your COROS account to enable syncing.{% endif %}
+            </p>
+            <form method="POST" action="/coros/login">
+                <input type="hidden" name="next" value="/">
+                <button type="submit" class="btn btn-primary" id="homeConnectBtn">Connect COROS</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+{% if sync_msg %}
+<div class="callout {% if sync_result == 'success' %}callout--success{% else %}callout--danger{% endif %}" id="syncResult">
+    <div style="font-size: 0.95rem; color: var(--text-primary);">
+        <strong style="color: var(--tone);">Sync Result:</strong> {{ sync_msg }}
+    </div>
+</div>
+{% endif %}
+
+<!-- =================================================================== Today -->
+<section class="section" id="today">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Today</span>
+            <h2>How today is going</h2>
+        </div>
+        <a href="{{ url_for('index') }}" class="link-arrow">Open dashboard <span class="arrow" aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    {%- set goals = today.goals -%}
+    {%- set pct = today.pct or {} -%}
+    <div class="dial-group home-dials" data-reveal-stagger="110">
+        {# ---- Sleep #}
+        {%- set s = today.sleep -%}
+        {%- set has_sleep = s and s.total_minutes is not none -%}
+        <figure class="dial-tile" data-metric="sleep">
+            <div class="dial dial--lg tone-lavender{% if not has_sleep %} dial--empty{% endif %}" data-pct="{{ (pct.sleep or 0) if has_sleep else 0 }}" style="--pct:{{ (pct.sleep or 0) if has_sleep else 0 }}"
+                 aria-label="Sleep: {{ (hmm(s.total_minutes) ~ ' hours') if has_sleep else 'no data' }}">
+                <span class="dial__value">{% if has_sleep %}{{ hmm(s.total_minutes) }}<span class="dial__unit">h</span>{% else %}—{% endif %}</span>
+                <span class="dial__label">Sleep</span>
+            </div>
+            <figcaption class="dial-tile__caption">
+                {% if has_sleep %}
+                    <span class="dial-tile__goal">Goal {{ hmm(goals.sleep_minutes) }} h</span>
+                    {% if s.deep_minutes is not none %}<span class="text-muted">Deep {{ hmm(s.deep_minutes) }} · REM {{ hmm(s.rem_minutes or 0) }}</span>{% else %}<span class="text-muted">Last night</span>{% endif %}
+                {% else %}
+                    <span class="dial-tile__reason">{{ today.sleep_reason or 'No sleep data' }}</span>
+                {% endif %}
+            </figcaption>
+        </figure>
+
+        {# ---- Activity time #}
+        {%- set act_known = today.activity_count or not today.daily_activity_reason -%}
+        <figure class="dial-tile" data-metric="activity">
+            <div class="dial dial--lg tone-peach{% if not act_known %} dial--empty{% endif %}" data-pct="{{ (pct.activity or 0) if act_known else 0 }}" style="--pct:{{ (pct.activity or 0) if act_known else 0 }}"
+                 aria-label="Activity time: {{ ((today.activity_time_minutes|round|int) ~ ' minutes') if act_known else 'no data' }}">
+                <span class="dial__value">{% if act_known %}{{ today.activity_time_minutes|round|int }}<span class="dial__unit">min</span>{% else %}—{% endif %}</span>
+                <span class="dial__label">Activity time</span>
+            </div>
+            <figcaption class="dial-tile__caption">
+                {% if act_known %}
+                    <span class="dial-tile__goal">Goal {{ goals.activity_minutes }} min</span>
+                    <span class="text-muted">{% if today.activity_count %}{{ today.activity_count }} {{ 'activity' if today.activity_count == 1 else 'activities' }}{% else %}{{ today.activity_reason or 'No activities recorded today' }}{% endif %}</span>
+                {% else %}
+                    <span class="dial-tile__reason">{{ today.daily_activity_reason }}</span>
+                {% endif %}
+            </figcaption>
+        </figure>
+
+        {# ---- Steps #}
+        <figure class="dial-tile" data-metric="steps">
+            <div class="dial dial--lg tone-mint{% if today.steps is none %} dial--empty{% endif %}" data-pct="{{ pct.steps or 0 }}" style="--pct:{{ pct.steps or 0 }}"
+                 aria-label="Steps: {{ thousands(today.steps) if today.steps is not none else 'no data' }}">
+                <span class="dial__value">{% if today.steps is not none %}{{ thousands(today.steps) }}{% else %}—{% endif %}</span>
+                <span class="dial__label">Steps</span>
+            </div>
+            <figcaption class="dial-tile__caption">
+                {% if today.steps is not none %}
+                    <span class="dial-tile__goal">Goal {{ thousands(goals.steps) }}</span>
+                {% else %}
+                    <span class="dial-tile__reason">{{ today.daily_activity_reason or 'No step data' }}</span>
+                {% endif %}
+            </figcaption>
+        </figure>
+
+        {# ---- Calories #}
+        <figure class="dial-tile" data-metric="calories">
+            <div class="dial dial--lg tone-apricot{% if today.calories_kcal is none %} dial--empty{% endif %}" data-pct="{{ pct.calories or 0 }}" style="--pct:{{ pct.calories or 0 }}"
+                 aria-label="Calories: {{ (thousands(today.calories_kcal) ~ ' kcal') if today.calories_kcal is not none else 'no data' }}">
+                <span class="dial__value">{% if today.calories_kcal is not none %}{{ thousands(today.calories_kcal) }}<span class="dial__unit">kcal</span>{% else %}—{% endif %}</span>
+                <span class="dial__label">Calories</span>
+            </div>
+            <figcaption class="dial-tile__caption">
+                {% if today.calories_kcal is not none %}
+                    <span class="dial-tile__goal">Goal {{ thousands(goals.calories_kcal) }} kcal</span>
+                {% else %}
+                    <span class="dial-tile__reason">{{ today.daily_activity_reason or 'No calorie data' }}</span>
+                {% endif %}
+            </figcaption>
+        </figure>
+    </div>
+</section>
+
+<!-- =================================================================== Races -->
+{%- macro race_card(r) -%}
+{%- set chip = {'open': 'chip--mint', 'not_started': 'chip--butter', 'closed': 'chip--rose'}.get(r.status, 'chip--neutral') -%}
+<article class="card race-card" data-race-id="{{ r.id }}" data-status="{{ r.status }}">
+    <div class="race-card__chips">
+        <span class="chip {{ chip }} race-card__status">{{ r.status_label }}</span>
+        {% if r.distance_km %}<span class="chip chip--sky chip--raw">{{ '%g' % r.distance_km }} km</span>{% endif %}
+        {% if r.days_until_event is not none and r.days_until_event >= 0 %}
+        <span class="chip chip--neutral chip--raw race-card__countdown">{% if r.days_until_event == 0 %}Today{% elif r.days_until_event == 1 %}Tomorrow{% else %}in {{ r.days_until_event }} days{% endif %}</span>
+        {% endif %}
+    </div>
+    <h3 class="race-card__name">{{ r.name }}</h3>
+    {% if r.location %}<p class="race-card__location text-secondary">{{ r.location }}</p>{% endif %}
+    <dl class="race-card__facts">
+        <div><dt>Event</dt><dd>{{ r.event_date_text }}</dd></div>
+        {% if r.registration_opens_display %}<div><dt>Registration opens</dt><dd>{{ r.registration_opens_display }}</dd></div>{% endif %}
+        {% if r.registration_closes_display %}<div><dt>Registration closes</dt><dd>{{ r.registration_closes_display }}</dd></div>{% endif %}
+        {% if r.last_registration_closed %}
+        <div class="race-card__lrc"><dt>Last registration closed</dt><dd>{{ r.last_registration_closed.date_display }}{% if r.last_registration_closed.edition_year %} ({{ r.last_registration_closed.edition_year }} edition){% endif %}</dd></div>
+        {% endif %}
+    </dl>
+    {% if r.evidence %}<blockquote class="race-card__evidence">“{{ r.evidence|truncate(180) }}”</blockquote>{% endif %}
+    <div class="race-card__foot">
+        <span class="text-muted race-card__checked">
+            {% if r.last_checked_at %}Checked <span data-utc="{{ r.last_checked_at }}">{{ r.last_checked_at }}</span>{% if r.scan_error %} · site unreadable{% endif %}
+            {% else %}Not checked yet · researched {{ races.as_of or 'manually' }}{% endif %}
+        </span>
+        {% if r.source_url %}
+        <a href="{{ r.source_url }}" class="link-arrow race-card__source" target="_blank" rel="noopener noreferrer">Official site <span class="arrow" aria-hidden="true">&nearr;</span></a>
+        {% endif %}
+    </div>
+</article>
+{%- endmacro -%}
+
+<section class="section" id="races">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Races</span>
+            <h2>Race watchlist</h2>
+            <p class="text-muted race-checked" id="racesLastChecked">
+                Last checked: {% if races.last_checked_at %}<span data-utc="{{ races.last_checked_at }}">{{ races.last_checked_at }}</span>{% else %}never (showing researched data{% if races.as_of %} from {{ races.as_of }}{% endif %}){% endif %}
+            </p>
+        </div>
+        <form method="POST" action="/races/refresh" class="sync-form race-refresh-form"
+              data-title="Checking race websites"
+              data-message="Visiting each race's official page for registration updates. This can take up to a minute…">
+            <button type="submit" id="raceRefreshBtn" class="sync-btn btn btn-secondary">Check race websites now</button>
+        </form>
+    </div>
+
+    {% if race_msg %}
+    <div class="callout {% if race_status == 'success' %}callout--success{% else %}callout--danger{% endif %}" id="raceResult">
+        <div style="font-size: 0.95rem; color: var(--text-primary);">
+            <strong style="color: var(--tone);">Race check:</strong> {{ race_msg }}
+        </div>
+    </div>
+    {% elif races.needs_refresh %}
+    <p class="race-hint text-muted" id="raceRefreshHint">Race statuses haven't been checked in the last 24 hours. Use “Check race websites now” for the latest registration news.</p>
+    {% endif %}
+    {% if races.error %}<p class="text-muted">{{ races.error }}</p>{% endif %}
+
+    {% if races.watchlist %}
+    <div class="race-grid" data-reveal-stagger="80" id="watchlistRaces">
+        {% for r in races.watchlist %}{{ race_card(r) }}{% endfor %}
+    </div>
+    {% else %}
+    <div class="card card--center"><p class="text-muted">No races on your watchlist yet.</p></div>
+    {% endif %}
+
+    <div class="race-sub" id="ncr50k">
+        <div class="section-head section-head--sub">
+            <div>
+                <span class="eyebrow eyebrow--plain">Ultra options</span>
+                <h3 class="race-sub__title">50K near Delhi NCR (Nov–Jan)</h3>
+            </div>
+        </div>
+        {% if races.ncr_50k %}
+        <div class="race-grid" data-reveal-stagger="80" id="ncrRaces">
+            {% for r in races.ncr_50k %}{{ race_card(r) }}{% endfor %}
+        </div>
+        {% else %}
+        <div class="card card--center"><p class="text-muted">No upcoming 50K races found near Delhi NCR.</p></div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/sync.js') }}"></script>
+<script>
+(function () {
+    // Greeting + date from the browser's local clock (server renders a neutral "Hello").
+    var now = new Date(), h = now.getHours();
+    var greeting = h >= 5 && h < 12 ? 'Good morning'
+                 : h >= 12 && h < 17 ? 'Good afternoon'
+                 : h >= 17 && h < 22 ? 'Good evening'
+                 : 'Hello, night owl';
+    var g = document.getElementById('homeGreeting');
+    if (g) { g.textContent = greeting; g.setAttribute('data-hour', String(h)); }
+    var d = document.getElementById('homeDate');
+    if (d) {
+        try {
+            var parts = {};
+            new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+                .formatToParts(now).forEach(function (p) { parts[p.type] = p.value; });
+            d.textContent = parts.weekday + ', ' + parts.day + ' ' + parts.month;
+        } catch (e) {
+            d.textContent = now.toDateString();
+        }
+    }
+})();
+</script>
+{% endblock %}

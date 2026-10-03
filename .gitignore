@@ -20,3 +20,7 @@ Thumbs.db
 
 # Tool Config
 .gemini/
+
+# E2E
+tests/e2e/artifacts/
+logs/

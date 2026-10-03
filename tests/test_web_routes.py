@@ -65,7 +65,7 @@ def test_dashboard_route_renders_data():
     client = app.test_client()
     
     start_t = time.time()
-    response = client.get("/")
+    response = client.get("/dashboard")
     elapsed_seconds = time.time() - start_t
     
     print(f"\n[DASHBOARD LOAD TIME] Render completed in {elapsed_seconds*1000:.2f}ms")

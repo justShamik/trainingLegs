@@ -1,0 +1,12 @@
+ARGS: {"labelId": "480672546503557126", "sportType": 100, "limit": 1}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "Activity FIT file download URL(s):\n1. 480672546503557126.fit\n   https://s3.coros.com/fit/460648181682683919/480672546503557126.fit"
+    }
+  ],
+  "isError": false
+}

@@ -1,0 +1,22 @@
+🏃 Outdoor Run Activity Details
+========================================
+
+Workout Time: 52:52
+Distance: 8.40 km
+Total Time: 52:52
+Average Pace: 6:17 /km
+Moving Average Pace: 6:17 /km
+Adjusted Pace: 6:18 /km
+Best Kilometer: 5:37 /km
+Average Heart Rate: 155 bpm
+Average Cadence: 176 spm
+Average Stride Length: 0.90 m
+Average Power: 224 W
+Elevation Gain / Loss: 4 m / 6 m
+Calories: 763 kcal
+Training Load: 141
+Aerobic TE: 3.2
+Anaerobic TE: 1.8
+Training Focus: Base
+Performance: Below Average
+Perceived Effort: Moderate

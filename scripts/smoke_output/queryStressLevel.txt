@@ -1,0 +1,12 @@
+ARGS: {"days": 7}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Stress Level — Last 7 days\\n========================\\n\\n2026-09-29:\\nAverage Stress: 27 (Low)\\nRelaxed: 4h 40m (78%)\\nLow: 45m (13%)\\nMedium: 10m (3%)\\nHigh: 25m (7%)\\n\\n2026-09-28:\\nAverage Stress: 27 (Low)\\nRelaxed: 12h 25m (63%)\\nLow: 5h 45m (29%)\\nMedium: 1h 5m (5%)\\nHigh: 35m (3%)\\n\\n2026-09-27:\\nAverage Stress: 35 (Low)\\nRelaxed: 10h (43%)\\nLow: 7h 35m (33%)\\nMedium: 4h 20m (19%)\\nHigh: 1h 15m (5%)\\n\\n2026-09-26:\\nAverage Stress: 21 (Relaxed)\\nRelaxed: 20h 20m (85%)\\nLow: 3h 15m (14%)\\nMedium: 20m (1%)\\nHigh: 5m (0%)\\n\\n2026-09-25:\\nAverage Stress: 32 (Low)\\nRelaxed: 8h 35m (38%)\\nLow: 11h 30m (51%)\\nMedium: 1h 55m (8%)\\nHigh: 35m (3%)\\n\\n2026-09-24:\\nAverage Stress: 32 (Low)\\nRelaxed: 11h 10m (50%)\\nLow: 6h 55m (31%)\\nMedium: 4h (18%)\\nHigh: 25m (2%)\\n\\n2026-09-23:\\nAverage Stress: 28 (Low)\\nRelaxed: 10h 20m (64%)\\nLow: 4h 25m (27%)\\nMedium: 45m (5%)\\nHigh: 45m (5%)\""
+    }
+  ],
+  "isError": false
+}

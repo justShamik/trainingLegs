@@ -1,0 +1,12 @@
+ARGS: {"labelId": "480672546503557126", "sportType": 100, "startTimestamp": 1790641745, "endTimestamp": 1790642345}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"source\":\"customTimeWindow\",\"labelId\":\"480672546503557126\",\"sportType\":100,\"mode\":8,\"subMode\":1,\"columns\":[{\"name\":\"lapIndex\",\"label\":\"圈数\"},{\"name\":\"distance\",\"label\":\"距离\"},{\"name\":\"time\",\"label\":\"时间\"},{\"name\":\"totalLength\",\"label\":\"累计时间\"},{\"name\":\"avgPace\",\"label\":\"平均配速\"},{\"name\":\"avgSpeedV2\",\"label\":\"平均速度\"},{\"name\":\"vertSpeed\",\"label\":\"垂直速度\"},{\"name\":\"avgPower\",\"label\":\"平均功率\"},{\"name\":\"avgHr\",\"label\":\"平均心率\"},{\"name\":\"maxHr\",\"label\":\"最大心率\"},{\"name\":\"groundTime\",\"label\":\"踏地时间\"},{\"name\":\"groundBalance\",\"label\":\"左右平衡\"},{\"name\":\"avgCadence\",\"label\":\"平均步频\"},{\"name\":\"maxCadence\",\"label\":\"最大步频\"},{\"name\":\"strideRatio\",\"label\":\"垂直步幅比\"},{\"name\":\"strideHeight\",\"label\":\"垂直振幅\"},{\"name\":\"avgStrideLength\",\"label\":\"平均步幅\"},{\"name\":\"formPower\",\"label\":\"姿势功率\"},{\"name\":\"legStiffness\",\"label\":\"下肢刚度\"},{\"name\":\"elevGain\",\"label\":\"累计上升\"},{\"name\":\"totalDescent\",\"label\":\"累计下降\"},{\"name\":\"bodyTemperature\",\"label\":\"体温\"},{\"name\":\"adjustedPace\",\"label\":\"等价配速\"},{\"name\":\"groundReactionForce\",\"label\":\"地反力峰值\"},{\"name\":\"groundContactAngle\",\"label\":\"踏地角度\"}],\"startTimestamp\":1790641745,\"endTimestamp\":1790642345,\"laps\":[{\"lapIndex\":0,\"distance\":1462,\"time\":600,\"totalLength\":600,\"avgPace\":410.0,\"avgSpeedV2\":877.0,\"vertSpeed\":6.0,\"avgPower\":207,\"avgHr\":144,\"maxHr\":149,\"groundTime\":280,\"groundBalance\":0.0,\"avgCadence\":173,\"maxCadence\":176,\"strideRatio\":103,\"strideHeight\":88,\"avgStrideLength\":84,\"legStiffness\":0,\"elevGain\":2.0,\"totalDescent\":1.0,\"bodyTemperature\":0,\"adjustedPace\":408}]}"
+    }
+  ],
+  "isError": false
+}

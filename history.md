@@ -457,3 +457,41 @@ tests/test_web_routes.py::test_plan_discard_route_endpoint PASSED        [100%]
 | `/sync` (POST) | Sync Trigger | Full/incremental COROS data sync with status reporting |
 | `/plan/discard` (POST) | Discard Plan | Instant plan reset |
 | `/coros/login` | COROS Login | Browser OAuth trigger via coros-mcp CLI |
+
+---
+
+## Sprint 8 - Analytics (self-hosted usage analytics, ADR-006)
+
+- **Package:** `app/analytics/` (`store.py` schema/insert/prune/aggregate, `views.py` ingestion API + dashboard + export + delete, `__init__.py` `init_analytics(app)` + `track()` + request hooks). Wired with one line in `create_app`.
+- **Storage:** `analytics_events` table in `coach.db` (created by `init_schema`, not schema.sql); events older than 180 days pruned at startup.
+- **Server events:** `page_view` (status + server ms), `sync_started`/`sync_finished`, `plan_generated`, `session_logged`, `chat_question` (length + topic bucket only), `feature_used` (plan_discard, strength_generate, strength_complete, profile_saved), `error` (HTTP 5xx). Derived in `after_request` by endpoint name; routes untouched.
+- **Client:** `static/js/analytics.js` via `templates/_analytics.html` (include in base.html): page_load_ms, clicks (label max 40 chars), form_submit, JS errors, time_on_page via sendBeacon to `POST /analytics/event` (always 204; 4 KB limit, 120 events/min, whitelisted types). Session id in sessionStorage; no cookies/IP/form values.
+- **Opt-out:** Do-Not-Track (client and server), `?analytics=off` (persists in localStorage), toggle on the dashboard.
+- **Dashboard:** `/analytics` (7/30/90d): KPIs, daily chart, features, funnel, per-page usage, recent errors; `/analytics/export.csv|json`; `POST /analytics/delete`.
+- **Tests:** `tests/test_analytics.py`.
+
+## Sprint 8 - Activity detail enrichment + navbar auth (workstream B)
+
+- **Bug 1 root cause:** `querySportRecords` returns only a summary list (distance, pace, avg HR, calories); cadence, stride, GCT, vertical oscillation, power, GAP, max HR and elevation were never fetched, so those columns stayed NULL.
+- **Fix:** `CorosMCPClient.fetch_activity_details()` calls `queryActivityLapData` (labelId + sportType 100-103; primary) with `getActivityDetail` text as fallback. `_parse_lap_data` reads the overall lap group (type -1) for cadence, stride (cm), power, GAP (`adjustedPace`), max HR, elevation gain/loss, and the per-km group (type 10) for splits (distance in cm) and time-weighted ground contact time / vertical oscillation (only reported per lap; overall value is 0). A 0 from COROS means not recorded and is stored as NULL.
+- **Sync:** `enrich_running_activities()` in `app/data/sync.py` runs after the main commit, enriches only running activities with `details_synced_at IS NULL` (new nullable column, migrated in `init_db`), newest first, max 15 per sync (about 5s per call live), tolerates failures (`client.call_failures`), never fails the sync. `save_activity` upsert now uses COALESCE so re-syncs never null out enriched data.
+- **UI:** activity_detail.html adds max HR and elevation cards; unavailable metrics show the "Not Available" badge plus a reason (`na_reason`: not recorded / not synced yet / not applicable for sport).
+- **Bug 2:** `inject_coros_auth` context processor in `create_app` supplies `coros_auth` to all templates (file check only); per-route calls removed from index/plan_view.
+- **Tests:** `tests/test_activity_enrichment.py`, fixtures in `tests/fixtures/` (real captured output).
+- **Live finding:** all six form metrics are available for outdoor runs with the watch sensors; hybrid fitness has none. Note `querySleepData` currently returns "Unknown tool" from the gateway (pre-existing, not addressed here).
+
+## Sprint 9 - retry counter & sleep (workstream E)
+
+- **Retry counter:** `activities.details_attempts` (INTEGER DEFAULT 0), `details_last_error`, `details_last_attempt_at` (migrated in `init_db`). `enrich_running_activities` orders candidates by attempts ASC then date DESC, skips activities with 3 failed attempts (`MAX_DETAIL_ATTEMPTS`), records the error on each failure (also when the CLI returns no data), and a success resets attempts/error. Sync message adds "N activities could not be enriched after 3 attempts"; the activity page "Not Available" reason shows the attempts and last error. "Sync 365 Days History" (full=1) calls `reset_detail_attempts` before enriching.
+- **Sleep:** `querySleepData` is still rejected by the gateway. `fetch_sleep_records` now calls `queryDailyHealthData {"days": N}` (N up to 365 in a single call; N=30 for a first incremental) and `_parse_daily_health_sleep` fills total, deep, light, REM, awake minutes (Sleep HR avg/min/max kept in raw_payload). COROS provides no sleep score and no bedtime, so `sleep_score` is NULL and no derived score is invented (NFR-4.1). Nights with a Total but all-zero stages store NULL stages; days without a Sleep Summary are skipped.
+- **UI/logic:** dashboard sleep KPI shows duration + stages with "Sleep score not provided by COROS - showing duration & stages"; the sleep chart becomes stacked stage bars when no score exists (`has_score` in trends); `context_builder` states the score is not provided; overtraining sleep rule already ignores NULL scores.
+- **Tests:** `tests/test_retry_and_sleep.py`, fixture `tests/fixtures/coros_daily_health_365.txt` (real capture).
+
+## Sprint 9 - 5-week dated plan
+
+- **Model:** `training_plans` gains nullable `start_date`, `end_date`, `total_weeks`; `plan_sessions` gains `session_date` (ISO) and `week_number` (1..5). Migrated in `init_db`; `_backfill_plan_dates` dates legacy single-week plans (start = Monday of `created_at` week, `total_weeks` 1, session_date from `day_of_week`). Session ids stay `<plan_id>_sess_<index in date order>`; `save_training_plan` derives dates for undated callers.
+- **Planner (`app/engine/planner.py`):** `generate_plan(is_deload=False, today=None)` returns 5 Mon-Sun weeks starting Monday of the week containing today (35 sessions, contiguous dates). 3:1 loading: build +8%/week x3, deload -20% (week 4), rebuild +8% (week 5; the week-over-week <=10% guardrail also holds on the rebound). Week 1 keeps the adaptation logic (overtraining flag, low compliance held flat, forced deload x0.75); if week 1 is a deload the cycle restarts. Race date inside the window: taper (race week -50%, week before -25%, post-race weeks held). Run days/roles (long run, quality, easy) are solved deterministically among the profile `available_days` (long run not adjacent to quality, <=4 consecutive run days, cyclic). Active niggles replace the quality session with easy running. Fixed old bug where weekly volume summed to 1.35x target and the ultra Sat long run + Sun vert were back-to-back hard days (B2B day is now Easy Aerobic). HR/Pace target strings unchanged in format.
+- **Guardrails:** `validate_multiweek_plan`, `split_weeks`, `weekly_volumes` in `guardrails.py` (per-week 10% cap and 80/20, plus back-to-back hard and consecutive days across week boundaries).
+- **Queries:** `calculate_weekly_compliance(plan_id, db_path, today)` now reports the CURRENT WEEK in the top-level keys and whole-plan figures under `plan_*` keys plus `week_number`; `auto_match_activities_to_sessions(..., today)` matches by `session_date` (same date first, then +-1 day, same distance tolerance) and never matches future sessions.
+- **Page:** `app/engine/plan_view.py` builds the view-model; `plan.html` shows a "Plan period: Mon 28 Sep 2026 – Sun 1 Nov 2026 (5 weeks: current week + next 4)" banner, an ended / moved-on notice with a "Generate New 5-Week Plan" button, collapsible week sections (button toggle, current week open) with km and vs-previous-week %, session cards with dates and a TODAY highlight, KPIs labelled by week with whole-plan subtitles.
+- **Tests:** `tests/test_dated_plan.py`, adjusted plan-engine/auto-match tests, new e2e `test_plan_shows_period_banner_weeks_and_collapse`.

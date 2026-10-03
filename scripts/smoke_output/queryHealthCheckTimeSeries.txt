@@ -1,0 +1,12 @@
+ARGS: {"days": 7}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Health Check Time Series — Latest in history after no complete data in last 7 days\\n========================\\n\\nDate: 2026-09-22\\ntimestamp=1790049453, timezone=22, source=history, device=COROS PACE 3 8EDCE4, dataSource=COROS PACE 3\\nHeart Rate List: [1790049453=83 bpm]\\nHRV List: [1790049453=51 ms]\\nStress List: [1790049453=59]\\nRespiration Rate List: [1790049453=14/min]\\nSpO2 List: [1790049453=95%]\\nStress Level: 3\\nResting Heart Rate: 49 bpm\""
+    }
+  ],
+  "isError": false
+}

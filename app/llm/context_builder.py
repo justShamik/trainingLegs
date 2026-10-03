@@ -23,7 +23,14 @@ def build_runner_context(db_path: Optional[str] = None) -> str:
     sleep_text = "N/A"
     if summary.get("latest_sleep"):
         s = summary["latest_sleep"]
-        sleep_text = f"Score: {s.get('sleep_score', 'N/A')}/100, Total: {(s.get('total_sleep_minutes', 0)/60.0):.1f} hrs"
+        total_hrs = f"{((s.get('total_sleep_minutes') or 0)/60.0):.1f} hrs"
+        if s.get('sleep_score') is not None:
+            sleep_text = f"Score: {s['sleep_score']}/100, Total: {total_hrs}"
+        else:
+            sleep_text = f"Total: {total_hrs} (sleep score not provided by COROS)"
+            if s.get('deep_sleep_minutes') is not None:
+                sleep_text += (f", Deep {s['deep_sleep_minutes']} / Light {s.get('light_sleep_minutes')} / "
+                               f"REM {s.get('rem_sleep_minutes')} / Awake {s.get('awake_minutes')} min")
 
     physio_text = "N/A"
     if summary.get("latest_physio"):

@@ -1,0 +1,329 @@
+{
+  "date": "2026-09-29",
+  "context": {
+    "labelId": "480672546503557126",
+    "sportType": 100,
+    "start": 1790641445,
+    "end": 1790644616
+  },
+  "results": [
+    {
+      "tool": "queryActivityLapData",
+      "args": {
+        "labelId": "480672546503557126",
+        "sportType": 100
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.5,
+      "json_string_encoded": false,
+      "preview": "{\"source\":\"activityDetail\",\"labelId\":\"480672546503557126\",\"sportType\":100,\"mode\":8,\"subMode\":1,\"columns\":[{\"name\":\"lapIndex\",\"label\":\"圈数\"},{\"name\":\"distance\",\"label\":\"距离\"},{\"name\":\"time\",\"label\":\"时间\"},{\"name\":\"totalLength\",\"label\":\"累计时间\"},{\"name\":\"avgPace\",\"label\":\"平均配速\"},{\"name\":\"avgSpeedV2\",\"label"
+    },
+    {
+      "tool": "queryCustomActivityLapData",
+      "args": {
+        "labelId": "480672546503557126",
+        "sportType": 100,
+        "startTimestamp": 1790641745,
+        "endTimestamp": 1790642345
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.5,
+      "json_string_encoded": false,
+      "preview": "{\"source\":\"customTimeWindow\",\"labelId\":\"480672546503557126\",\"sportType\":100,\"mode\":8,\"subMode\":1,\"columns\":[{\"name\":\"lapIndex\",\"label\":\"圈数\"},{\"name\":\"distance\",\"label\":\"距离\"},{\"name\":\"time\",\"label\":\"时间\"},{\"name\":\"totalLength\",\"label\":\"累计时间\"},{\"name\":\"avgPace\",\"label\":\"平均配速\"},{\"name\":\"avgSpeedV2\",\"lab"
+    },
+    {
+      "tool": "getActivityDetail",
+      "args": {
+        "labelId": "480672546503557126",
+        "sportType": 100
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.4,
+      "json_string_encoded": true,
+      "preview": "\"🏃 Outdoor Run Activity Details\\n========================================\\n\\nWorkout Time: 52:52\\nDistance: 8.40 km\\nTotal Time: 52:52\\nAverage Pace: 6:17 /km\\nMoving Average Pace: 6:17 /km\\nAdjusted Pace: 6:18 /km\\nBest Kilometer: 5:37 /km\\nAverage Heart Rate: 155 bpm\\nAverage Cadence: 176 spm\\nAve"
+    },
+    {
+      "tool": "analyzeActivityDetail",
+      "args": {
+        "labelId": "480672546503557126",
+        "sportType": 100,
+        "focus": "cadence stride ground contact"
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.2,
+      "json_string_encoded": true,
+      "preview": "\"Conclusion: This running was a solid 8.40 km session completed in 52:52.\\n\\nKey findings:\\n- The session covered 8.40 km in 52:52.\\n- Average pace was 6:18 /km.\\n- Heart rate: Heart rate averaged 155 bpm, peaking at 172 bpm.\\n- Elevation gain was 4 m, so terrain likely added extra load.\\n- Average "
+    },
+    {
+      "tool": "queryDailyHealthData",
+      "args": {
+        "days": 7
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.9,
+      "json_string_encoded": true,
+      "preview": "\"Daily Health Data — Last 7 days | Resting HR: 53 bpm | HRV Baseline: 42 ms\\nNote: sleep entries are dated by their wake-up day.\\n\\n--- 20260923 ---\\nSteps: 6,235 | Calories: 427 kcal | Exercise: 1 min\\nStress: Avg 28\\nSleep Summary:\\n  Total: 46 min | Deep: 6 min | Light: 34 min | REM: 0 min | Awak"
+    },
+    {
+      "tool": "querySleepData",
+      "args": {
+        "startDate": "20260922",
+        "endDate": "20260929"
+      },
+      "works": false,
+      "error": "error: mcp tools/call failed: {\"code\":-32602,\"message\":\"Unknown tool: invalid_tool_name\",\"data\":\"Tool not found: querySleepData\"}\n",
+      "secs": 4.0,
+      "json_string_encoded": false,
+      "preview": ""
+    },
+    {
+      "tool": "queryDevices",
+      "args": {},
+      "works": true,
+      "error": "",
+      "secs": 4.1,
+      "json_string_encoded": true,
+      "preview": "\"Bound Devices (1)\\n========================\\n\\n1. COROS PACE 3\\n   Bluetooth ID: 8EDCE4\\n   Model Name: COROS W331\\n   Serial Number: W31AV77062\\n   Warranty Expires: 2026-05-18 16:08:05\""
+    },
+    {
+      "tool": "queryFitnessAssessmentOverview",
+      "args": {},
+      "works": true,
+      "error": "",
+      "secs": 4.4,
+      "json_string_encoded": true,
+      "preview": "\"Fitness Assessment Overview\\n========================\\n\\nVO2max: 46\\nRunning Level: 73\\nThreshold Pace: 5:12 /km\\n5 km Prediction: 24:58\\n10 km Prediction: 52:13\\nHalf Marathon Prediction: 1:57:51\\nMarathon Prediction: 4:10:28\""
+    },
+    {
+      "tool": "queryTrainingLoadAssessment",
+      "args": {
+        "days": 7
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.4,
+      "json_string_encoded": true,
+      "preview": "\"Training Load Assessment\\n========================\\n\\n2026-09-29\\nComment: Resuming\\nShort-Term Load: 44\\nLong-Term Load: 62\\nLoad Ratio: 0.70\\n\\n2026-09-28\\nComment: Decreasing\\nShort-Term Load: 27\\nLong-Term Load: 60\\nLoad Ratio: 0.45\\n\\n2026-09-27\\nComment: Performance\\nShort-Term Load: 32\\nLong"
+    },
+    {
+      "tool": "queryRecoveryStatus",
+      "args": {},
+      "works": true,
+      "error": "",
+      "secs": 4.2,
+      "json_string_encoded": true,
+      "preview": "\"Recovery Status\\n========================\\n\\nRecovery: 96%\\nLevel: Heavy training allowed\\nEstimated Full Recovery: 10h\""
+    },
+    {
+      "tool": "queryMenstruationCycles",
+      "args": {},
+      "works": true,
+      "error": "",
+      "secs": 4.6,
+      "json_string_encoded": true,
+      "preview": "\"Menstrual Cycle Data\\n====================\\nQuery Range: 2026-08-30 to 2027-09-29\\nToday: 2026-09-29 | No cycle includes today\\nCurrent Cycle: Not found in returned cycles\\nNext Period Start: Unknown\\nNote: The returned cycles do not include today; the user may not have entered menstrual cycle data"
+    },
+    {
+      "tool": "querySportRecords",
+      "args": {
+        "startDate": "20260830",
+        "endDate": "20260929",
+        "limit": 200
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.3,
+      "json_string_encoded": true,
+      "preview": "\"Sport Records — 2026-08-30 to 2026-09-29 (16 records)\\n========================\\n\\n1. Outdoor Run — 2026-09-29\\n   Location: Countdown Intervals\\n   Start Coordinates: 28.500999, 76.999001\\n   Time Window: startTimestamp=1790641445 | endTimestamp=1790644616\\n   Duration: 52:52 | Distance: 8.40 km\\n"
+    },
+    {
+      "tool": "queryAvgHeartRate",
+      "args": {
+        "days": 7
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.3,
+      "json_string_encoded": true,
+      "preview": "\"Average Heart Rate — Last 7 days\\n========================\\n\\n2026-09-29: 76 bpm (Min: 50, Max: 165)\\n2026-09-28: 62 bpm (Min: 35, Max: 97)\\n2026-09-27: 67 bpm (Min: 45, Max: 105)\\n2026-09-26: 57 bpm (Min: 41, Max: 75)\\n2026-09-25: 66 bpm (Min: 39, Max: 102)\\n2026-09-24: 66 bpm (Min: 36, Max: 118)\\"
+    },
+    {
+      "tool": "queryRestingHeartRate",
+      "args": {
+        "days": 7
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.6,
+      "json_string_encoded": true,
+      "preview": "\"Resting Heart Rate — Last 7 days\\n========================\\n\\n2026-09-29: 56 bpm\\n2026-09-28: 54 bpm\\n2026-09-27: 51 bpm\\n2026-09-26: 55 bpm\\n2026-09-25: No data\\n2026-09-24: 52 bpm\\n2026-09-23: No data\""
+    },
+    {
+      "tool": "querySleepHrv",
+      "args": {
+        "days": 7
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.6,
+      "json_string_encoded": true,
+      "preview": "\"Sleep HRV — 2026-09-23 to 2026-09-29\\n========================\\nNote: dates are wake-up days (each value comes from the night that ended that morning).\\n\\nHRV Assessment — Last 7 days\\n========================\\n\\n2026-09-29:\\n  HRV Avg: 76 ms — Normal\\n  Normal Range: 66 - 104 ms\\n  Baseline: 85 ms"
+    },
+    {
+      "tool": "queryStressLevel",
+      "args": {
+        "days": 7
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.4,
+      "json_string_encoded": true,
+      "preview": "\"Stress Level — Last 7 days\\n========================\\n\\n2026-09-29:\\nAverage Stress: 27 (Low)\\nRelaxed: 4h 40m (78%)\\nLow: 45m (13%)\\nMedium: 10m (3%)\\nHigh: 25m (7%)\\n\\n2026-09-28:\\nAverage Stress: 27 (Low)\\nRelaxed: 12h 25m (63%)\\nLow: 5h 45m (29%)\\nMedium: 1h 5m (5%)\\nHigh: 35m (3%)\\n\\n2026-09-2"
+    },
+    {
+      "tool": "queryHealthCheckTimeSeries",
+      "args": {
+        "days": 7
+      },
+      "works": true,
+      "error": "",
+      "secs": 5.3,
+      "json_string_encoded": true,
+      "preview": "\"Health Check Time Series — Latest in history after no complete data in last 7 days\\n========================\\n\\nDate: 2026-09-22\\ntimestamp=1790049453, timezone=22, source=history, device=COROS PACE 3 8EDCE4, dataSource=COROS PACE 3\\nHeart Rate List: [1790049453=83 bpm]\\nHRV List: [1790049453=51 ms"
+    },
+    {
+      "tool": "queryStressTimeSeries",
+      "args": {
+        "days": 1
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.7,
+      "json_string_encoded": true,
+      "preview": "\"Stress Time Series — last 1 days\\n========================\\n\\n2026-09-29:\\n  timestamp=1790620490, timezone=22, stress=14, score=1, stressHrv=0, stressHr=0\\n  timestamp=1790620790, timezone=22, stress=16, score=1, stressHrv=0, stressHr=0\\n  timestamp=1790621090, timezone=22, stress=13, score=1, str"
+    },
+    {
+      "tool": "queryTrainingPlanDetails",
+      "args": {
+        "planId": "478647701888745771"
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.1,
+      "json_string_encoded": true,
+      "preview": "\"Training Plan Detail\\n========================\\nPlan ID: 478647701888745771\\nName: P10061\\nOverview: P10129\\nStatus: In progress\\nType: custom\\nDates: 2026-07-20 to 2026-10-04\\nWeeks: 10\\nEditable via MCP: no\\n  Reason: This plan was not created via MCP and cannot be modified.\\n\\nDays\\n------------"
+    },
+    {
+      "tool": "queryTrainingPlanLibrary",
+      "args": {
+        "statusList": [
+          0,
+          1,
+          2
+        ]
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.0,
+      "json_string_encoded": true,
+      "preview": "\"Training Plan Library\\n========================\\nStatus filter: not started, in progress, completed (all; statusList=[0,1,2])\\nPlans on this page: 18\\n\\n1. P10061 [In progress] [custom]\\n   Plan ID: 478647701888745771\\n   Record role: execution\\n   Editable via MCP: no\\n   Modification: unavailable"
+    },
+    {
+      "tool": "queryTrainingSchedule",
+      "args": {
+        "startDate": "20260929",
+        "endDate": "20261006"
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.3,
+      "json_string_encoded": true,
+      "preview": "\"Training Schedule\\n========================\\n\\n2026-09-29\\nCountdown Intervals\\nStandalone workout (scheduled from the workout library)\\nidInPlan: 122\\nDistance: 9.44 km\\nEstimated Time: 1:10:00\\nLoad: 122 TL\\nTo view or modify this workout, use queryScheduledWorkoutDetails then updateScheduledWork"
+    },
+    {
+      "tool": "queryWorkoutDetails",
+      "args": {
+        "workoutId": "478647684444635536"
+      },
+      "works": true,
+      "error": "",
+      "secs": 4.0,
+      "json_string_encoded": true,
+      "preview": "\"Workout Detail\\n========================\\nWorkout ID: 478647684444635536\\nName: W30084\\nSport: Strength\\nType: custom\\nEstimated Time: 23:20\\nOverview: W30222\\nEditable via MCP: no\\n  Reason: COROS sport type 4 (Strength) cannot be expressed by MCP (only running, cycling and trail running).\\nThe co"
+    },
+    {
+      "tool": "queryWorkoutLibrary",
+      "args": {},
+      "works": true,
+      "error": "",
+      "secs": 4.8,
+      "json_string_encoded": true,
+      "preview": "\"Workout Library\\n========================\\nTotal workouts: 18\\n\\n1. W30084 [Strength] [custom]\\n   Workout ID: 478647684444635536\\n   Estimated Time: 23:20\\n   Sets: 21\\n   Overview: W30222\\n   Created: 2026-07-03 17:59:35 | Updated: 2026-07-03 17:59:35\\n\\n2. W30112 [Strength] [custom]\\n   Workout "
+    },
+    {
+      "tool": "queryUserInfo",
+      "args": {},
+      "works": true,
+      "error": "",
+      "secs": 4.9,
+      "json_string_encoded": true,
+      "preview": "\"User Profile Information\\n========================\\n\\nHeight: 178.0 cm\\nWeight: 80.6 kg\\nBirthday: 1993-02-18 (Age: 33)\\nGender: Male\\nNickname: Shamik\""
+    },
+    {
+      "tool": "queryActivityFitFileDownloadUrls",
+      "args": {
+        "labelId": "480672546503557126",
+        "sportType": 100,
+        "limit": 1
+      },
+      "works": true,
+      "error": "",
+      "secs": 5.1,
+      "json_string_encoded": false,
+      "preview": "Activity FIT file download URL(s):\n1. 480672546503557126.fit\n   https://s3.coros.com/fit/460648181682683919/480672546503557126.fit"
+    }
+  ],
+  "not_tested": [
+    {
+      "tool": "createScheduledWorkout",
+      "reason": "write/side-effect, not smoke-tested"
+    },
+    {
+      "tool": "queryScheduledWorkoutDetails",
+      "reason": "needs idInPlan of an MCP-created workout"
+    },
+    {
+      "tool": "updateScheduledWorkout",
+      "reason": "write/side-effect, not smoke-tested"
+    },
+    {
+      "tool": "createTrainingPlan",
+      "reason": "write/side-effect, not smoke-tested"
+    },
+    {
+      "tool": "updateTrainingPlan",
+      "reason": "write/side-effect, not smoke-tested"
+    },
+    {
+      "tool": "createSingleWorkout",
+      "reason": "write/side-effect, not smoke-tested"
+    },
+    {
+      "tool": "scheduleWorkout",
+      "reason": "write/side-effect, not smoke-tested"
+    },
+    {
+      "tool": "updateWorkoutDetails",
+      "reason": "write/side-effect, not smoke-tested"
+    },
+    {
+      "tool": "downloadActivityFitFiles",
+      "reason": "binary FIT download (50/day quota), not smoke-tested"
+    }
+  ]
+}

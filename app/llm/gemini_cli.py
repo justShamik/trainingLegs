@@ -5,7 +5,10 @@ Provides structured prompt execution with timeout, retry-with-backoff, versioned
 import os
 import subprocess
 import time
+import logging
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 PROMPTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "prompts")
 
@@ -42,22 +45,27 @@ class GeminiCLIWrapper:
                 )
                 if response and response.text:
                     return response.text.strip()
-            except Exception:
-                pass
+            except Exception as err:
+                logger.warning("Gemini SDK call failed: %s", err)
 
         # 2. Try Gemini CLI subprocess with stdin input
-        cmd = [
-            "cmd.exe", "/c",
-            "set PATH=C:\\Program Files\\nodejs;C:\\Users\\Onlys\\AppData\\Roaming\\npm;%PATH% && gemini -p -"
-        ]
+        env = dict(os.environ)
+        extra_paths = [r"C:\Program Files\nodejs", os.path.join(os.path.expanduser("~"), "AppData", "Roaming", "npm")]
+        env["PATH"] = os.pathsep.join(extra_paths + [env.get("PATH", "")])
+        cmd = ["cmd.exe", "/c", "gemini -p -"] if os.name == "nt" else ["gemini", "-p", "-"]
 
+        deadline = time.monotonic() + self.timeout_seconds
         for attempt in range(1, self.max_retries + 1):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
             try:
-                res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=self.timeout_seconds)
+                res = subprocess.run(cmd, input=full_prompt, capture_output=True, text=True, timeout=remaining, env=env)
                 if res.returncode == 0 and res.stdout.strip():
                     return res.stdout.strip()
-            except Exception:
-                pass
+                logger.warning("Gemini CLI attempt %d failed with exit code %s", attempt, res.returncode)
+            except Exception as err:
+                logger.warning("Gemini CLI attempt %d error: %s", attempt, err)
             time.sleep(0.3 * attempt)
 
         # 3. Intelligent data-driven fallback response if CLI/SDK fails or is unconfigured (AC-3.5)

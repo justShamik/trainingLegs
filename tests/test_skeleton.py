@@ -5,7 +5,7 @@ from app.engine.guardrails import validate_plan_volume_increase
 def test_flask_app_creation():
     app = create_app()
     client = app.test_client()
-    response = client.get("/")
+    response = client.get("/dashboard")
     assert response.status_code == 200
     assert b"TRAINING DASHBOARD" in response.data
 

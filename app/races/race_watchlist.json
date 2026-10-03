@@ -1,0 +1,385 @@
+{
+  "as_of": "2026-10-03",
+  "races": [
+    {
+      "id": "ladakh-marathon-42k",
+      "ignore_phrases": ["register now"],
+      "name": "Ladakh Marathon — Full Marathon",
+      "distance_km": 42.2,
+      "location": "Leh, Ladakh",
+      "category": "watchlist",
+      "event_date": null,
+      "event_date_text": "Sep 2027, 14th edition (dates not yet announced). Most recent: 13 Sep 2026 (13th edition, race week 10-13 Sep 2026).",
+      "edition_year": 2027,
+      "registration_status": "not_started",
+      "registration_opens": null,
+      "registration_closes": null,
+      "previous_registrations": [
+        {"edition_year": 2026, "opened": "2026-02-19", "closed": "2026-03-23", "source": "https://ladakhmarathon.com/race-information/"}
+      ],
+      "official_url": "https://ladakhmarathon.com/",
+      "registration_url": "https://ladakhmarathon.com/sign-up/",
+      "scrape_urls": [
+        "https://ladakhmarathon.com/race-information/",
+        "https://ladakhmarathon.com/rules-regulations/",
+        "https://ladakhmarathon.com/sign-up/"
+      ],
+      "sources": [
+        "https://ladakhmarathon.com/race-information/",
+        "https://thenewsmill.com/2026/02/ladakh-marathon-2026-registrations-open-for-13th-edition-in-himalayas/",
+        "https://ddnews.gov.in/en/13th-ladakh-marathon-to-be-held-from-sep-10-to-13-registrations-begins/",
+        "https://www.tribuneindia.com/news/sports/ladakh-marathon-returns-for-12th-edition-reaches-new-peak-with-record-breaking-participation/"
+      ],
+      "notes": "2026 window confirmed on official site: 'Registrations for the 13th edition ... will open on Thursday 19th February 2026 and close on Monday 23rd March 2026'; site now shows 'Registration Closed' for all races. 2025 (12th edition, 11-14 Sep 2025) open/close dates NOT found (Wayback snapshots of Mar-May 2025 show 'Register Now' buttons, so registration was open in that period). 2027 not announced. INFERENCE (not data): next window likely Feb-Mar 2027 given the 2026 pattern. Eligibility (previous marathon finisher certificate) required."
+    },
+    {
+      "id": "ladakh-marathon-21k",
+      "ignore_phrases": ["register now"],
+      "name": "Ladakh Marathon — Half Marathon",
+      "distance_km": 21.1,
+      "location": "Leh, Ladakh",
+      "category": "watchlist",
+      "event_date": null,
+      "event_date_text": "Sep 2027, 14th edition (dates not yet announced). Most recent: 13 Sep 2026.",
+      "edition_year": 2027,
+      "registration_status": "not_started",
+      "registration_opens": null,
+      "registration_closes": null,
+      "previous_registrations": [
+        {"edition_year": 2026, "opened": "2026-02-19", "closed": "2026-03-23", "source": "https://ladakhmarathon.com/race-information/"}
+      ],
+      "official_url": "https://ladakhmarathon.com/races/half-marathon/",
+      "registration_url": "https://ladakhmarathon.com/sign-up/",
+      "scrape_urls": [
+        "https://ladakhmarathon.com/race-information/",
+        "https://ladakhmarathon.com/rules-regulations/"
+      ],
+      "sources": [
+        "https://ladakhmarathon.com/race-information/",
+        "https://thenewsmill.com/2026/02/ladakh-marathon-2026-registrations-open-for-13th-edition-in-himalayas/"
+      ],
+      "notes": "Same registration window as all Ladakh Marathon races (single window for all six races). 2026 half marathon was on Sun 13 Sep 2026. 2025 window not found. INFERENCE: 2027 window likely Feb-Mar 2027."
+    },
+    {
+      "id": "hell-race-the-border-50k",
+      "ignore_phrases": ["register now"],
+      "trusted_urls": ["https://konfhub.com/"],
+      "ticket_filter": "50\\s*K|FRONTLINE",
+      "name": "The Border (Hell Race) — 50 km 'The Frontline Dash'",
+      "distance_km": 50,
+      "location": "Jaisalmer to Longewala, Rajasthan",
+      "category": "watchlist",
+      "event_date": "2026-12-19",
+      "event_date_text": "19-20 Dec 2026 (start 12 noon 19 Dec; 50 km cut-off 8 h). Bib expo 17-18 Dec 2026.",
+      "edition_year": 2026,
+      "registration_status": "closed",
+      "registration_opens": "2026-09-15",
+      "registration_closes": null,
+      "previous_registrations": [
+        {"edition_year": 2025, "opened": "2025-11-07", "closed": "2025-11-15", "source": "https://konfhub.com/the-border-2025"},
+        {"edition_year": 2024, "opened": "2024-07-01", "closed": "2024-11-21", "source": "https://konfhub.com/the-border-2024"}
+      ],
+      "official_url": "https://thehellrace.com/the-hell-race/the-border/",
+      "registration_url": "https://konfhub.com/the-border-2026",
+      "scrape_urls": [
+        "https://konfhub.com/the-border-2026",
+        "https://thehellrace.com/the-hell-race/the-border/"
+      ],
+      "sources": [
+        "https://thehellrace.com/the-hell-race/the-border/",
+        "https://konfhub.com/the-border-2026",
+        "https://konfhub.com/the-border-2025",
+        "https://konfhub.com/the-border-2024",
+        "https://thehellrace.com/"
+      ],
+      "notes": "Identification: 'Border Ultra' = The Hell Race's event 'THE BORDER' (100 mi / 100 km / 50 km, Jaisalmer-Longewala); the only Hell Race border-area event with a 50 km category in 2026 (KonfHub title 'THE BORDER 2026 - JAISALMER TO LAUNGEWALA | 100 MILES | 100 KM | 50 KM'). Status 'closed' = SOLD OUT: on 2026-10-03 the KonfHub JSON shows sold_out:true for 50 KM (and 100 KM, 100 Miles), even though thehellrace.com still shows 'REGISTER NOW'. 50 KM ticket sale start 2026-09-15 12:00 IST; KonfHub end timestamp equals race end (20 Dec), so no separate close date. Previous: 2025 edition (6-7 Dec 2025) 50 km ticket 7 Nov 2025 12:00 IST to 16 Nov 2025 00:00 IST; 2024 edition (14-15 Dec 2024) 1 Jul 2024 to 21 Nov 2024 04:00 IST. KonfHub timestamps are UTC; converted to IST. Ticket start dates may reflect re-opened ticket types, not first opening. Fee 50 km INR 7,450. allinrunning.com/the-border is a third-party training/travel package, not the organiser."
+    },
+    {
+      "id": "skf-goa-river-marathon-42k",
+      "name": "SKF Goa River Marathon — Full Marathon (candidate for 'Goa River Ultra')",
+      "distance_km": 42.2,
+      "location": "Chicalim / Vasco da Gama, South Goa (Zuari river course)",
+      "category": "watchlist",
+      "event_date": "2026-12-13",
+      "event_date_text": "Sun 13 Dec 2026 (full marathon start 04:00)",
+      "edition_year": 2026,
+      "registration_status": "open",
+      "registration_opens": null,
+      "registration_closes": null,
+      "previous_registrations": [
+        {"edition_year": 2025, "opened": null, "closed": "2025-11-25", "source": "https://www.skfgoarivermarathon.com.valmikinayak.in/faqs.php"},
+        {"edition_year": 2023, "opened": null, "closed": "2023-11-30", "source": "https://goarivermarathon.com/Shop/faqs.php"}
+      ],
+      "official_url": "https://www.skfgoarivermarathon.com/",
+      "registration_url": "https://www.skfgoarivermarathon.com/registration",
+      "scrape_urls": [
+        "https://www.skfgoarivermarathon.com/registration",
+        "https://goarivermarathon.com/Shop/faqs.php"
+      ],
+      "sources": [
+        "https://www.skfgoarivermarathon.com/",
+        "https://www.skfgoarivermarathon.com.valmikinayak.in/faqs.php",
+        "https://goarivermarathon.com/Shop/faqs.php",
+        "https://www.runners.quest/goa-river-marathon/",
+        "https://aims-worldrunning.org/races/10125.html"
+      ],
+      "notes": "Identification: no event named 'Goa River Ultra' was found. Closest name match is the SKF Goa River Marathon (AIMS; categories 42.195K, 20-miler 32K, 21.1K, 10K, 5K; NO ultra). The other Goa ultra is Hell Race 'Goa Ultra' (see hell-race-goa-ultra). Open now: the official site's JS bundle shows 'Register Now' and a 'Festival Offer' countdown to 2026-10-15 23:59 ('Prices increase by Rs300-500 after October 15th'). 2026 close date not on official site (one aggregator summary said 25 Nov; unverified, so null). INFERENCE: likely ~25-30 Nov 2026 based on 2025 (25 Nov) and 2023 (30 Nov). 2025 open date: FAQ says early-bird is 'first two months of registration' but no date. The valmikinayak.in domain appears to be a mirror/archive of the 2025 official site (countdown 'Dec 14, 2025') - treat with medium confidence."
+    },
+    {
+      "id": "hell-race-goa-ultra",
+      "ignore_phrases": ["register now"],
+      "trusted_urls": ["https://konfhub.com/"],
+      "name": "Goa Ultra (Hell Race) — 60 km (alternative candidate for 'Goa River Ultra')",
+      "distance_km": 60,
+      "location": "Palolem Beach, South Goa (coastal roads + Netravali Wildlife Sanctuary)",
+      "category": "watchlist",
+      "event_date": null,
+      "event_date_text": "2027 edition not announced. Most recent: 8-9 Aug 2026 (2025 edition was 2-3 Aug 2025).",
+      "edition_year": 2027,
+      "registration_status": "not_started",
+      "registration_opens": null,
+      "registration_closes": null,
+      "previous_registrations": [
+        {"edition_year": 2026, "opened": "2026-03-01", "closed": "2026-07-19", "source": "https://konfhub.com/goa-ultra-2026"}
+      ],
+      "official_url": "https://thehellrace.com/goa-ultra-02-03-aug-2025-the-hell-race/",
+      "registration_url": null,
+      "scrape_urls": [
+        "https://thehellrace.com/goa-ultra-02-03-aug-2025-the-hell-race/",
+        "https://thehellrace.com/",
+        "https://konfhub.com/goa-ultra-2027"
+      ],
+      "sources": [
+        "https://thehellrace.com/goa-ultra-02-03-aug-2025-the-hell-race/",
+        "https://konfhub.com/goa-ultra-2026",
+        "https://thehellrace.com/"
+      ],
+      "notes": "Monsoon ultra with 30/60/120 km (no 50 km). Included because 'Goa River Ultra' is ambiguous; the user may mean this or the SKF Goa River Marathon. 2026 KonfHub tickets: 1 Mar 2026 12:00 IST to 20 Jul 2026 00:00 IST (i.e. closed end of 19 Jul). konfhub.com/goa-ultra-2027 does not exist yet (guessed slug - a 404/empty page there means not started). 2025 edition registration dates not found. INFERENCE: next window ~Mar-Jul 2027."
+    },
+    {
+      "id": "auroville-marathon-42k",
+      "name": "Auroville Marathon — Full Marathon",
+      "distance_km": 42.2,
+      "location": "Auroville, Tamil Nadu (near Puducherry)",
+      "category": "watchlist",
+      "event_date": "2027-02-14",
+      "event_date_text": "Sun 14 Feb 2027 (17th edition); bib collection 13 Feb 2027",
+      "edition_year": 2027,
+      "registration_status": "not_started",
+      "registration_opens": null,
+      "registration_closes": null,
+      "previous_registrations": [
+        {"edition_year": 2026, "opened": null, "closed": "2025-12-31", "source": "https://www.aurovillemarathon.com/faq/"},
+        {"edition_year": 2025, "opened": "2024-12-09", "closed": "2025-01-25", "source": "https://racemart.in/events/auroville-marathon-2025"}
+      ],
+      "official_url": "https://www.aurovillemarathon.com/",
+      "registration_url": "https://www.aurovillemarathon.com/register/",
+      "scrape_urls": [
+        "https://www.aurovillemarathon.com/",
+        "https://www.aurovillemarathon.com/register/",
+        "https://www.aurovillemarathon.com/faq/"
+      ],
+      "sources": [
+        "https://www.aurovillemarathon.com/",
+        "https://www.aurovillemarathon.com/register/",
+        "https://www.aurovillemarathon.com/faq/",
+        "https://racemart.in/events/auroville-marathon-2025"
+      ],
+      "notes": "Homepage (2026-10-03): 'The Registration will start soon...' and 'Race Day 14th Feb 2027'. /register/ still says 'Registration is closed for Auroville Marathon 2026.' 2026 edition (8 Feb 2026): FAQ 'What is the last date of registration? 31st Dec 2025 (12 Noon)'; a search-engine summary said it was extended to 10 Jan 2026 (not verified on a primary page). 2026 open date not found. 2025 edition (16 Feb 2025): 'Opens on 9th December 2024 and closes on 25th January 2025' (RaceMart). Non-commercial event; fills/closes early. INFERENCE: 2027 registration probably opens Oct-Dec 2026."
+    },
+    {
+      "id": "sohna-capitaltrails-50k",
+      "name": "SOHNA By CapitalTrails — Ultra (~50 km, self-supported trail)",
+      "distance_km": 50,
+      "location": "Aravalli Retreat, Sohna, Haryana (Delhi NCR)",
+      "category": "ncr_50k",
+      "event_date": "2026-11-01",
+      "event_date_text": "Sun 1 Nov 2026, 07:00 IST (ultra cut-off 10 h)",
+      "edition_year": 2026,
+      "registration_status": "open",
+      "registration_opens": null,
+      "registration_closes": "2026-10-28",
+      "previous_registrations": [],
+      "official_url": "https://capitaltrails.in/capitaltrails-race-series/sohna",
+      "registration_url": "https://www.webscorer.com/register?raceid=427024",
+      "scrape_urls": [
+        "https://www.webscorer.com/register?raceid=427024"
+      ],
+      "sources": [
+        "https://www.webscorer.com/register?raceid=427024",
+        "https://capitaltrails.in/capitaltrails-race-series/sohna",
+        "https://www.capitaltrails.in/trail-races-in-india"
+      ],
+      "notes": "Webscorer: 'Registration closes: Wednesday, October 28, 2026 23:59 (GMT+5:30)'. Ultra fee INR 4,500. First-ever ultra category for this race ('For the first time ever ... introducing an ultramarathon category'), so no previous 50 km registration history. Capped (~30 per category) with a waitlist confirmed first-in-first-out, so 'open' may mean waitlisted entry. Fully self-supported, unmarked course (drop bag at halfway). ~50 km from central Delhi."
+    },
+    {
+      "id": "columbia-trail-race-50k",
+      "name": "2nd Columbia Trail Race (Coach Ravinder / PFS) — 50K",
+      "distance_km": 50,
+      "location": "Village Mangar, Gurgaon-Faridabad Road, Haryana (Delhi NCR)",
+      "category": "ncr_50k",
+      "event_date": "2026-11-01",
+      "event_date_text": "Sun 1 Nov 2026, 05:30 IST start",
+      "edition_year": 2026,
+      "registration_status": "open",
+      "registration_opens": null,
+      "registration_closes": "2026-10-24",
+      "previous_registrations": [
+        {"edition_year": 2026, "opened": null, "closed": "2026-01-19", "source": "https://www.racemart.in/events/8th-aravali-trail-run"},
+        {"edition_year": 2024, "opened": "2024-06-04", "closed": "2024-11-18", "source": "https://konfhub.com/7th-aravali-trail-run"}
+      ],
+      "official_url": "https://columbiatrailrace.pfsindia.in/",
+      "registration_url": "https://racesregistrations.com/event/568",
+      "scrape_urls": [
+        "https://columbiatrailrace.pfsindia.in/",
+        "https://racesregistrations.com/event/568"
+      ],
+      "sources": [
+        "https://columbiatrailrace.pfsindia.in/",
+        "https://www.coachravinder.com/",
+        "https://pfsindia.in/past-events.html",
+        "https://www.racemart.in/events/8th-aravali-trail-run",
+        "https://konfhub.com/7th-aravali-trail-run"
+      ],
+      "notes": "Official page: 'Registration Open', 'Registrations close 24th Oct 2026 or earlier if targeted slots fill'; 40% early-bird 'till 12th Oct 2026' (50K INR 3,000 discounted / 5,000 regular). Categories 5K-75K. Same organiser's previous trail ultras: 'Columbia Trail Race 2026' a.k.a. 8th Aravali Trail Run (24-25 Jan 2026, Delta 105 Manesar, 51.5K/77.2K/103K) - last registration date 19 Jan 2026 (RaceMart); 7th Aravali Trail Run (23-24 Nov 2024, 51K) - KonfHub tickets 4 Jun 2024 to 18 Nov 2024 23:59 IST. These are listed as the series' preceding editions; venue differs. INFERENCE: a Jan 2027 Aravali Trail Run edition may also happen but nothing is announced."
+    },
+    {
+      "id": "sundown-run-50k",
+      "name": "6th Sundown Run (Coach Ravinder / PFS) — 50K Ultra (night run)",
+      "distance_km": 50,
+      "location": "Karma Lakelands, Sector 80, New Gurugram, Haryana (Delhi NCR)",
+      "category": "ncr_50k",
+      "event_date": "2026-12-19",
+      "event_date_text": "Sat 19 Dec 2026, 16:00 IST start (night run inside a gated estate; road/loop, not trail)",
+      "edition_year": 2026,
+      "registration_status": "open",
+      "registration_opens": null,
+      "registration_closes": "2026-12-14",
+      "previous_registrations": [
+        {"edition_year": 2025, "opened": null, "closed": null, "source": "https://pfsindia.in/past-events.html"}
+      ],
+      "official_url": "https://sundownrun.pfsindia.in/",
+      "registration_url": "https://evantik.runizen.com/e/6th-sundown-run/orders/new",
+      "scrape_urls": [
+        "https://sundownrun.pfsindia.in/"
+      ],
+      "sources": [
+        "https://sundownrun.pfsindia.in/",
+        "https://www.coachravinder.com/",
+        "https://pfsindia.in/past-events.html"
+      ],
+      "notes": "Official page: 'Register Now', 'Early-bird offer till 19th October 2026', 'Registrations close 14 December or when slots fill'; schema.org validThrough 2026-12-14. Categories 50K, 30K, 21.1K, 10K, 5K. Previous 50K editions: 5th Sundown Run 20 Dec 2025 and Sundown Run 31 May 2025 (both list 50K) - their registration open/close dates were not found."
+    },
+    {
+      "id": "mussoorie-ultra-50k",
+      "name": "Mussoorie Ultra (2nd edition) — 50 km",
+      "distance_km": 50,
+      "location": "The Fern Brentwood Resort, Mall Road, Mussoorie, Uttarakhand (near NCR, ~290 km by road - beyond the 250 km guide)",
+      "category": "ncr_50k",
+      "event_date": "2026-11-29",
+      "event_date_text": "Sun 29 Nov 2026, 06:00",
+      "edition_year": 2026,
+      "registration_status": "open",
+      "registration_opens": null,
+      "registration_closes": null,
+      "previous_registrations": [
+        {"edition_year": 2025, "opened": null, "closed": null, "source": "https://www.etvbharat.com/en/state/ultra-marathon-in-mussoorie-actor-tom-alter-dream-comes-true-enn25112302533"}
+      ],
+      "official_url": "https://runnersduniya.com/event/mussoorie-ultra/",
+      "registration_url": "https://www.townscript.com/v2/e/mussoorie-ultra-2nd-edition-320212/booking/tickets",
+      "scrape_urls": [
+        "https://runnersduniya.com/event/mussoorie-ultra/",
+        "https://www.townscript.com/e/mussoorie-ultra-2nd-edition-320212"
+      ],
+      "sources": [
+        "https://runnersduniya.com/event/mussoorie-ultra/",
+        "https://garhwalpost.in/tom-alters-dream-mussoorie-ultra-marathon-to-be-held-on-29-nov/",
+        "https://www.mepass.in/events/mussoorie-ultra-2nd-edition"
+      ],
+      "notes": "Organiser Piku Sports with Mussoorie Hotel & Restaurant Association; no dedicated official site found (RunnersDuniya listing + Townscript). Garhwal Post (17 Sep 2026): 300+ outside runners already registered, so registration is open. 50 km fee INR 5,200. Date conflict: Mepass lists 22 Nov 2026; news + RunnersDuniya say 29 Nov 2026 (used). A search summary claimed registration started 1 Jun 2026 - not verified, so null. Close date not published. 1st edition was Nov 2025 (registration dates not found)."
+    },
+    {
+      "id": "garhwal-highline-50k",
+      "name": "The Garhwal Highline (Globeracers) — 50 km",
+      "distance_km": 50,
+      "location": "Garhwal Himalaya, Uttarakhand (Rishikesh-Uttarkashi region; exact route TBA) - near NCR, likely >250 km",
+      "category": "ncr_50k",
+      "event_date": "2026-12-25",
+      "event_date_text": "25-27 Dec 2026 race days; 50 km on 25 Dec 05:00-13:00 (8 h)",
+      "edition_year": 2026,
+      "registration_status": "open",
+      "registration_opens": null,
+      "registration_closes": "2026-12-10",
+      "previous_registrations": [],
+      "official_url": "https://globeracers.run/races/garhwal-highline",
+      "registration_url": "https://globeracers.run/races/garhwal-highline/register",
+      "scrape_urls": [
+        "https://globeracers.run/races/garhwal-highline",
+        "https://globeracers.run/"
+      ],
+      "sources": [
+        "https://globeracers.run/races/garhwal-highline",
+        "https://globeracers.run/races/garhwal-highline/register",
+        "https://globeracers.run/"
+      ],
+      "notes": "Official page: 'Key Dates registration closes 10 Dec 2026 race RACE DAYS: 25-27 Dec 2026'; 50 km fee INR 4,000; eligibility: minimum 2 full marathons. Registration form is live (status 'open' is inferred from the live form + future close date; no explicit 'open' text). Successor to the Uttarkashi 135 Mile Ultra (Rishikesh-Uttarkashi); final route 'will be announced soon' - distance from Delhi uncertain (Rishikesh ~240 km)."
+    },
+    {
+      "id": "red-stone-ultra-50k",
+      "ignore_phrases": ["register now"],
+      "trusted_urls": ["https://konfhub.com/"],
+      "name": "Red Stone Ultra (Hell Race) — 50 km (outside Nov-Jan window)",
+      "distance_km": 50,
+      "location": "Northern Aravalli, Sector 59, Gurugram, Haryana (Delhi NCR)",
+      "category": "ncr_50k",
+      "event_date": "2027-02-07",
+      "event_date_text": "Sun 7 Feb 2027, 06:00 (8 h cut-off) per official page - FEBRUARY, outside the Nov 2026-Jan 2027 window",
+      "edition_year": 2027,
+      "registration_status": "not_started",
+      "registration_opens": null,
+      "registration_closes": null,
+      "previous_registrations": [
+        {"edition_year": 2026, "opened": "2025-12-14", "closed": "2026-01-31", "source": "https://konfhub.com/red-stone-ultra-2026"},
+        {"edition_year": 2025, "opened": "2024-11-01", "closed": "2025-01-15", "source": "https://konfhub.com/red-stone-ultra-2025"}
+      ],
+      "official_url": "https://thehellrace.com/the-hell-race/red-stone-ultra/",
+      "registration_url": null,
+      "scrape_urls": [
+        "https://thehellrace.com/the-hell-race/red-stone-ultra/",
+        "https://konfhub.com/red-stone-ultra-2027"
+      ],
+      "sources": [
+        "https://thehellrace.com/the-hell-race/red-stone-ultra/",
+        "https://konfhub.com/red-stone-ultra-2026",
+        "https://konfhub.com/red-stone-ultra-2025",
+        "https://itra.run/Races/RaceResults/50km/2026/115734"
+      ],
+      "notes": "Included as the best-known NCR 50 km trail ultra although it falls in Feb. Official page states 'START: 06:00 AM, 07 Feb, 2027' but its title/register buttons still say 'Red Stone Ultra 2026' and link to konfhub.com/red-stone-ultra-2026 (ended) - treat date as medium confidence. 2026 edition (8 Feb 2026): KonfHub 14 Dec 2025 13:00 IST to 1 Feb 2026 00:00 IST; 50 KM now shows sold_out:true. 2025 edition (25 Jan 2025): 1 Nov 2024 16:00 IST to 15 Jan 2025 23:55 IST. konfhub.com/red-stone-ultra-2027 is a guessed slug (empty now). INFERENCE: 2027 registration likely opens Nov-Dec 2026. ITRA-rated; fee 2026 50 km INR 2,950."
+    },
+    {
+      "id": "bhatti-lakes-ultra-50k",
+      "name": "Bhatti Lakes Ultra (Globeracers) — 50 km (outside Nov-Jan window)",
+      "distance_km": 50,
+      "location": "Asola Bhatti, Delhi-Faridabad border (Delhi NCR)",
+      "category": "ncr_50k",
+      "event_date": "2026-10-24",
+      "event_date_text": "23-25 Oct 2026 race weekend; 50 km on Sat 24 Oct 2026, 06:00-14:00 - OCTOBER, just outside the window",
+      "edition_year": 2026,
+      "registration_status": "open",
+      "registration_opens": null,
+      "registration_closes": "2026-10-10",
+      "previous_registrations": [],
+      "official_url": "https://globeracers.run/races/bhatti-lakes",
+      "registration_url": "https://globeracers.run/races/bhatti-lakes/register",
+      "scrape_urls": [
+        "https://globeracers.run/races/bhatti-lakes"
+      ],
+      "sources": [
+        "https://globeracers.run/races/bhatti-lakes",
+        "https://globeracers.run/",
+        "https://www.capitaltrails.in/trail-races-in-india"
+      ],
+      "notes": "Official page: 'registration closes 10 Oct 2026', race 23-25 Oct 2026; 50 km fee INR 5,999; eligibility minimum 2 full marathons. Listed because it is the closest NCR 50 km race and closes in 7 days. Previous-edition registration dates not found."
+    }
+  ]
+}

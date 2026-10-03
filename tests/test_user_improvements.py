@@ -52,7 +52,7 @@ def test_dashboard_last_sync_display(temp_db, client):
     summary = get_dashboard_summary(db_path=temp_db)
     assert summary["last_sync_display"] == "2026-09-28 14:30"
     
-    res = client.get("/")
+    res = client.get("/dashboard")
     assert res.status_code == 200
     html = res.data.decode("utf-8")
     assert "Last Synced with COROS:" in html
@@ -60,7 +60,7 @@ def test_dashboard_last_sync_display(temp_db, client):
 
 def test_dashboard_kpi_time_windows(client):
     """Test 2: Dashboard KPI cards & chart titles explicitly state time windows."""
-    res = client.get("/")
+    res = client.get("/dashboard")
     assert res.status_code == 200
     html = res.data.decode("utf-8")
     
@@ -80,7 +80,7 @@ def test_recent_activities_window_filtering(temp_db, client):
     activities_all = get_recent_activities(days=0, db_path=temp_db)
     assert len(activities_all) == 1
     
-    res = client.get("/?days=7")
+    res = client.get("/dashboard?days=7")
     assert res.status_code == 200
     html = res.data.decode("utf-8")
     assert "Window:" in html
@@ -129,7 +129,7 @@ def test_coach_chat_returns_personalized_guidance(client):
 
 def test_coros_auth_status_validation(client):
     """Test 6: COROS authentication status is validated and displayed on page header."""
-    res = client.get("/")
+    res = client.get("/dashboard")
     assert res.status_code == 200
     html = res.data.decode("utf-8")
     assert "COROS" in html

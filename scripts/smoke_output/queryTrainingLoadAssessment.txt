@@ -1,0 +1,12 @@
+ARGS: {"days": 7}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Training Load Assessment\\n========================\\n\\n2026-09-29\\nComment: Resuming\\nShort-Term Load: 44\\nLong-Term Load: 62\\nLoad Ratio: 0.70\\n\\n2026-09-28\\nComment: Decreasing\\nShort-Term Load: 27\\nLong-Term Load: 60\\nLoad Ratio: 0.45\\n\\n2026-09-27\\nComment: Performance\\nShort-Term Load: 32\\nLong-Term Load: 61\\nLoad Ratio: 0.52\\n\\n2026-09-26\\nComment: Performance\\nShort-Term Load: 37\\nLong-Term Load: 63\\nLoad Ratio: 0.58\\n\\n2026-09-25\\nComment: Performance\\nShort-Term Load: 43\\nLong-Term Load: 64\\nLoad Ratio: 0.67\\n\\n2026-09-24\\nComment: Performance\\nShort-Term Load: 51\\nLong-Term Load: 66\\nLoad Ratio: 0.77\\n\\n2026-09-23\\nComment: Maintaining\\nShort-Term Load: 56\\nLong-Term Load: 67\\nLoad Ratio: 0.83\""
+    }
+  ],
+  "isError": false
+}

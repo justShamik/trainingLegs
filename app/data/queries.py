@@ -1,20 +1,36 @@
 """Database aggregation and retrieval queries for Dashboard, Activity, Profile, and Training Plans."""
 import sqlite3
 import uuid
+from datetime import date, datetime, timedelta, tzinfo
 from typing import Dict, Any, List, Optional
 from app.data.db import get_db_connection
 
 def save_training_plan(plan_data: Dict[str, Any], db_path: Optional[str] = None) -> str:
-    """Save generated training plan and session breakdown."""
+    """Save generated training plan and its dated session breakdown.
+
+    Plans without start_date/session_date (legacy single-week callers) are dated from the Monday of the current week.
+    Session ids are deterministic: <plan_id>_sess_<index in date order>.
+    """
+    from datetime import date, timedelta
+    weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
     conn = get_db_connection(db_path)
     plan_id = plan_data.get("id") or f"plan_{uuid.uuid4().hex[:8]}"
-    
+    sessions = plan_data.get("sessions", [])
+
+    start_date = plan_data.get("start_date")
+    if not start_date:
+        today = date.today()
+        start_date = (today - timedelta(days=today.weekday())).isoformat()
+    total_weeks = plan_data.get("total_weeks") or max([int(s.get("week_number") or 1) for s in sessions] or [1])
+    end_date = plan_data.get("end_date") or (date.fromisoformat(start_date) + timedelta(days=7 * total_weeks - 1)).isoformat()
+
     conn.execute(
         """
         INSERT INTO training_plans (
             id, version, goal_distance, race_date, total_volume_km,
-            methodology_name, methodology_rationale, is_deload
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            methodology_name, methodology_rationale, is_deload,
+            start_date, end_date, total_weeks
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             plan_id,
@@ -24,28 +40,35 @@ def save_training_plan(plan_data: Dict[str, Any], db_path: Optional[str] = None)
             float(plan_data.get("total_volume_km", 0.0)),
             plan_data.get("methodology_name", "Daniels' VDOT Periodisation"),
             plan_data.get("methodology_rationale", "Base building phase"),
-            1 if plan_data.get("is_deload") else 0
+            1 if plan_data.get("is_deload") else 0,
+            start_date, end_date, total_weeks
         )
     )
-    
-    sessions = plan_data.get("sessions", [])
+
     for idx, s in enumerate(sessions):
+        day_name = s.get("day_of_week", "Mon")
+        session_date = s.get("session_date")
+        if not session_date:
+            offset = weekdays.index(day_name) if day_name in weekdays else 0
+            session_date = (date.fromisoformat(start_date) + timedelta(days=offset)).isoformat()
         conn.execute(
             """
             INSERT INTO plan_sessions (
                 id, plan_id, day_of_week, session_type, distance_km,
-                duration_min, target_pace_or_hr, stated_purpose
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                duration_min, target_pace_or_hr, stated_purpose, session_date, week_number
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 f"{plan_id}_sess_{idx}",
                 plan_id,
-                s.get("day_of_week", "Mon"),
+                day_name,
                 s.get("session_type", "Rest"),
                 float(s["distance_km"]) if s.get("distance_km") is not None else None,
                 float(s["duration_min"]) if s.get("duration_min") is not None else None,
                 s.get("target_pace_or_hr", "Aerobic / Zone 2"),
-                s.get("stated_purpose", "Recovery")
+                s.get("stated_purpose", "Recovery"),
+                session_date,
+                int(s.get("week_number") or 1)
             )
         )
 
@@ -57,14 +80,14 @@ def get_active_training_plan(db_path: Optional[str] = None) -> Optional[Dict[str
     """Retrieve most recent training plan and its sessions."""
     conn = get_db_connection(db_path)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM training_plans ORDER BY created_at DESC LIMIT 1")
+    cursor.execute("SELECT * FROM training_plans ORDER BY created_at DESC, rowid DESC LIMIT 1")
     plan_row = cursor.fetchone()
     if not plan_row:
         conn.close()
         return None
         
     plan = dict(plan_row)
-    cursor.execute("SELECT * FROM plan_sessions WHERE plan_id = ? ORDER BY rowid ASC", (plan["id"],))
+    cursor.execute("SELECT * FROM plan_sessions WHERE plan_id = ? ORDER BY session_date ASC, rowid ASC", (plan["id"],))
     plan["sessions"] = [dict(s) for s in cursor.fetchall()]
     conn.close()
     return plan
@@ -141,6 +164,28 @@ def save_user_profile(profile_data: Dict[str, Any], db_path: Optional[str] = Non
     conn.commit()
     conn.close()
 
+def save_gemini_api_key(api_key: str, db_path: Optional[str] = None) -> None:
+    """Store only the Gemini API key, creating a default profile row if none exists."""
+    if not get_user_profile_row_exists(db_path):
+        save_user_profile(get_user_profile(db_path=db_path), db_path=db_path)
+    conn = get_db_connection(db_path)
+    conn.execute("UPDATE user_profile SET gemini_api_key = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1", (api_key or None,))
+    conn.commit()
+    conn.close()
+
+def get_user_profile_row_exists(db_path: Optional[str] = None) -> bool:
+    conn = get_db_connection(db_path)
+    row = conn.execute("SELECT 1 FROM user_profile WHERE id = 1").fetchone()
+    conn.close()
+    return row is not None
+
+def _sync_ts_to_iso(ts: Optional[str]) -> Optional[str]:
+    """sync_logs.timestamp is stored in UTC; expose it as ISO-8601 so the browser can localise it."""
+    if not ts:
+        return None
+    iso = str(ts).replace(" ", "T")
+    return iso if iso.endswith("Z") else iso + "Z"
+
 def get_dashboard_summary(db_path: Optional[str] = None) -> Dict[str, Any]:
     """Retrieve top-level KPI metrics for current week and latest recovery status."""
     conn = get_db_connection(db_path)
@@ -153,12 +198,13 @@ def get_dashboard_summary(db_path: Optional[str] = None) -> Dict[str, Any]:
             COALESCE(SUM(elevation_gain_m), 0.0) as weekly_elevation_m,
             COUNT(id) as weekly_runs_count
         FROM activities
-        WHERE date >= date('now', 'weekday 1 -7 days')
+        WHERE date >= date('now', '-7 days')
     """)
     week_stats = dict(cursor.fetchone())
     
     cursor.execute("""
-        SELECT date, total_sleep_minutes, sleep_score, deep_sleep_minutes
+        SELECT date, total_sleep_minutes, sleep_score, deep_sleep_minutes,
+               light_sleep_minutes, rem_sleep_minutes, awake_minutes
         FROM sleep_records
         ORDER BY date DESC LIMIT 1
     """)
@@ -178,6 +224,7 @@ def get_dashboard_summary(db_path: Optional[str] = None) -> Dict[str, Any]:
     """)
     sync_row = cursor.fetchone()
     last_sync_timestamp = sync_row["timestamp"] if sync_row else None
+    last_sync_iso = _sync_ts_to_iso(last_sync_timestamp)
     if last_sync_timestamp and len(last_sync_timestamp) >= 16:
         last_sync_display = last_sync_timestamp[:16].replace("T", " ")
     elif last_sync_timestamp:
@@ -200,6 +247,7 @@ def get_dashboard_summary(db_path: Optional[str] = None) -> Dict[str, Any]:
         "latest_physio": latest_physio,
         "acwr": acwr,
         "last_sync_timestamp": last_sync_timestamp,
+        "last_sync_iso": last_sync_iso,
         "last_sync_display": last_sync_display
     }
 
@@ -255,26 +303,28 @@ def get_trend_charts_data(db_path: Optional[str] = None) -> Dict[str, Any]:
             COALESCE(SUM(elevation_gain_m), 0.0) as elevation_m
         FROM activities
         GROUP BY week
-        ORDER BY week ASC
+        ORDER BY week DESC
         LIMIT 12
     """)
-    weekly_rows = [dict(r) for r in cursor.fetchall()]
-    
+    weekly_rows = [dict(r) for r in cursor.fetchall()][::-1]
+
     cursor.execute("""
-        SELECT date, total_sleep_minutes / 60.0 as sleep_hours, sleep_score
+        SELECT date, total_sleep_minutes / 60.0 as sleep_hours, sleep_score,
+               deep_sleep_minutes / 60.0 as deep_hours, light_sleep_minutes / 60.0 as light_hours,
+               rem_sleep_minutes / 60.0 as rem_hours, awake_minutes / 60.0 as awake_hours
         FROM sleep_records
-        ORDER BY date ASC
+        ORDER BY date DESC
         LIMIT 30
     """)
-    sleep_rows = [dict(r) for r in cursor.fetchall()]
+    sleep_rows = [dict(r) for r in cursor.fetchall()][::-1]
 
     cursor.execute("""
         SELECT date, hrv_score, resting_hr, acute_load, chronic_load
         FROM daily_physiology
-        ORDER BY date ASC
+        ORDER BY date DESC
         LIMIT 30
     """)
-    physio_rows = [dict(r) for r in cursor.fetchall()]
+    physio_rows = [dict(r) for r in cursor.fetchall()][::-1]
     
     conn.close()
     
@@ -287,7 +337,13 @@ def get_trend_charts_data(db_path: Optional[str] = None) -> Dict[str, Any]:
         "sleep_trend": {
             "labels": [r["date"] for r in sleep_rows],
             "sleep_hours": [round(r["sleep_hours"], 1) if r.get("sleep_hours") is not None else 0.0 for r in sleep_rows],
-            "sleep_score": [r["sleep_score"] for r in sleep_rows]
+            "sleep_score": [r["sleep_score"] for r in sleep_rows],
+            # Stages are NULL (None) when COROS gave no split; never zero-filled
+            "deep_hours": [round(r["deep_hours"], 2) if r.get("deep_hours") is not None else None for r in sleep_rows],
+            "light_hours": [round(r["light_hours"], 2) if r.get("light_hours") is not None else None for r in sleep_rows],
+            "rem_hours": [round(r["rem_hours"], 2) if r.get("rem_hours") is not None else None for r in sleep_rows],
+            "awake_hours": [round(r["awake_hours"], 2) if r.get("awake_hours") is not None else None for r in sleep_rows],
+            "has_score": any(r["sleep_score"] is not None for r in sleep_rows)
         },
         "physio_trend": {
             "labels": [r["date"] for r in physio_rows],
@@ -333,6 +389,23 @@ def get_activity_detail(activity_id: str, db_path: Optional[str] = None) -> Opti
             s["pace_str"] = "N/A"
 
     activity["splits"] = splits
+    if activity.get("gap_s_km"):
+        activity["gap_str"] = f"{int(activity['gap_s_km'] // 60)}:{int(activity['gap_s_km'] % 60):02d} /km"
+    # Explain WHY a form metric is missing (never fabricate a value)
+    if activity.get("details_synced_at"):
+        activity["na_reason"] = "Not recorded for this activity"
+    elif "run" in (activity.get("sport_type") or "").lower():
+        attempts = activity.get("details_attempts") or 0
+        if attempts >= 3:
+            activity["na_reason"] = (f"Detail fetch failed {attempts} times ({activity.get('details_last_error') or 'unknown error'}) "
+                                     "- use 'Sync 365 Days History' to retry")
+        elif attempts:
+            activity["na_reason"] = (f"Detail fetch failed ({attempts} of 3 attempts: "
+                                     f"{activity.get('details_last_error') or 'unknown error'}) - will retry on next sync")
+        else:
+            activity["na_reason"] = "Detail data not synced yet - click Sync on the dashboard"
+    else:
+        activity["na_reason"] = "Not applicable for this sport type"
     conn.close()
     return activity
 
@@ -359,7 +432,8 @@ def update_session_status(
         "actual_distance_km": actual_distance_km,
         "actual_duration_min": actual_duration_min,
         "actual_avg_pace_s_km": actual_avg_pace_s_km,
-        "actual_avg_hr": actual_avg_hr
+        "actual_avg_hr": actual_avg_hr,
+        "status": status
     }
     score, rating = calculate_workout_adherence(sess_dict, actual_metrics)
 
@@ -382,41 +456,30 @@ def update_session_status(
     conn.commit()
     conn.close()
 
-def calculate_weekly_compliance(plan_id: Optional[str] = None, db_path: Optional[str] = None) -> Dict[str, Any]:
-    """Calculate compliance metrics for the active or specified plan."""
+def get_plan_session(session_id: str, db_path: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    """Retrieve a single plan session row."""
     conn = get_db_connection(db_path)
-    cursor = conn.cursor()
-    
-    if not plan_id:
-        cursor.execute("SELECT id FROM training_plans ORDER BY created_at DESC LIMIT 1")
-        row = cursor.fetchone()
-        if not row:
-            conn.close()
-            return {
-                "prescribed_total_km": 0.0,
-                "completed_total_km": 0.0,
-                "volume_compliance_pct": 0.0,
-                "total_sessions": 0,
-                "completed_sessions": 0,
-                "modified_sessions": 0,
-                "skipped_sessions": 0,
-                "pending_sessions": 0,
-                "session_compliance_pct": 0.0
-            }
-        plan_id = row["id"]
-
-    cursor.execute("SELECT * FROM plan_sessions WHERE plan_id = ?", (plan_id,))
-    sessions = [dict(r) for r in cursor.fetchall()]
+    row = conn.execute("SELECT * FROM plan_sessions WHERE id = ?", (session_id,)).fetchone()
     conn.close()
+    return dict(row) if row else None
 
+def _empty_compliance() -> Dict[str, Any]:
+    return {
+        "scope": "week", "week_number": None, "week_start": None, "week_end": None,
+        "prescribed_total_km": 0.0, "completed_total_km": 0.0, "volume_compliance_pct": 0.0,
+        "total_sessions": 0, "completed_sessions": 0, "modified_sessions": 0,
+        "skipped_sessions": 0, "pending_sessions": 0, "session_compliance_pct": 0.0,
+        "plan_prescribed_total_km": 0.0, "plan_completed_total_km": 0.0, "plan_volume_compliance_pct": 0.0,
+        "plan_total_sessions": 0, "plan_completed_sessions": 0, "plan_session_compliance_pct": 0.0,
+    }
+
+def _compliance_for(sessions: List[Dict[str, Any]]) -> Dict[str, Any]:
     prescribed_total_km = sum(s["distance_km"] or 0.0 for s in sessions)
-    
     completed_total_km = sum(
         s["actual_distance_km"] if s.get("actual_distance_km") is not None else (s["distance_km"] or 0.0)
         for s in sessions
         if s.get("status") in ("Completed", "Modified")
     )
-    
     volume_compliance_pct = round((completed_total_km / prescribed_total_km * 100.0), 1) if prescribed_total_km > 0 else 100.0
 
     non_rest_sessions = [s for s in sessions if s.get("session_type") != "Rest"]
@@ -425,12 +488,9 @@ def calculate_weekly_compliance(plan_id: Optional[str] = None, db_path: Optional
     modified_sessions = sum(1 for s in non_rest_sessions if s.get("status") == "Modified")
     skipped_sessions = sum(1 for s in non_rest_sessions if s.get("status") == "Skipped")
     pending_sessions = sum(1 for s in non_rest_sessions if s.get("status") in ("Pending", None))
-
     executed_count = completed_sessions + modified_sessions
     session_compliance_pct = round((executed_count / total_sessions * 100.0), 1) if total_sessions > 0 else 100.0
-
     return {
-        "plan_id": plan_id,
         "prescribed_total_km": round(prescribed_total_km, 1),
         "completed_total_km": round(completed_total_km, 1),
         "volume_compliance_pct": volume_compliance_pct,
@@ -439,92 +499,167 @@ def calculate_weekly_compliance(plan_id: Optional[str] = None, db_path: Optional
         "modified_sessions": modified_sessions,
         "skipped_sessions": skipped_sessions,
         "pending_sessions": pending_sessions,
-        "session_compliance_pct": session_compliance_pct
+        "session_compliance_pct": session_compliance_pct,
     }
 
-def auto_match_activities_to_sessions(plan_id: Optional[str] = None, db_path: Optional[str] = None) -> int:
-    """Automatically match completed COROS activities to plan sessions based on day/distance heuristic."""
+def calculate_weekly_compliance(plan_id: Optional[str] = None, db_path: Optional[str] = None, today=None) -> Dict[str, Any]:
+    """Compliance for the active or specified plan.
+
+    The top-level keys (prescribed_total_km, volume_compliance_pct, ...) cover the CURRENT WEEK of the plan
+    (the week containing `today`, clamped to the plan's first/last week). The whole-plan figures are returned
+    under the plan_* keys (plan_prescribed_total_km, plan_completed_total_km, plan_volume_compliance_pct,
+    plan_total_sessions, plan_completed_sessions, plan_session_compliance_pct).
+    """
+    from datetime import date as _date, timedelta
+    today = today or _date.today()
+    conn = get_db_connection(db_path)
+    cursor = conn.cursor()
+
+    if not plan_id:
+        cursor.execute("SELECT id FROM training_plans ORDER BY created_at DESC, rowid DESC LIMIT 1")
+        row = cursor.fetchone()
+        if not row:
+            conn.close()
+            return _empty_compliance()
+        plan_id = row["id"]
+
+    plan_row = cursor.execute("SELECT start_date, total_weeks FROM training_plans WHERE id = ?", (plan_id,)).fetchone()
+    cursor.execute("SELECT * FROM plan_sessions WHERE plan_id = ? ORDER BY session_date, rowid", (plan_id,))
+    sessions = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+
+    week_number, week_start = 1, None
+    if plan_row and plan_row["start_date"]:
+        start = _date.fromisoformat(plan_row["start_date"])
+        total_weeks = plan_row["total_weeks"] or 1
+        week_number = min(max((today - start).days // 7 + 1, 1), total_weeks)
+        week_start = start + timedelta(days=7 * (week_number - 1))
+    week_sessions = [s for s in sessions if int(s.get("week_number") or 1) == week_number]
+
+    result = _compliance_for(week_sessions)
+    whole = _compliance_for(sessions)
+    result.update({
+        "plan_id": plan_id,
+        "scope": "week",
+        "week_number": week_number,
+        "week_start": week_start.isoformat() if week_start else None,
+        "week_end": (week_start + timedelta(days=6)).isoformat() if week_start else None,
+        "plan_prescribed_total_km": whole["prescribed_total_km"],
+        "plan_completed_total_km": whole["completed_total_km"],
+        "plan_volume_compliance_pct": whole["volume_compliance_pct"],
+        "plan_total_sessions": whole["total_sessions"],
+        "plan_completed_sessions": whole["completed_sessions"] + whole["modified_sessions"],
+        "plan_session_compliance_pct": whole["session_compliance_pct"],
+    })
+    return result
+
+def auto_match_activities_to_sessions(plan_id: Optional[str] = None, db_path: Optional[str] = None, today=None) -> int:
+    """Match COROS run activities to plan sessions by calendar date.
+
+    Only past/today sessions (session_date <= today) are candidates - future sessions are never matched.
+    Pass 1 matches an activity on the SAME date as the session; pass 2 falls back to +-1 day. In both passes the
+    distance must be within max(3 km, 35%) of the prescription and the closest distance wins.
+    """
+    from datetime import date as _date, timedelta
     from app.engine.tracking import generate_post_run_feedback, calculate_workout_adherence
+    today = today or _date.today()
 
     conn = get_db_connection(db_path)
     cursor = conn.cursor()
-    
+
     if not plan_id:
-        cursor.execute("SELECT id FROM training_plans ORDER BY created_at DESC LIMIT 1")
+        cursor.execute("SELECT id FROM training_plans ORDER BY created_at DESC, rowid DESC LIMIT 1")
         plan_row = cursor.fetchone()
         if not plan_row:
             conn.close()
             return 0
         plan_id = plan_row["id"]
 
-    cursor.execute("SELECT * FROM plan_sessions WHERE plan_id = ? AND (status IS NULL OR status = 'Pending')", (plan_id,))
-    pending_sessions = [dict(s) for s in cursor.fetchall()]
+    cursor.execute(
+        "SELECT * FROM plan_sessions WHERE plan_id = ? AND (status IS NULL OR status = 'Pending') "
+        "AND session_date IS NOT NULL AND session_date <= ? ORDER BY session_date, rowid",
+        (plan_id, today.isoformat()))
+    pending_sessions = [dict(s) for s in cursor.fetchall()
+                        if s["session_type"] != "Rest" and s["distance_km"]]
+    if not pending_sessions:
+        conn.close()
+        return 0
 
+    first_day = (_date.fromisoformat(pending_sessions[0]["session_date"]) - timedelta(days=1)).isoformat()
     cursor.execute("""
-        SELECT * FROM activities 
+        SELECT * FROM activities
         WHERE id NOT IN (SELECT matched_activity_id FROM plan_sessions WHERE matched_activity_id IS NOT NULL)
+          AND LOWER(sport_type) LIKE '%run%'
+          AND substr(date, 1, 10) >= ? AND substr(date, 1, 10) <= ?
         ORDER BY date DESC
-    """)
-    unmatched_activities = [dict(a) for a in cursor.fetchall()]
+    """, (first_day, today.isoformat()))
+    unmatched_activities = [dict(a) for a in cursor.fetchall() if a["distance_m"] is not None]
 
-    matched_count = 0
-    day_map = {
-        "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6, "Sun": 0
-    }
+    def _day(value: str) -> Optional[_date]:
+        try:
+            return _date.fromisoformat(str(value)[:10])
+        except ValueError:
+            return None
 
     used_activity_ids = set()
+    assignments: Dict[str, Dict[str, Any]] = {}
 
-    for sess in pending_sessions:
-        if sess.get("session_type") == "Rest" or not sess.get("distance_km"):
-            continue
-
-        target_dist = float(sess["distance_km"])
-        best_match = None
-        best_diff = 999.0
-
-        for act in unmatched_activities:
-            if act["id"] in used_activity_ids:
+    for max_gap in (0, 1):  # pass 1: same date, pass 2: +-1 day
+        for sess in pending_sessions:
+            if sess["id"] in assignments:
                 continue
-            act_dist = act["distance_m"] / 1000.0
-            dist_diff = abs(act_dist - target_dist)
-            
-            # Check if distance match is reasonable (within 35% or 3km)
-            if dist_diff <= max(3.0, target_dist * 0.35):
-                if dist_diff < best_diff:
-                    best_diff = dist_diff
-                    best_match = act
+            sdate = _day(sess["session_date"])
+            target_dist = float(sess["distance_km"])
+            best, best_diff = None, 999.0
+            for act in unmatched_activities:
+                if act["id"] in used_activity_ids:
+                    continue
+                adate = _day(act["date"])
+                if sdate is None or adate is None or abs((adate - sdate).days) > max_gap:
+                    continue
+                if max_gap == 1 and adate == sdate:
+                    continue  # same-date candidates were handled in pass 1
+                dist_diff = abs(act["distance_m"] / 1000.0 - target_dist)
+                if dist_diff <= max(3.0, target_dist * 0.35) and dist_diff < best_diff:
+                    best, best_diff = act, dist_diff
+            if best:
+                used_activity_ids.add(best["id"])
+                assignments[sess["id"]] = best
 
-        if best_match:
-            used_activity_ids.add(best_match["id"])
-            act_dist_km = round(best_match["distance_m"] / 1000.0, 2)
-            act_dur_min = round(best_match["duration_s"] / 60.0, 1)
-            act_pace = best_match.get("avg_pace_s_km")
-            act_hr = best_match.get("avg_hr")
+    matched_count = 0
+    for sess in pending_sessions:
+        best_match = assignments.get(sess["id"])
+        if not best_match:
+            continue
+        act_dist_km = round(best_match["distance_m"] / 1000.0, 2)
+        act_dur_min = round((best_match.get("duration_s") or 0.0) / 60.0, 1)
+        act_pace = best_match.get("avg_pace_s_km")
+        act_hr = best_match.get("avg_hr")
 
-            actual_metrics = {
-                "actual_distance_km": act_dist_km,
-                "actual_duration_min": act_dur_min,
-                "actual_avg_pace_s_km": act_pace,
-                "actual_avg_hr": act_hr
-            }
+        actual_metrics = {
+            "actual_distance_km": act_dist_km,
+            "actual_duration_min": act_dur_min,
+            "actual_avg_pace_s_km": act_pace,
+            "actual_avg_hr": act_hr
+        }
 
-            feedback = generate_post_run_feedback(sess, actual_metrics)
-            score, rating = calculate_workout_adherence(sess, actual_metrics)
+        feedback = generate_post_run_feedback(sess, actual_metrics)
+        score, rating = calculate_workout_adherence(sess, actual_metrics)
 
-            cursor.execute("""
-                UPDATE plan_sessions
-                SET matched_activity_id = ?,
-                    status = 'Completed',
-                    actual_distance_km = ?,
-                    actual_duration_min = ?,
-                    actual_avg_pace_s_km = ?,
-                    actual_avg_hr = ?,
-                    post_run_feedback = ?,
-                    adherence_score = ?,
-                    adherence_rating = ?
-                WHERE id = ?
-            """, (best_match["id"], act_dist_km, act_dur_min, act_pace, act_hr, feedback, score, rating, sess["id"]))
-            matched_count += 1
+        cursor.execute("""
+            UPDATE plan_sessions
+            SET matched_activity_id = ?,
+                status = 'Completed',
+                actual_distance_km = ?,
+                actual_duration_min = ?,
+                actual_avg_pace_s_km = ?,
+                actual_avg_hr = ?,
+                post_run_feedback = ?,
+                adherence_score = ?,
+                adherence_rating = ?
+            WHERE id = ?
+        """, (best_match["id"], act_dist_km, act_dur_min, act_pace, act_hr, feedback, score, rating, sess["id"]))
+        matched_count += 1
 
     conn.commit()
     conn.close()
@@ -817,3 +952,151 @@ def update_strength_workout_status(workout_id: str, status: str, db_path: Option
     conn.close()
 
 
+# ---- Home page: today's dials + sync status ----------------------------------------------
+
+DEFAULT_SLEEP_GOAL = 480        # minutes
+DEFAULT_ACTIVITY_GOAL = 60      # minutes
+DEFAULT_STEPS_GOAL = 10000
+DEFAULT_CALORIES_GOAL = 2500    # kcal
+NOT_SYNCED_TODAY = "Not synced yet today"
+
+def _pct(value: Optional[float], goal: float) -> Optional[int]:
+    """Dial fill 0-100 (capped); None when the value is unknown."""
+    if value is None or not goal:
+        return None
+    return int(round(max(0.0, min(100.0, value * 100.0 / goal))))
+
+def local_date_of(ts: Optional[str], tz: Optional[tzinfo] = None) -> Optional[date]:
+    """Local calendar date of an activities.date value.
+
+    Timestamps carrying 'Z'/an offset are converted to `tz` (default: system local zone), so
+    2026-10-02T20:00:00Z is 2026-10-03 in IST. Date-only or naive values keep their date part."""
+    if not ts:
+        return None
+    s = str(ts).strip()
+    try:
+        if len(s) <= 10:
+            return date.fromisoformat(s[:10])
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00").replace(" ", "T"))
+    except ValueError:
+        try:
+            return date.fromisoformat(s[:10])
+        except ValueError:
+            return None
+    if dt.tzinfo is None:
+        return dt.date()
+    return dt.astimezone(tz).date()
+
+def get_today_summary(db_path: Optional[str] = None, today: Optional[date] = None,
+                      tz: Optional[tzinfo] = None) -> Dict[str, Any]:
+    """Today's sleep / activity time / steps / calories with goal fill % for the home dials.
+
+    `today` defaults to the system local date. Sleep is dated by wake-up day, so last night's
+    sleep is the sleep_records row dated today. Unknown values stay None with a reason (NFR-4.1)."""
+    if today is None:
+        today = datetime.now(tz).date() if tz else date.today()
+    elif isinstance(today, str):
+        today = date.fromisoformat(today[:10])
+    day = today.isoformat()
+
+    conn = get_db_connection(db_path)
+    try:
+        sleep_row = conn.execute(
+            "SELECT total_sleep_minutes, deep_sleep_minutes, light_sleep_minutes, rem_sleep_minutes, awake_minutes "
+            "FROM sleep_records WHERE date = ?", (day,)).fetchone()
+        try:
+            act_row = conn.execute("SELECT steps, calories_kcal, exercise_minutes, stress_avg "
+                                   "FROM daily_activity WHERE date = ?", (day,)).fetchone()
+        except sqlite3.OperationalError:  # table not migrated yet
+            act_row = None
+        # Coarse SQL window (+/- 1 day covers any UTC offset), exact local-date match in Python
+        rows = conn.execute(
+            "SELECT date, duration_s FROM activities WHERE substr(date, 1, 10) BETWEEN ? AND ?",
+            ((today - timedelta(days=1)).isoformat(), (today + timedelta(days=1)).isoformat())).fetchall()
+    finally:
+        conn.close()
+
+    todays = [r for r in rows if local_date_of(r["date"], tz) == today]
+    activity_min = round(sum((r["duration_s"] or 0) for r in todays) / 60.0, 1)
+
+    sleep = None
+    sleep_reason = None
+    if sleep_row:
+        sleep = {
+            "total_minutes": sleep_row["total_sleep_minutes"],
+            "deep_minutes": sleep_row["deep_sleep_minutes"],
+            "light_minutes": sleep_row["light_sleep_minutes"],
+            "rem_minutes": sleep_row["rem_sleep_minutes"],
+            "awake_minutes": sleep_row["awake_minutes"],
+        }
+    else:
+        sleep_reason = NOT_SYNCED_TODAY if act_row is None else "No sleep recorded last night"
+
+    steps = act_row["steps"] if act_row else None
+    calories = act_row["calories_kcal"] if act_row else None
+    return {
+        "date": day,
+        "sleep": sleep,
+        "sleep_reason": sleep_reason,
+        "activity_time_minutes": activity_min,
+        "activity_count": len(todays),
+        "activity_reason": None if todays else "No activities recorded today",
+        "exercise_minutes": act_row["exercise_minutes"] if act_row else None,
+        "stress_avg": act_row["stress_avg"] if act_row else None,
+        "steps": steps,
+        "calories_kcal": calories,
+        "daily_activity_reason": None if act_row else NOT_SYNCED_TODAY,
+        "goals": {
+            "sleep_minutes": DEFAULT_SLEEP_GOAL,
+            "activity_minutes": DEFAULT_ACTIVITY_GOAL,
+            "steps": DEFAULT_STEPS_GOAL,
+            "calories_kcal": DEFAULT_CALORIES_GOAL,
+        },
+        "pct": {
+            "sleep": _pct(sleep["total_minutes"] if sleep else None, DEFAULT_SLEEP_GOAL),
+            "activity": _pct(activity_min, DEFAULT_ACTIVITY_GOAL),
+            "steps": _pct(steps, DEFAULT_STEPS_GOAL),
+            "calories": _pct(calories, DEFAULT_CALORIES_GOAL),
+        },
+    }
+
+def get_sync_status(db_path: Optional[str] = None) -> Dict[str, Any]:
+    """Last sync (from sync_logs) + COROS token state: connected / expired / disconnected.
+
+    validate_token_status only reads the local token file (no subprocess / network)."""
+    conn = get_db_connection(db_path)
+    try:
+        ok_row = conn.execute("SELECT timestamp FROM sync_logs WHERE status = 'SUCCESS' "
+                              "ORDER BY id DESC LIMIT 1").fetchone()
+        last_row = conn.execute("SELECT timestamp, sync_type, status, error_message FROM sync_logs "
+                                "ORDER BY id DESC LIMIT 1").fetchone()
+    except sqlite3.OperationalError:
+        ok_row = last_row = None
+    finally:
+        conn.close()
+
+    try:
+        from app.mcp_client.coros_client import CorosMCPClient
+        token = CorosMCPClient().validate_token_status() or {}
+    except Exception as err:
+        token = {"is_authenticated": False, "token_exists": None, "status_code": "UNKNOWN",
+                 "message": f"Could not check COROS token ({type(err).__name__})"}
+
+    if token.get("is_authenticated"):
+        state = "connected"
+    elif token.get("token_exists"):
+        state = "expired"
+    else:
+        state = "disconnected"
+    return {
+        "state": state,
+        "last_sync_iso": _sync_ts_to_iso(ok_row["timestamp"] if ok_row else None),
+        "last_attempt_iso": _sync_ts_to_iso(last_row["timestamp"] if last_row else None),
+        "last_sync_status": last_row["status"] if last_row else None,
+        "last_sync_type": last_row["sync_type"] if last_row else None,
+        "last_sync_message": last_row["error_message"] if last_row else None,
+        "is_authenticated": bool(token.get("is_authenticated")),
+        "status_code": token.get("status_code"),
+        "token_message": token.get("message"),
+        "token_expires_at": token.get("expires_at"),
+    }

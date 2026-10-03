@@ -3,71 +3,89 @@
 {% block title %}Goal Profile & Constraints - Personal Running Coach{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: var(--space-lg);">
-    <h1>RUNNER PROFILE & GOAL TARGETS</h1>
-    <p style="color: var(--text-secondary);">Set your target race, availability schedule, and physical constraints for AI coaching generation.</p>
-</div>
+<section class="page-hero">
+    <div class="page-hero__text">
+        <span class="eyebrow eyebrow--accent">Goal profile</span>
+        <h1 class="sc">RUNNER PROFILE & GOAL TARGETS</h1>
+        <p class="lead">Set your target race, availability schedule, and physical constraints for AI coaching generation.</p>
+    </div>
+</section>
 
 {% if saved_success %}
-<div style="background-color: rgba(0, 230, 118, 0.15); border: 1px solid var(--status-success); color: var(--status-success); padding: var(--space-md); border-radius: var(--radius-sm); margin-bottom: var(--space-lg);">
-    <strong>Profile Updated Successfully!</strong> Your goals and constraints have been saved.
+<div class="callout callout--success card--narrow">
+    <div style="color: var(--text-primary);">
+        <strong style="color: var(--tone);">Profile Updated Successfully!</strong> Your goals and constraints have been saved.
+    </div>
 </div>
 {% endif %}
 
-<div class="card" style="max-width: 800px; margin: 0 auto;">
+<div class="card card--narrow" style="padding: clamp(20px, 4vw, 40px);">
     <form method="POST" action="/profile">
-        <h2 style="margin-bottom: var(--space-md); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-xs);">1. TARGET RACE & GOALS</h2>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg);">
-            <div>
-                <label style="display: block; color: var(--text-secondary); margin-bottom: var(--space-xs); font-weight: 600;">Race Distance Target</label>
-                <select name="race_distance_type" style="width: 100%; background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-sm);">
-                    <option value="5K" {% if profile.race_distance_type == '5K' %}selected{% endif %}>5K Road Race</option>
-                    <option value="10K" {% if profile.race_distance_type == '10K' %}selected{% endif %}>10K Road Race</option>
-                    <option value="Half Marathon" {% if profile.race_distance_type == 'Half Marathon' %}selected{% endif %}>Half Marathon (21.1 km)</option>
-                    <option value="Marathon" {% if profile.race_distance_type == 'Marathon' %}selected{% endif %}>Marathon (42.2 km)</option>
-                    <option value="50K Ultra" {% if profile.race_distance_type == '50K Ultra' %}selected{% endif %}>50K Ultra / Trail</option>
-                    <option value="100K Ultra" {% if profile.race_distance_type == '100K Ultra' %}selected{% endif %}>100K Ultra / Trail</option>
-                </select>
+        <div class="form-section">
+            <div class="form-section__title">
+                <span class="form-section__index">01</span>
+                <h2>Target race &amp; goals</h2>
             </div>
-            <div>
-                <label style="display: block; color: var(--text-secondary); margin-bottom: var(--space-xs); font-weight: 600;">Race Date</label>
-                <input type="date" name="race_date" value="{{ profile.race_date or '' }}" style="width: 100%; background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-sm);" required>
-            </div>
-            <div>
-                <label style="display: block; color: var(--text-secondary); margin-bottom: var(--space-xs); font-weight: 600;">Target Time (HH:MM:SS)</label>
-                <input type="text" name="target_time_str" value="{{ profile.target_time_str or '3:45:00' }}" placeholder="e.g. 3:45:00" style="width: 100%; background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-sm);" required>
-            </div>
-        </div>
-
-        <h2 style="margin-bottom: var(--space-md); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-xs);">2. AVAILABILITY & CONSTRAINTS</h2>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-md); margin-bottom: var(--space-lg);">
-            <div>
-                <label style="display: block; color: var(--text-secondary); margin-bottom: var(--space-xs); font-weight: 600;">Max Weekly Hours Available</label>
-                <input type="number" step="0.5" name="weekly_hours_available" value="{{ profile.weekly_hours_available or 8.0 }}" style="width: 100%; background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-sm);" required>
-            </div>
-            <div>
-                <label style="display: block; color: var(--text-secondary); margin-bottom: var(--space-xs); font-weight: 600;">Available Training Days (Comma Separated)</label>
-                <input type="text" name="available_days" value="{{ profile.available_days or 'Mon,Tue,Thu,Sat,Sun' }}" style="width: 100%; background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-sm);" required>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Race Distance Target</label>
+                    <select name="race_distance_type">
+                        <option value="5K" {% if profile.race_distance_type == '5K' %}selected{% endif %}>5K Road Race</option>
+                        <option value="10K" {% if profile.race_distance_type == '10K' %}selected{% endif %}>10K Road Race</option>
+                        <option value="Half Marathon" {% if profile.race_distance_type == 'Half Marathon' %}selected{% endif %}>Half Marathon (21.1 km)</option>
+                        <option value="Marathon" {% if profile.race_distance_type == 'Marathon' %}selected{% endif %}>Marathon (42.2 km)</option>
+                        <option value="50K Ultra" {% if profile.race_distance_type == '50K Ultra' %}selected{% endif %}>50K Ultra / Trail</option>
+                        <option value="100K Ultra" {% if profile.race_distance_type == '100K Ultra' %}selected{% endif %}>100K Ultra / Trail</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Race Date</label>
+                    <input type="date" name="race_date" value="{{ profile.race_date or '' }}" required>
+                </div>
+                <div class="field">
+                    <label>Target Time (HH:MM:SS)</label>
+                    <input type="text" name="target_time_str" value="{{ profile.target_time_str or '3:45:00' }}" placeholder="e.g. 3:45:00" required>
+                </div>
             </div>
         </div>
 
-        <h2 style="margin-bottom: var(--space-md); border-bottom: 1px solid var(--border-color); padding-bottom: var(--space-xs);">3. MEDICAL & PHYSICAL HISTORY</h2>
-        
-        <div style="margin-bottom: var(--space-md);">
-            <label style="display: block; color: var(--text-secondary); margin-bottom: var(--space-xs); font-weight: 600;">Injury History</label>
-            <textarea name="injury_history" rows="2" style="width: 100%; background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-sm);">{{ profile.injury_history or 'None' }}</textarea>
+        <div class="form-section">
+            <div class="form-section__title">
+                <span class="form-section__index">02</span>
+                <h2>Availability &amp; constraints</h2>
+            </div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>Max Weekly Hours Available</label>
+                    <input type="number" step="0.5" name="weekly_hours_available" value="{{ profile.weekly_hours_available or 8.0 }}" required>
+                </div>
+                <div class="field">
+                    <label>Available Training Days (Comma Separated)</label>
+                    <input type="text" name="available_days" value="{{ profile.available_days or 'Mon,Tue,Thu,Sat,Sun' }}" required>
+                </div>
+            </div>
         </div>
 
-        <div style="margin-bottom: var(--space-lg);">
-            <label style="display: block; color: var(--text-secondary); margin-bottom: var(--space-xs); font-weight: 600;">Current Niggles / Discomforts</label>
-            <textarea name="current_niggles" rows="2" style="width: 100%; background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--radius-sm);">{{ profile.current_niggles or 'None' }}</textarea>
+        <div class="form-section">
+            <div class="form-section__title">
+                <span class="form-section__index">03</span>
+                <h2>Medical &amp; physical history</h2>
+            </div>
+            <div class="stack">
+                <div class="field">
+                    <label>Injury History</label>
+                    <textarea name="injury_history" rows="2">{{ profile.injury_history or 'None' }}</textarea>
+                </div>
+                <div class="field">
+                    <label>Current Niggles / Discomforts</label>
+                    <textarea name="current_niggles" rows="2">{{ profile.current_niggles or 'None' }}</textarea>
+                </div>
+            </div>
         </div>
 
-        <button type="submit" style="background-color: var(--accent-orange); color: #fff; border: none; font-family: var(--font-display); font-size: 1.4rem; padding: 10px 32px; border-radius: var(--radius-sm); cursor: pointer; text-transform: uppercase;">
-            Save Goal Profile
-        </button>
+        <div style="margin-top: var(--space-xl); display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary btn-lg">Save Goal Profile</button>
+        </div>
     </form>
 </div>
 {% endblock %}

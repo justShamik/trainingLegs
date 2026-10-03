@@ -1,0 +1,12 @@
+ARGS: {"days": 7}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Average Heart Rate — Last 7 days\\n========================\\n\\n2026-09-29: 76 bpm (Min: 50, Max: 165)\\n2026-09-28: 62 bpm (Min: 35, Max: 97)\\n2026-09-27: 67 bpm (Min: 45, Max: 105)\\n2026-09-26: 57 bpm (Min: 41, Max: 75)\\n2026-09-25: 66 bpm (Min: 39, Max: 102)\\n2026-09-24: 66 bpm (Min: 36, Max: 118)\\n2026-09-23: 62 bpm (Min: 40, Max: 97)\""
+    }
+  ],
+  "isError": false
+}

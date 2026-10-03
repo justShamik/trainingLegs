@@ -4,43 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Personal Running Coach - COROS Training Analysis & Performance Optimization Engine">
+    <meta name="theme-color" content="#060708">
+    <meta name="color-scheme" content="dark">
     <title>{% block title %}Personal Running Coach{% endblock %}</title>
-    
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='none' stroke='%23ff5c1a' stroke-width='3'/%3E%3C/svg%3E">
+
+    <!-- Typography: Instrument Serif (display), Inter Tight (UI numerals), Inter (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600&family=Inter:wght@400;500;600&display=swap">
+
     <!-- Design System CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
+
+    <!-- Scroll choreography (adds .js-motion to <html>; see docs/DESIGN_SYSTEM.md) -->
+    <script src="{{ url_for('static', filename='js/motion.js') }}" defer></script>
+
     <!-- Chart.js for Trend Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header class="navbar">
-        <a href="/" class="nav-brand">
-            <div class="brand-icon"></div>
-            <div class="brand-title">RUNNING<span class="brand-accent">COACH</span></div>
+        <a href="{{ url_for('home') }}" class="nav-brand" aria-label="Running Coach home">
+            <span class="brand-icon" aria-hidden="true"></span>
+            <span class="brand-title">Running<span class="brand-accent"> Coach</span></span>
         </a>
-        <nav style="display: flex; align-items: center; gap: 16px;">
+        <nav class="nav-main" aria-label="Primary">
             <ul class="nav-links">
-                <li><a href="/" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a></li>
+                <li><a href="{{ url_for('home') }}" class="nav-link {% if active_page == 'home' %}active{% endif %}">Home</a></li>
+                <li><a href="{{ url_for('index') }}" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a></li>
                 <li><a href="/plan" class="nav-link {% if active_page == 'plan' %}active{% endif %}">Training Plan</a></li>
                 <li><a href="/strength" class="nav-link {% if active_page == 'strength' %}active{% endif %}">Strength & S&C</a></li>
                 <li><a href="/block-summary" class="nav-link {% if active_page == 'block_summary' %}active{% endif %}">Block Summary</a></li>
                 <li><a href="/profile" class="nav-link {% if active_page == 'profile' %}active{% endif %}">Goal Profile</a></li>
                 <li><a href="/chat" class="nav-link {% if active_page == 'chat' %}active{% endif %}">Coach Chat</a></li>
+                <li><a href="/analytics" class="nav-link {% if active_page == 'analytics' %}active{% endif %}">Analytics</a></li>
             </ul>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                {% if coros_auth and coros_auth.is_authenticated %}
-                <span style="font-size: 0.8rem; background: rgba(0, 230, 118, 0.15); color: var(--status-success); border: 1px solid var(--status-success); padding: 4px 10px; border-radius: 12px; font-weight: 600;" title="{{ coros_auth.message }}">
-                    🟢 COROS Connected
-                </span>
-                {% else %}
-                <form method="POST" action="/coros/login" style="margin:0;">
-                    <button type="submit" style="font-size: 0.8rem; background: rgba(255, 23, 68, 0.15); color: var(--status-danger); border: 1px solid var(--status-danger); padding: 4px 10px; border-radius: 12px; font-weight: 600; cursor: pointer;" title="Click to open COROS login window">
-                        🔴 Connect COROS Account
-                    </button>
-                </form>
-                {% endif %}
-            </div>
         </nav>
+        <div class="nav-status">
+            {% if coros_auth and coros_auth.is_authenticated %}
+            <span class="status-pill status-pill--ok" title="{{ coros_auth.message }}">
+                <span class="status-dot" aria-hidden="true"></span>COROS Connected
+            </span>
+            {% else %}
+            <form method="POST" action="/coros/login">
+                <input type="hidden" name="next" value="{{ request.full_path.rstrip('?') if request else '/' }}">
+                <button type="submit" class="status-pill status-pill--off" title="Click to open COROS login window">
+                    <span class="status-dot" aria-hidden="true"></span>Connect COROS Account
+                </button>
+            </form>
+            {% endif %}
+        </div>
     </header>
 
     <main class="container">
@@ -48,5 +62,6 @@
     </main>
 
     {% block scripts %}{% endblock %}
+    {% include '_analytics.html' %}
 </body>
 </html>

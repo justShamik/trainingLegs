@@ -1,0 +1,12 @@
+ARGS: {"labelId": "480672546503557126", "sportType": 100, "focus": "cadence stride ground contact"}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Conclusion: This running was a solid 8.40 km session completed in 52:52.\\n\\nKey findings:\\n- The session covered 8.40 km in 52:52.\\n- Average pace was 6:18 /km.\\n- Heart rate: Heart rate averaged 155 bpm, peaking at 172 bpm.\\n- Elevation gain was 4 m, so terrain likely added extra load.\\n- Average cadence was 176 spm.\\n- Estimated energy cost was 763 kcal.\\n\\nRecommendation: If you want to improve this run, review pace consistency and heart-rate control together instead of looking at only one metric.\""
+    }
+  ],
+  "isError": false
+}

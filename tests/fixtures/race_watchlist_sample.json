@@ -1,0 +1,88 @@
+{
+  "as_of": "2026-10-01",
+  "races": [
+    {
+      "id": "ladakh-marathon-42",
+      "name": "Ladakh Marathon - Full Marathon",
+      "distance_km": 42.2,
+      "location": "Leh, Ladakh",
+      "category": "watchlist",
+      "event_date": "2027-09-12",
+      "event_date_text": "12 September 2027 (expected)",
+      "edition_year": 2027,
+      "registration_status": "not_started",
+      "registration_opens": null,
+      "registration_closes": null,
+      "previous_registrations": [
+        {"edition_year": 2025, "opened": "2025-01-15", "closed": "2025-07-31", "source": "https://example.test/ladakh-2025"},
+        {"edition_year": 2026, "opened": "2026-01-10", "closed": "2026-08-10", "source": "https://example.test/ladakh-2026"}
+      ],
+      "official_url": "https://example.test/ladakh",
+      "registration_url": "https://example.test/ladakh/register",
+      "scrape_urls": ["https://example.test/ladakh"],
+      "sources": ["https://example.test/ladakh"],
+      "notes": "Fixture"
+    },
+    {
+      "id": "goa-river-ultra",
+      "name": "Goa River Ultra",
+      "distance_km": 50,
+      "location": "Goa",
+      "category": "watchlist",
+      "event_date": "2026-12-06",
+      "event_date_text": "6 December 2026",
+      "edition_year": 2026,
+      "registration_status": "open",
+      "registration_opens": "2026-06-01",
+      "registration_closes": "2026-11-20",
+      "previous_registrations": [],
+      "official_url": "https://example.test/goa",
+      "registration_url": "https://example.test/goa/register",
+      "scrape_urls": ["https://example.test/goa"],
+      "sources": ["https://example.test/goa"],
+      "notes": ""
+    },
+    {
+      "id": "auroville-marathon",
+      "name": "Auroville Marathon",
+      "distance_km": 42.2,
+      "location": "Auroville, Tamil Nadu",
+      "category": "watchlist",
+      "event_date": null,
+      "event_date_text": "February 2027 (date not announced)",
+      "edition_year": 2027,
+      "registration_status": "unknown",
+      "previous_registrations": [
+        {"edition_year": 2026, "opened": null, "closed": "2025-12-15", "source": "https://example.test/auroville-2026"}
+      ],
+      "official_url": "https://example.test/auroville",
+      "scrape_urls": ["https://example.test/auroville"]
+    },
+    {
+      "id": "ncr-past-50k",
+      "name": "Aravalli 50K (last edition)",
+      "distance_km": 50,
+      "location": "Gurugram",
+      "category": "ncr_50k",
+      "event_date": "2026-01-18",
+      "edition_year": 2026,
+      "registration_status": "closed",
+      "scrape_urls": []
+    },
+    {
+      "id": "ncr-upcoming-50k",
+      "name": "Delhi Winter 50K",
+      "distance_km": 50,
+      "location": "New Delhi",
+      "category": "ncr_50k",
+      "event_date": "2026-11-22",
+      "edition_year": 2026,
+      "registration_status": "open",
+      "registration_closes": "2026-11-15",
+      "scrape_urls": ["https://example.test/delhi50"]
+    },
+    {
+      "name": "Missing id - must be skipped"
+    }
+  ]
+}

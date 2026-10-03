@@ -1,0 +1,12 @@
+ARGS: {"workoutId": "478647684444635536"}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Workout Detail\\n========================\\nWorkout ID: 478647684444635536\\nName: W30084\\nSport: Strength\\nType: custom\\nEstimated Time: 23:20\\nOverview: W30222\\nEditable via MCP: no\\n  Reason: COROS sport type 4 (Strength) cannot be expressed by MCP (only running, cycling and trail running).\\nThe course JSON below is a partial result; do not infer that a section had no intensity target just because its intensity fields are absent.\\nCourse JSON: {\\\"courseName\\\":\\\"W30084\\\",\\\"courseDescription\\\":\\\"W30222\\\",\\\"sportType\\\":4}\\n\\nUpdate hint: to modify this workout, copy the course JSON, adjust it, and call updateWorkoutDetails with the whole course (full replacement). If it is not editable, explain the reasons to the user. Do not show Workout ID to the user.\""
+    }
+  ],
+  "isError": false
+}

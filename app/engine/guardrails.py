@@ -80,3 +80,35 @@ def validate_weekly_plan(plan: Dict[str, Any], prior_volume_km: float) -> Tuple[
         violations.append("Plan violates 80-20 intensity distribution (Easy volume < 80%)")
 
     return len(violations) == 0, violations
+
+
+def split_weeks(sessions: List[Dict[str, Any]]) -> Dict[int, List[Dict[str, Any]]]:
+    """Group sessions by week_number (sessions without one count as week 1), each in list (date) order."""
+    weeks: Dict[int, List[Dict[str, Any]]] = {}
+    for s in sessions:
+        weeks.setdefault(int(s.get("week_number") or 1), []).append(s)
+    return dict(sorted(weeks.items()))
+
+def weekly_volumes(sessions: List[Dict[str, Any]]) -> Dict[int, float]:
+    """Total prescribed km per week_number."""
+    return {w: round(sum(float(s.get("distance_km") or 0.0) for s in ss), 1) for w, ss in split_weeks(sessions).items()}
+
+def validate_multiweek_plan(plan: Dict[str, Any], prior_volume_km: float) -> Tuple[bool, List[str]]:
+    """Validate a multi-week plan: per-week 10% volume cap (week 1 vs prior_volume_km), 80/20 per week,
+    and back-to-back-hard / max-consecutive-days over the whole continuous date-ordered session list
+    (so week boundaries are checked too)."""
+    violations: List[str] = []
+    sessions = plan.get("sessions", [])
+    prev = prior_volume_km
+    for week, vol in weekly_volumes(sessions).items():
+        if not validate_plan_volume_increase(prev, vol):
+            violations.append(f"Week {week} volume increase exceeds 10% limit (Prior: {prev}km, Proposed: {vol}km)")
+        prev = vol
+    for week, ws in split_weeks(sessions).items():
+        if not validate_80_20_intensity(ws):
+            violations.append(f"Week {week} violates 80-20 intensity distribution (Easy volume < 80%)")
+    if not validate_no_back_to_back_hard_days(sessions):
+        violations.append("Plan contains back-to-back hard days (Threshold/VO2max/Long Run/Vert on consecutive days)")
+    if not validate_max_consecutive_days(sessions):
+        violations.append("Plan exceeds max 4 consecutive active training days without rest")
+    return len(violations) == 0, violations

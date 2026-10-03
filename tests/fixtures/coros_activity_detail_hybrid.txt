@@ -1,0 +1,12 @@
+💪 Hybrid Fitness Activity Details
+========================================
+
+Workout Time: 41:05
+Total Time: 41:05
+Average Heart Rate: 110 bpm
+Calories: 280 kcal
+Training Load: 19
+Aerobic TE: 1.4
+Anaerobic TE: 0.0
+Training Focus: Recovery
+Perceived Effort: Easy

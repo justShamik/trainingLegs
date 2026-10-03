@@ -2,124 +2,162 @@
 
 {% block title %}{{ activity.name or activity.sport_type }} Details - Personal Running Coach{% endblock %}
 
+{% macro na_badge() %}
+<div class="card-value"><span class="badge-na">Not Available</span></div>
+<div class="card-subtext">{{ activity.na_reason }}</div>
+{% endmacro %}
+
 {% block content %}
-<div style="margin-bottom: var(--space-lg); display: flex; justify-content: space-between; align-items: flex-end;">
-    <div>
-        <a href="/" class="nav-link" style="font-size: 0.9rem; color: var(--text-muted);">&larr; Back to Dashboard</a>
-        <h1 style="margin-top: var(--space-xs);">{{ activity.name or activity.sport_type }}</h1>
-        <p style="color: var(--text-secondary);">Date: {{ activity.date[:10] }} | Type: {{ activity.sport_type }}</p>
+<section class="page-hero" data-parallax="0.12">
+    <div class="page-hero__text">
+        <a href="{{ url_for('index') }}" class="back-link"><span aria-hidden="true">&larr;</span> Back to Dashboard</a>
+        <h1>{{ activity.name or activity.sport_type }}</h1>
+        <div class="page-hero__meta">
+            <span class="chip chip--neutral chip--raw num">Date: {{ activity.date[:10] }}</span>
+            <span class="chip chip--peach chip--raw">Type: {{ activity.sport_type }}</span>
+        </div>
     </div>
-</div>
+</section>
 
 <!-- Key Performance Summary Grid -->
-<div class="kpi-grid">
-    <div class="card">
+<div class="kpi-grid" data-reveal-stagger="70">
+    <div class="card tone-peach">
         <div class="card-header">Distance</div>
-        <div class="card-value">{{ activity.distance_km }}<span class="card-unit">KM</span></div>
+        <div class="card-value">{{ activity.distance_km }}<span class="card-unit">km</span></div>
     </div>
-    <div class="card">
+    <div class="card tone-apricot">
         <div class="card-header">Duration</div>
-        <div class="card-value">{{ activity.duration_min }}<span class="card-unit">MIN</span></div>
+        <div class="card-value">{{ activity.duration_min }}<span class="card-unit">min</span></div>
     </div>
-    <div class="card">
+    <div class="card tone-butter">
         <div class="card-header">Avg Pace</div>
         <div class="card-value">{{ activity.pace_str }}</div>
     </div>
-    <div class="card">
+    <div class="card tone-rose">
         <div class="card-header">Avg Heart Rate</div>
         {% if activity.avg_hr %}
-            <div class="card-value">{{ activity.avg_hr }}<span class="card-unit">BPM</span></div>
+            <div class="card-value">{{ activity.avg_hr }}<span class="card-unit">bpm</span></div>
         {% else %}
             <div class="card-value"><span class="badge-na">Not Available</span></div>
+        {% endif %}
+    </div>
+    <div class="card tone-rose">
+        <div class="card-header">Max Heart Rate</div>
+        {% if activity.max_hr %}
+            <div class="card-value">{{ activity.max_hr }}<span class="card-unit">bpm</span></div>
+        {% else %}
+            {{ na_badge() }}
+        {% endif %}
+    </div>
+    <div class="card tone-sky">
+        <div class="card-header">Elevation Gain / Loss</div>
+        {% if activity.elevation_gain_m is not none %}
+            <div class="card-value">{{ activity.elevation_gain_m|round(0)|int }}{% if activity.elevation_loss_m is not none %} / {{ activity.elevation_loss_m|round(0)|int }}{% endif %}<span class="card-unit">m</span></div>
+        {% else %}
+            {{ na_badge() }}
         {% endif %}
     </div>
 </div>
 
 <!-- Running Form & Advanced Sensor Metrics -->
-<h2>RUNNING FORM & ADVANCED METRICS</h2>
-<div class="kpi-grid" style="margin-top: var(--space-md);">
-    <div class="card">
-        <div class="card-header">Avg Cadence</div>
-        {% if activity.avg_cadence %}
-            <div class="card-value">{{ activity.avg_cadence }}<span class="card-unit">SPM</span></div>
-        {% else %}
-            <div class="card-value"><span class="badge-na">Not Available</span></div>
-        {% endif %}
+<section class="section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Running dynamics</span>
+            <h2>Form &amp; advanced metrics</h2>
+        </div>
     </div>
-    <div class="card">
-        <div class="card-header">Stride Length</div>
-        {% if activity.stride_length_cm %}
-            <div class="card-value">{{ activity.stride_length_cm }}<span class="card-unit">CM</span></div>
-        {% else %}
-            <div class="card-value"><span class="badge-na">Not Available</span></div>
-        {% endif %}
+    <div class="kpi-grid" data-reveal-stagger="70">
+        <div class="card tone-lavender">
+            <div class="card-header">Avg Cadence</div>
+            {% if activity.avg_cadence %}
+                <div class="card-value">{{ activity.avg_cadence }}<span class="card-unit">spm</span></div>
+            {% else %}
+                {{ na_badge() }}
+            {% endif %}
+        </div>
+        <div class="card tone-lavender">
+            <div class="card-header">Stride Length</div>
+            {% if activity.stride_length_cm %}
+                <div class="card-value">{{ activity.stride_length_cm|round(0)|int }}<span class="card-unit">cm</span></div>
+            {% else %}
+                {{ na_badge() }}
+            {% endif %}
+        </div>
+        <div class="card tone-mint">
+            <div class="card-header">Ground Contact Time</div>
+            {% if activity.ground_contact_time_ms %}
+                <div class="card-value">{{ activity.ground_contact_time_ms|round(0)|int }}<span class="card-unit">ms</span></div>
+            {% else %}
+                {{ na_badge() }}
+            {% endif %}
+        </div>
+        <div class="card tone-mint">
+            <div class="card-header">Vertical Oscillation</div>
+            {% if activity.vertical_oscillation_mm %}
+                <div class="card-value">{{ activity.vertical_oscillation_mm|round(0)|int }}<span class="card-unit">mm</span></div>
+            {% else %}
+                {{ na_badge() }}
+            {% endif %}
+        </div>
+        <div class="card tone-apricot">
+            <div class="card-header">Running Power</div>
+            {% if activity.avg_power_w %}
+                <div class="card-value">{{ activity.avg_power_w|round(0)|int }}<span class="card-unit">W</span></div>
+            {% else %}
+                {{ na_badge() }}
+            {% endif %}
+        </div>
+        <div class="card tone-butter">
+            <div class="card-header">Grade Adjusted Pace</div>
+            {% if activity.gap_s_km %}
+                <div class="card-value">{{ activity.gap_str }}</div>
+            {% else %}
+                {{ na_badge() }}
+            {% endif %}
+        </div>
     </div>
-    <div class="card">
-        <div class="card-header">Ground Contact Time</div>
-        {% if activity.ground_contact_time_ms %}
-            <div class="card-value">{{ activity.ground_contact_time_ms }}<span class="card-unit">MS</span></div>
-        {% else %}
-            <div class="card-value"><span class="badge-na">Not Available</span></div>
-        {% endif %}
-    </div>
-    <div class="card">
-        <div class="card-header">Vertical Oscillation</div>
-        {% if activity.vertical_oscillation_mm %}
-            <div class="card-value">{{ activity.vertical_oscillation_mm }}<span class="card-unit">MM</span></div>
-        {% else %}
-            <div class="card-value"><span class="badge-na">Not Available</span></div>
-        {% endif %}
-    </div>
-    <div class="card">
-        <div class="card-header">Running Power</div>
-        {% if activity.avg_power_w %}
-            <div class="card-value">{{ activity.avg_power_w }}<span class="card-unit">W</span></div>
-        {% else %}
-            <div class="card-value"><span class="badge-na">Not Available</span></div>
-        {% endif %}
-    </div>
-    <div class="card">
-        <div class="card-header">Grade Adjusted Pace</div>
-        {% if activity.gap_s_km %}
-            <div class="card-value">{{ (activity.gap_s_km // 60)|int }}:{{ (activity.gap_s_km % 60)|int }}/km</div>
-        {% else %}
-            <div class="card-value"><span class="badge-na">Not Available</span></div>
-        {% endif %}
-    </div>
-</div>
+</section>
 
 <!-- Lap / Split Breakdown Table -->
-<h2 style="margin-bottom: var(--space-md);">LAP & SPLIT BREAKDOWN</h2>
-<div class="table-container">
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Split #</th>
-                <th>Distance</th>
-                <th>Duration</th>
-                <th>Avg Pace</th>
-                <th>Avg HR</th>
-                <th>Elevation Gain</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if activity.splits %}
-                {% for split in activity.splits %}
+<section class="section">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Splits</span>
+            <h2>Lap &amp; split breakdown</h2>
+        </div>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
                 <tr>
-                    <td>Split {{ split.split_index }}</td>
-                    <td>{{ split.distance_km }} km</td>
-                    <td>{{ split.duration_min }} min</td>
-                    <td>{{ split.pace_str }}</td>
-                    <td>{% if split.avg_hr %}{{ split.avg_hr }} bpm{% else %}<span class="badge-na">N/A</span>{% endif %}</td>
-                    <td>{% if split.elevation_gain_m %}{{ split.elevation_gain_m|round(0) }} m{% else %}<span class="badge-na">N/A</span>{% endif %}</td>
+                    <th>Split #</th>
+                    <th>Distance</th>
+                    <th>Duration</th>
+                    <th>Avg Pace</th>
+                    <th>Avg HR</th>
+                    <th>Elevation Gain</th>
                 </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">No lap split records available for this workout.</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                {% if activity.splits %}
+                    {% for split in activity.splits %}
+                    <tr>
+                        <td>Split {{ split.split_index }}</td>
+                        <td>{{ split.distance_km }} km</td>
+                        <td>{{ split.duration_min }} min</td>
+                        <td>{{ split.pace_str }}</td>
+                        <td>{% if split.avg_hr %}{{ split.avg_hr }} bpm{% else %}<span class="badge-na">N/A</span>{% endif %}</td>
+                        <td>{% if split.elevation_gain_m is not none %}{{ split.elevation_gain_m|round(0)|int }} m{% else %}<span class="badge-na">N/A</span>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="empty">No lap split records available for this workout. ({{ activity.na_reason }})</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</section>
 {% endblock %}

@@ -1,0 +1,12 @@
+ARGS: {}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Menstrual Cycle Data\\n====================\\nQuery Range: 2026-08-30 to 2027-09-29\\nToday: 2026-09-29 | No cycle includes today\\nCurrent Cycle: Not found in returned cycles\\nNext Period Start: Unknown\\nNote: The returned cycles do not include today; the user may not have entered menstrual cycle data recently.\\nGeneral: usual period 7 days, usual cycle 28 days\\n\\nNo menstrual cycle data found for this range.\""
+    }
+  ],
+  "isError": false
+}

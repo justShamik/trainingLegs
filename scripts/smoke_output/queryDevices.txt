@@ -1,0 +1,12 @@
+ARGS: {}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Bound Devices (1)\\n========================\\n\\n1. COROS PACE 3\\n   Bluetooth ID: 8EDCE4\\n   Model Name: COROS W331\\n   Serial Number: W31AV77062\\n   Warranty Expires: 2026-05-18 16:08:05\""
+    }
+  ],
+  "isError": false
+}

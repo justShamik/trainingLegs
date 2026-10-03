@@ -44,3 +44,11 @@ This document records key architectural decisions, package choices, substitution
   - VO2max: Calculated via Jack Daniels VDOT tables if Evolab metric unavailable.
   - TSS / Training Load: Derived using TRIMPS HR zone calculation if COROS load missing.
   - Weight & Body Metrics: Editable via profile form settings UI.
+
+---
+
+### ADR-006: Self-Hosted, Privacy-First Usage Analytics
+- **Context:** A "user analytics tool" was requested. ADR-001 forbids external cloud services; the app is single-user and handles health data.
+- **Decision:** Build analytics in-app (`app/analytics/`), storing events in a local SQLite table `analytics_events`. No third-party trackers, no cookies, no IP or fingerprinting; the session id is random per browser session (sessionStorage). Chat text and form values are never stored (chat stores length + topic bucket only). Respects Do-Not-Track and a local opt-out; 180-day retention; one-click export and delete.
+- **Rationale:** Gives the user usage/performance/error insight while keeping all data on the machine, consistent with ADR-001.
+- **Impact:** New table, `/analytics` routes, one script include in base.html, one line in `create_app`.

@@ -1,0 +1,12 @@
+ARGS: {"days": 7}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Resting Heart Rate — Last 7 days\\n========================\\n\\n2026-09-29: 56 bpm\\n2026-09-28: 54 bpm\\n2026-09-27: 51 bpm\\n2026-09-26: 55 bpm\\n2026-09-25: No data\\n2026-09-24: 52 bpm\\n2026-09-23: No data\""
+    }
+  ],
+  "isError": false
+}

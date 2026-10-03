@@ -97,7 +97,10 @@ CREATE TABLE IF NOT EXISTS training_plans (
     methodology_name TEXT NOT NULL,
     methodology_rationale TEXT NOT NULL,
     is_deload INTEGER DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    start_date TEXT,
+    end_date TEXT,
+    total_weeks INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS plan_sessions (
@@ -117,6 +120,8 @@ CREATE TABLE IF NOT EXISTS plan_sessions (
     actual_avg_pace_s_km REAL,
     actual_avg_hr INTEGER,
     post_run_feedback TEXT,
+    session_date TEXT,
+    week_number INTEGER,
     FOREIGN KEY(plan_id) REFERENCES training_plans(id) ON DELETE CASCADE,
     FOREIGN KEY(matched_activity_id) REFERENCES activities(id) ON DELETE SET NULL
 );

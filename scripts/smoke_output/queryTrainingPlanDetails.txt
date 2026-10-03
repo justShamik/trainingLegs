@@ -1,0 +1,12 @@
+ARGS: {"planId": "478647701888745771"}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Training Plan Detail\\n========================\\nPlan ID: 478647701888745771\\nName: P10061\\nOverview: P10129\\nStatus: In progress\\nType: custom\\nDates: 2026-07-20 to 2026-10-04\\nWeeks: 10\\nEditable via MCP: no\\n  Reason: This plan was not created via MCP and cannot be modified.\\n\\nDays\\n------------------------\\nNote: Requested window is outside the plan date range; no days returned.\\nNo days in this window.\\n\\nModification unavailable: do not call updateTrainingPlan with this Plan ID. Query queryTrainingPlanLibrary for an in-progress execution record with editable=true; if none exists, start or restart the plan in the COROS app first. Do not show Plan ID to the user.\""
+    }
+  ],
+  "isError": false
+}

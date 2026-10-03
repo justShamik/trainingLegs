@@ -54,6 +54,8 @@ def generate_post_run_feedback(session: Dict[str, Any], actual_metrics: Dict[str
 def calculate_workout_adherence(session: Dict[str, Any], actual_metrics: Dict[str, Any]) -> Tuple[float, str]:
     """Calculate numerical adherence score (0-100%) and rating label for a matched workout."""
     import re
+    if actual_metrics.get("status") == "Skipped":
+        return 0.0, "⚪ 0% Adherence (Session Skipped)"
     prescribed_dist = float(session.get("distance_km") or 0.0)
     actual_dist = float(actual_metrics.get("actual_distance_km") or actual_metrics.get("distance_km") or prescribed_dist)
 

@@ -1,0 +1,12 @@
+ARGS: {}
+OK: True
+
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "\"Recovery Status\\n========================\\n\\nRecovery: 96%\\nLevel: Heavy training allowed\\nEstimated Full Recovery: 10h\""
+    }
+  ],
+  "isError": false
+}

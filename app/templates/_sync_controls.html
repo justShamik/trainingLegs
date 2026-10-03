@@ -1,0 +1,34 @@
+{#- Shared COROS sync controls (dashboard + home). Behaviour lives in static/js/sync.js.
+    sync_forms(prefix, next, locked, lock_reason): the two POST /sync forms.
+      prefix  - id prefix: '' keeps the dashboard ids (syncPendingBtn / syncFullBtn),
+                'home' gives homeSyncPendingBtn / homeSyncFullBtn.
+      next    - local path to come back to after the sync (validated server-side).
+      locked  - render the buttons disabled (e.g. COROS not connected); sync.js never re-enables them.
+    sync_overlay(): the full-screen loading overlay (#syncOverlay), one per page. -#}
+
+{% macro sync_forms(prefix='', next='/', locked=False, lock_reason='') -%}
+{%- set pending_id = (prefix ~ 'SyncPendingBtn') if prefix else 'syncPendingBtn' -%}
+{%- set full_id = (prefix ~ 'SyncFullBtn') if prefix else 'syncFullBtn' -%}
+<form method="POST" action="/sync" class="sync-form" data-message="Downloading your latest activities and health data from COROS…">
+    <input type="hidden" name="full" value="0">
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" id="{{ pending_id }}" class="sync-btn btn btn-primary"{% if locked %} disabled data-locked="1" title="{{ lock_reason }}"{% endif %}>
+        Sync Pending Data
+    </button>
+</form>
+<form method="POST" action="/sync" class="sync-form" data-message="Downloading 365 days of history from COROS. This can take a minute…">
+    <input type="hidden" name="full" value="1">
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" id="{{ full_id }}" class="sync-btn btn btn-secondary"{% if locked %} disabled data-locked="1" title="{{ lock_reason }}"{% endif %}>
+        Sync 365 Days History
+    </button>
+</form>
+{%- endmacro %}
+
+{% macro sync_overlay() -%}
+<div id="syncOverlay" class="sync-overlay" style="display: none;" role="status" aria-live="polite">
+    <div class="sync-spinner"></div>
+    <div id="syncOverlayTitle" class="sync-overlay__title" data-default="Syncing with COROS">Syncing with COROS</div>
+    <div id="syncOverlayMsg" class="sync-overlay__msg"></div>
+</div>
+{%- endmacro %}
