@@ -172,3 +172,31 @@ def test_mobile_no_horizontal_scroll(request, chrome, server, width):
         expect(page.locator(".home-dials .dial")).to_have_count(4)
     finally:
         _finish_context(request, ctx, observer)
+
+
+def test_gsap_scroll_trial_engages_and_settles(page):
+    page.goto("/")
+    expect(page.locator("html")).to_have_class(re.compile(r"\bgsap-fx\b"))
+    expect(page.locator("html")).to_have_class(re.compile(r"\blenis\b"))
+    expect(page.locator("#homeGreeting .split-word")).not_to_have_count(0)
+    steps = page.locator('.dial-tile[data-metric="steps"] .dial__value')
+    # before the count-up starts the real value is shown, never a placeholder 0
+    assert steps.text_content() != "0"
+    page.locator("#today").scroll_into_view_if_needed()
+    expect(steps).to_have_text(f"{TODAY_STEPS:,}")
+    for _ in range(10):
+        page.mouse.wheel(0, 900)
+        page.wait_for_timeout(150)
+    last = page.locator("#ncrRaces .race-card").last
+    expect(last).to_be_visible()
+    page.wait_for_function("el => getComputedStyle(el).opacity === '1'", arg=last.element_handle(), timeout=5000)
+    expect(page.get_by_role("heading", name="Race watchlist")).to_have_text("Race watchlist")
+
+
+def test_classic_motion_fallback(page):
+    page.goto("/?motion=classic")
+    expect(page.locator("#homeGreeting")).to_be_visible()
+    assert "gsap-fx" not in (page.locator("html").get_attribute("class") or "")
+    expect(page.locator("#homeGreeting .split-word")).to_have_count(0)
+    page.locator("#today").scroll_into_view_if_needed()
+    expect(page.locator(".home-dials .dial").first).to_have_class(re.compile(r"\bis-in\b"))

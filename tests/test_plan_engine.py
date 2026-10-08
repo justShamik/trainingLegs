@@ -87,7 +87,8 @@ def test_end_to_end_plan_generation_for_3_profiles():
         "race_distance_type": "Marathon",
         "race_date": "2026-11-20",
         "target_time_str": "3:45:00",
-        "weekly_hours_available": 8.0
+        "weekly_hours_available": 8.0,
+        "available_days": "Mon,Tue,Thu,Sat,Sun"
     }, db_path=TEST_PLAN_DB)
     
     planner_mara = TrainingPlanner(db_path=TEST_PLAN_DB)
@@ -100,7 +101,8 @@ def test_end_to_end_plan_generation_for_3_profiles():
         "race_distance_type": "50K Ultra",
         "race_date": "2026-12-05",
         "target_time_str": "6:00:00",
-        "weekly_hours_available": 10.0
+        "weekly_hours_available": 10.0,
+        "available_days": "Tue,Wed,Fri,Sat,Sun"
     }, db_path=TEST_PLAN_DB)
     
     planner_ultra = TrainingPlanner(db_path=TEST_PLAN_DB)

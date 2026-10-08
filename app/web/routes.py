@@ -19,7 +19,7 @@ from app.data.queries import (
 from app.races import service as race_service
 from app.data.sync import perform_sync
 from app.mcp_client.coros_client import CorosMCPClient
-from app.engine.planner import TrainingPlanner
+from app.engine.planner import TrainingPlanner, ProfileIncompleteError, profile_gaps
 from app.engine.tracking import detect_overtraining_risk, generate_post_run_feedback
 from app.engine.strength import StrengthEngine
 from app.engine.targets import describe_target
@@ -179,6 +179,8 @@ def create_app(db_path: str = None) -> Flask:
         overtraining = detect_overtraining_risk(db_path=current_db)
         from app.engine.plan_view import build_plan_view
         plan_vm = build_plan_view(active_plan)
+        from app.engine.reschedule import adjustable_sessions
+        adjustable = adjustable_sessions(active_plan, app.config.get("TODAY") or date.today())
 
         return render_template(
             "plan.html",
@@ -186,6 +188,10 @@ def create_app(db_path: str = None) -> Flask:
             plan_vm=plan_vm,
             compliance=compliance,
             overtraining=overtraining,
+            adjustable=adjustable,
+            adjusted_msg=request.args.get("adjusted"),
+            profile_gaps=profile_gaps(get_user_profile(db_path=current_db)),
+            generate_blocked=request.args.get("profile_incomplete") == "1",
             active_page="plan"
         )
 
@@ -194,7 +200,11 @@ def create_app(db_path: str = None) -> Flask:
         current_db = app.config.get("DATABASE_PATH")
         is_deload = request.form.get("is_deload") == "1"
         planner = TrainingPlanner(db_path=current_db)
-        generated_plan = planner.generate_plan(is_deload=is_deload)
+        try:
+            generated_plan = planner.generate_plan(is_deload=is_deload, today=app.config.get("TODAY"))
+        except ProfileIncompleteError:
+            # Never plan from invented goals (NFR-4.1): /plan lists exactly what is missing and links to /profile
+            return redirect(url_for("plan_view", profile_incomplete=1))
         save_training_plan(generated_plan, db_path=current_db)
         return redirect(url_for("plan_view"))
 
@@ -315,16 +325,13 @@ def create_app(db_path: str = None) -> Flask:
             return jsonify({"status": "success"})
 
         if request.method == "POST":
-            try:
-                weekly_hours = float(request.form.get("weekly_hours_available") or 8.0)
-            except ValueError:
-                weekly_hours = 8.0
+            # Blank fields stay blank (NULL): no invented defaults; the planner reports what is missing
             profile_data = {
-                "race_distance_type": request.form.get("race_distance_type", "Marathon"),
-                "race_date": request.form.get("race_date"),
-                "target_time_str": request.form.get("target_time_str"),
-                "weekly_hours_available": weekly_hours,
-                "available_days": request.form.get("available_days") or "Mon,Tue,Thu,Sat,Sun",
+                "race_distance_type": (request.form.get("race_distance_type") or "").strip(),
+                "race_date": (request.form.get("race_date") or "").strip() or None,
+                "target_time_str": (request.form.get("target_time_str") or "").strip() or None,
+                "weekly_hours_available": (request.form.get("weekly_hours_available") or "").strip() or None,
+                "available_days": (request.form.get("available_days") or "").strip() or None,
                 "injury_history": request.form.get("injury_history"),
                 "current_niggles": request.form.get("current_niggles")
             }
@@ -332,7 +339,8 @@ def create_app(db_path: str = None) -> Flask:
             saved_success = True
 
         user_profile = get_user_profile(db_path=current_db)
-        return render_template("profile.html", profile=user_profile, saved_success=saved_success, active_page="profile")
+        return render_template("profile.html", profile=user_profile, saved_success=saved_success,
+                               profile_gaps=profile_gaps(user_profile), active_page="profile")
 
     @app.route("/chat", methods=["GET", "POST"])
     def chat():
@@ -349,6 +357,9 @@ def create_app(db_path: str = None) -> Flask:
             return jsonify({"response": response_text})
 
         return render_template("chat.html", active_page="chat")
+
+    from app.web.adjust_routes import register_adjust_routes
+    register_adjust_routes(app)  # /session/<id>/adjust: swap or missed + rebalance (preview, then confirm)
 
     @app.errorhandler(404)
     def handle_not_found(e):

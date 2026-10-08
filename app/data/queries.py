@@ -1,9 +1,18 @@
 """Database aggregation and retrieval queries for Dashboard, Activity, Profile, and Training Plans."""
+import json
 import sqlite3
 import uuid
 from datetime import date, datetime, timedelta, tzinfo
 from typing import Dict, Any, List, Optional
 from app.data.db import get_db_connection
+
+
+def _active_plan_id(cursor) -> Optional[str]:
+    row = cursor.execute(
+        "SELECT id FROM training_plans WHERE status = 'active' ORDER BY created_at DESC, rowid DESC LIMIT 1"
+    ).fetchone()
+    return row["id"] if row else None
+
 
 def save_training_plan(plan_data: Dict[str, Any], db_path: Optional[str] = None) -> str:
     """Save generated training plan and its dated session breakdown.
@@ -24,13 +33,15 @@ def save_training_plan(plan_data: Dict[str, Any], db_path: Optional[str] = None)
     total_weeks = plan_data.get("total_weeks") or max([int(s.get("week_number") or 1) for s in sessions] or [1])
     end_date = plan_data.get("end_date") or (date.fromisoformat(start_date) + timedelta(days=7 * total_weeks - 1)).isoformat()
 
+    conn.execute("UPDATE training_plans SET status = 'superseded' WHERE status = 'active'")
+
     conn.execute(
         """
         INSERT INTO training_plans (
             id, version, goal_distance, race_date, total_volume_km,
             methodology_name, methodology_rationale, is_deload,
-            start_date, end_date, total_weeks
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            start_date, end_date, total_weeks, decisions_json
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             plan_id,
@@ -41,7 +52,8 @@ def save_training_plan(plan_data: Dict[str, Any], db_path: Optional[str] = None)
             plan_data.get("methodology_name", "Daniels' VDOT Periodisation"),
             plan_data.get("methodology_rationale", "Base building phase"),
             1 if plan_data.get("is_deload") else 0,
-            start_date, end_date, total_weeks
+            start_date, end_date, total_weeks,
+            json.dumps(plan_data["decisions"]) if plan_data.get("decisions") else None
         )
     )
 
@@ -80,33 +92,24 @@ def get_active_training_plan(db_path: Optional[str] = None) -> Optional[Dict[str
     """Retrieve most recent training plan and its sessions."""
     conn = get_db_connection(db_path)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM training_plans ORDER BY created_at DESC, rowid DESC LIMIT 1")
-    plan_row = cursor.fetchone()
-    if not plan_row:
+    plan_id = _active_plan_id(cursor)
+    if not plan_id:
         conn.close()
         return None
-        
-    plan = dict(plan_row)
+
+    plan = dict(cursor.execute("SELECT * FROM training_plans WHERE id = ?", (plan_id,)).fetchone())
     cursor.execute("SELECT * FROM plan_sessions WHERE plan_id = ? ORDER BY session_date ASC, rowid ASC", (plan["id"],))
     plan["sessions"] = [dict(s) for s in cursor.fetchall()]
     conn.close()
     return plan
 
 def delete_active_training_plan(db_path: Optional[str] = None) -> bool:
-    """Delete current active training plan and its sessions."""
+    """Discard the active plan. Rows are kept as history; older plans are NOT reactivated."""
     conn = get_db_connection(db_path)
-    cursor = conn.cursor()
-    cursor.execute("SELECT id FROM training_plans ORDER BY created_at DESC LIMIT 1")
-    row = cursor.fetchone()
-    if not row:
-        conn.close()
-        return False
-    plan_id = row["id"]
-    cursor.execute("DELETE FROM plan_sessions WHERE plan_id = ?", (plan_id,))
-    cursor.execute("DELETE FROM training_plans WHERE id = ?", (plan_id,))
+    cur = conn.execute("UPDATE training_plans SET status = 'discarded' WHERE status = 'active'")
     conn.commit()
     conn.close()
-    return True
+    return cur.rowcount > 0
 
 def get_user_profile(db_path: Optional[str] = None) -> Dict[str, Any]:
     """Retrieve user profile and training goal constraints."""
@@ -117,18 +120,21 @@ def get_user_profile(db_path: Optional[str] = None) -> Dict[str, Any]:
     conn.close()
     
     if row:
-        return dict(row)
-        
-    # Default initial profile
+        profile = dict(row)
+        profile["race_distance_type"] = profile.get("race_distance_type") or None  # '' = never chosen
+        return profile
+
+    # No saved profile: every goal field is unknown. Never fabricate a goal (NFR-4.1); the planner reports
+    # exactly which fields are missing (app.engine.planner.profile_gaps).
     return {
         "id": 1,
-        "race_distance_type": "Marathon",
-        "race_date": "2026-11-15",
-        "target_time_str": "3:45:00",
-        "weekly_hours_available": 8.0,
-        "available_days": "Mon,Tue,Thu,Sat,Sun",
-        "injury_history": "None",
-        "current_niggles": "None",
+        "race_distance_type": None,
+        "race_date": None,
+        "target_time_str": None,
+        "weekly_hours_available": None,
+        "available_days": None,
+        "injury_history": None,
+        "current_niggles": None,
         "gemini_api_key": None
     }
 
@@ -151,12 +157,17 @@ def save_user_profile(profile_data: Dict[str, Any], db_path: Optional[str] = Non
         gemini_api_key=COALESCE(excluded.gemini_api_key, user_profile.gemini_api_key),
         updated_at=CURRENT_TIMESTAMP;
     """
+    try:
+        hours = float(profile_data["weekly_hours_available"]) if profile_data.get("weekly_hours_available") not in (None, "") else None
+    except (TypeError, ValueError):
+        hours = None
+    # Missing values are stored as NULL ('' for the NOT NULL distance column), never as invented defaults.
     conn.execute(sql, (
-        profile_data.get("race_distance_type", "Marathon"),
-        profile_data.get("race_date"),
-        profile_data.get("target_time_str"),
-        float(profile_data.get("weekly_hours_available", 8.0)),
-        profile_data.get("available_days", "Mon,Tue,Thu,Sat,Sun"),
+        profile_data.get("race_distance_type") or "",
+        profile_data.get("race_date") or None,
+        profile_data.get("target_time_str") or None,
+        hours,
+        profile_data.get("available_days") or None,
         profile_data.get("injury_history"),
         profile_data.get("current_niggles"),
         profile_data.get("gemini_api_key")
@@ -165,7 +176,7 @@ def save_user_profile(profile_data: Dict[str, Any], db_path: Optional[str] = Non
     conn.close()
 
 def save_gemini_api_key(api_key: str, db_path: Optional[str] = None) -> None:
-    """Store only the Gemini API key, creating a default profile row if none exists."""
+    """Store only the Gemini API key, creating an empty (all goal fields unknown) profile row if none exists."""
     if not get_user_profile_row_exists(db_path):
         save_user_profile(get_user_profile(db_path=db_path), db_path=db_path)
     conn = get_db_connection(db_path)
@@ -427,6 +438,8 @@ def update_session_status(
     cursor.execute("SELECT * FROM plan_sessions WHERE id = ?", (session_id,))
     sess_row = cursor.fetchone()
     sess_dict = dict(sess_row) if sess_row else {}
+    if status == "Completed" and sess_dict.get("original_session_type"):
+        status = "Modified"  # adjusted session: done, but not as originally prescribed
 
     actual_metrics = {
         "actual_distance_km": actual_distance_km,
@@ -463,6 +476,45 @@ def get_plan_session(session_id: str, db_path: Optional[str] = None) -> Optional
     conn.close()
     return dict(row) if row else None
 
+def apply_session_adjustments(proposal: Dict[str, Any], db_path: Optional[str] = None) -> int:
+    """Write a CONFIRMED adjustment proposal (app.engine.reschedule) in one transaction.
+
+    The first adjustment of a session stores its original prescription (original_session_type / _distance_km /
+    _duration_min); later adjustments keep it, so compliance is always measured against the original plan.
+    """
+    from app.engine.tracking import calculate_workout_adherence, generate_post_run_feedback
+    now = datetime.now().isoformat(timespec="seconds")
+    conn = get_db_connection(db_path)
+    try:
+        for c in proposal.get("changes", []):
+            a, b = c["after"], c["before"]
+            kind = proposal["mode"] if c.get("is_target") else "rebalance"
+            score = rating = feedback = None
+            if a.get("status") == "Skipped":
+                score, rating = calculate_workout_adherence(a, {"status": "Skipped"})
+                feedback = generate_post_run_feedback(a, {"status": "Skipped"})
+            conn.execute(
+                """
+                UPDATE plan_sessions
+                SET session_type = ?, distance_km = ?, duration_min = ?, target_pace_or_hr = ?, stated_purpose = ?,
+                    status = ?,
+                    original_session_type = CASE WHEN original_session_type IS NULL THEN ? ELSE original_session_type END,
+                    original_distance_km = CASE WHEN original_session_type IS NULL THEN ? ELSE original_distance_km END,
+                    original_duration_min = CASE WHEN original_session_type IS NULL THEN ? ELSE original_duration_min END,
+                    adjustment_kind = ?, adjustment_reason = ?, adjustment_note = ?, adjusted_at = ?,
+                    adherence_score = COALESCE(?, adherence_score), adherence_rating = COALESCE(?, adherence_rating),
+                    post_run_feedback = COALESCE(?, post_run_feedback)
+                WHERE id = ? AND (status IS NULL OR status = 'Pending')
+                """,
+                (a["session_type"], a["distance_km"], a["duration_min"], a["target_pace_or_hr"], a["stated_purpose"],
+                 a["status"] or "Pending", b["session_type"], b["distance_km"] or 0.0, b["duration_min"] or 0.0,
+                 kind, proposal.get("reason_label"), proposal.get("note") or None, now,
+                 score, rating, feedback, c["session_id"]))
+        conn.commit()
+    finally:
+        conn.close()
+    return len(proposal.get("changes", []))
+
 def _empty_compliance() -> Dict[str, Any]:
     return {
         "scope": "week", "week_number": None, "week_start": None, "week_end": None,
@@ -473,8 +525,13 @@ def _empty_compliance() -> Dict[str, Any]:
         "plan_total_sessions": 0, "plan_completed_sessions": 0, "plan_session_compliance_pct": 0.0,
     }
 
+def _prescribed(s: Dict[str, Any], key: str) -> Any:
+    """Original prescription of an adjusted (swapped / rebalanced) session, else the current one."""
+    return s.get(f"original_{key}") if s.get("original_session_type") else s.get(key)
+
 def _compliance_for(sessions: List[Dict[str, Any]]) -> Dict[str, Any]:
-    prescribed_total_km = sum(s["distance_km"] or 0.0 for s in sessions)
+    # Measured against the ORIGINAL prescription: swaps and rebalancing never inflate compliance.
+    prescribed_total_km = sum(_prescribed(s, "distance_km") or 0.0 for s in sessions)
     completed_total_km = sum(
         s["actual_distance_km"] if s.get("actual_distance_km") is not None else (s["distance_km"] or 0.0)
         for s in sessions
@@ -482,7 +539,7 @@ def _compliance_for(sessions: List[Dict[str, Any]]) -> Dict[str, Any]:
     )
     volume_compliance_pct = round((completed_total_km / prescribed_total_km * 100.0), 1) if prescribed_total_km > 0 else 100.0
 
-    non_rest_sessions = [s for s in sessions if s.get("session_type") != "Rest"]
+    non_rest_sessions = [s for s in sessions if _prescribed(s, "session_type") != "Rest"]
     total_sessions = len(non_rest_sessions)
     completed_sessions = sum(1 for s in non_rest_sessions if s.get("status") == "Completed")
     modified_sessions = sum(1 for s in non_rest_sessions if s.get("status") == "Modified")
@@ -516,12 +573,10 @@ def calculate_weekly_compliance(plan_id: Optional[str] = None, db_path: Optional
     cursor = conn.cursor()
 
     if not plan_id:
-        cursor.execute("SELECT id FROM training_plans ORDER BY created_at DESC, rowid DESC LIMIT 1")
-        row = cursor.fetchone()
-        if not row:
+        plan_id = _active_plan_id(cursor)
+        if not plan_id:
             conn.close()
             return _empty_compliance()
-        plan_id = row["id"]
 
     plan_row = cursor.execute("SELECT start_date, total_weeks FROM training_plans WHERE id = ?", (plan_id,)).fetchone()
     cursor.execute("SELECT * FROM plan_sessions WHERE plan_id = ? ORDER BY session_date, rowid", (plan_id,))
@@ -568,12 +623,10 @@ def auto_match_activities_to_sessions(plan_id: Optional[str] = None, db_path: Op
     cursor = conn.cursor()
 
     if not plan_id:
-        cursor.execute("SELECT id FROM training_plans ORDER BY created_at DESC, rowid DESC LIMIT 1")
-        plan_row = cursor.fetchone()
-        if not plan_row:
+        plan_id = _active_plan_id(cursor)
+        if not plan_id:
             conn.close()
             return 0
-        plan_id = plan_row["id"]
 
     cursor.execute(
         "SELECT * FROM plan_sessions WHERE plan_id = ? AND (status IS NULL OR status = 'Pending') "
@@ -588,11 +641,12 @@ def auto_match_activities_to_sessions(plan_id: Optional[str] = None, db_path: Op
     first_day = (_date.fromisoformat(pending_sessions[0]["session_date"]) - timedelta(days=1)).isoformat()
     cursor.execute("""
         SELECT * FROM activities
-        WHERE id NOT IN (SELECT matched_activity_id FROM plan_sessions WHERE matched_activity_id IS NOT NULL)
+        WHERE id NOT IN (SELECT matched_activity_id FROM plan_sessions
+                         WHERE plan_id = ? AND matched_activity_id IS NOT NULL)
           AND LOWER(sport_type) LIKE '%run%'
           AND substr(date, 1, 10) >= ? AND substr(date, 1, 10) <= ?
         ORDER BY date DESC
-    """, (first_day, today.isoformat()))
+    """, (plan_id, first_day, today.isoformat()))
     unmatched_activities = [dict(a) for a in cursor.fetchall() if a["distance_m"] is not None]
 
     def _day(value: str) -> Optional[_date]:
@@ -649,7 +703,7 @@ def auto_match_activities_to_sessions(plan_id: Optional[str] = None, db_path: Op
         cursor.execute("""
             UPDATE plan_sessions
             SET matched_activity_id = ?,
-                status = 'Completed',
+                status = CASE WHEN original_session_type IS NULL THEN 'Completed' ELSE 'Modified' END,
                 actual_distance_km = ?,
                 actual_duration_min = ?,
                 actual_avg_pace_s_km = ?,
@@ -1100,3 +1154,33 @@ def get_sync_status(db_path: Optional[str] = None) -> Dict[str, Any]:
         "token_message": token.get("message"),
         "token_expires_at": token.get("expires_at"),
     }
+
+
+def get_run_history(before: date, weeks: int = 4, db_path: Optional[str] = None) -> Dict[str, Any]:
+    """Running volume of the `weeks` complete Monday-Sunday weeks before `before` (a Monday), oldest first.
+
+    Weeks that start before the first recorded run are unknown (not zero) and are left out, so a short sync
+    history is not mistaken for weeks off. observed_max_hr is the highest plausible max HR from runs in the last
+    365 days (None when COROS gave none). Nothing is invented: no runs -> weekly_km is [] (NFR-4.1).
+    """
+    conn = get_db_connection(db_path)
+    run_filter = "LOWER(COALESCE(sport_type, '')) LIKE '%run%' AND distance_m IS NOT NULL"
+    first = conn.execute(f"SELECT MIN(substr(date, 1, 10)) AS d FROM activities WHERE {run_filter}").fetchone()["d"]
+    first_day = date.fromisoformat(first) if first else None
+    weekly: List[Dict[str, Any]] = []
+    for i in range(weeks, 0, -1):
+        ws = before - timedelta(days=7 * i)
+        we = ws + timedelta(days=6)
+        if first_day is None or we < first_day:
+            continue
+        km = conn.execute(
+            f"SELECT COALESCE(SUM(distance_m), 0) / 1000.0 AS km FROM activities WHERE {run_filter}"
+            " AND substr(date, 1, 10) BETWEEN ? AND ?", (ws.isoformat(), we.isoformat())).fetchone()["km"]
+        weekly.append({"start": ws.isoformat(), "km": round(float(km or 0.0), 1)})
+    hr = conn.execute(
+        f"SELECT MAX(max_hr) AS hr FROM activities WHERE {run_filter} AND max_hr BETWEEN 140 AND 230"
+        " AND substr(date, 1, 10) BETWEEN ? AND ?",
+        ((before - timedelta(days=365)).isoformat(), before.isoformat())).fetchone()["hr"]
+    conn.close()
+    return {"weeks": weekly, "weekly_km": [w["km"] for w in weekly],
+            "observed_max_hr": int(hr) if hr else None, "first_run_date": first}

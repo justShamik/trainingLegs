@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Adjust Session - Personal Running Coach{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="page-hero__text">
+        <span class="eyebrow eyebrow--accent">Adjust session</span>
+        <h1>Can't do this session?</h1>
+        <p class="lead">{{ date_label }}: <strong>{{ session_text }}</strong>. Pick a reason, then swap it for a lighter alternative or mark it missed and rebalance the rest of the week. Nothing is saved until you confirm on the next page.</p>
+    </div>
+    <div class="page-hero__actions">
+        <a href="/plan" class="btn btn-ghost" id="adjust-cancel">Cancel</a>
+    </div>
+</section>
+
+{% if error == 'reason' %}
+<div class="callout callout--warning"><span>Pick a reason first.</span></div>
+{% endif %}
+
+<div class="card" style="margin-bottom: var(--space-lg);">
+    <span class="eyebrow">Step 1</span>
+    <h2 style="margin: 6px 0 12px;">What's getting in the way?</h2>
+    <form method="GET" action="{{ url_for('session_adjust', session_id=session.id) }}" class="form-grid" id="reason-form">
+        <div class="field">
+            <label for="reason">Reason</label>
+            <select name="reason" id="reason">
+                <option value="" {% if not reason %}selected{% endif %} disabled>Choose a reason</option>
+                {% for key, label in reasons %}
+                <option value="{{ key }}" {% if key == reason %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="note">Note (optional)</label>
+            <input type="text" name="note" id="note" maxlength="300" value="{{ note }}" placeholder="e.g. Work trip until Friday">
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn btn-secondary">Show options</button>
+        </div>
+    </form>
+</div>
+
+{% if reason %}
+<div class="grid-auto" style="margin-bottom: var(--space-xl);">
+    <div class="card" id="swap-card">
+        <span class="eyebrow">Option A</span>
+        <h2 style="margin: 6px 0 12px;">Swap for an alternative</h2>
+        {% if actions.swap and options %}
+        {% if reason == 'illness' %}
+        <p class="text-secondary" style="margin-bottom: 12px;">When you're ill, rest or a very easy jog is the only sensible choice; hard training delays recovery.</p>
+        {% endif %}
+        <form method="GET" action="{{ url_for('session_adjust_preview', session_id=session.id) }}" class="stack" id="swap-form">
+            <input type="hidden" name="mode" value="swap">
+            <input type="hidden" name="reason" value="{{ reason }}">
+            <input type="hidden" name="note" value="{{ note }}">
+            {% for o in options %}
+            <label class="panel" style="display: flex; gap: 12px; align-items: flex-start; cursor: pointer;" data-option="{{ o.key }}">
+                <input type="radio" name="option" value="{{ o.key }}" {% if o.recommended %}checked{% endif %} style="margin-top: 4px;">
+                <span>
+                    <strong>{{ o.label }}</strong>
+                    {% if o.recommended %}<span class="chip chip--success" style="margin-left: 6px;">Recommended</span>{% endif %}
+                    <span class="text-secondary" style="display: block; font-size: 0.9rem; margin-top: 4px;">{{ o.why }}</span>
+                </span>
+            </label>
+            {% endfor %}
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">Preview swap</button>
+            </div>
+        </form>
+        {% elif actions.swap %}
+        <p class="text-secondary">No alternative keeps the training guardrails for this session. Use "Missed" instead.</p>
+        {% else %}
+        <p class="text-secondary">This day has passed, so it can no longer be swapped. Mark it missed instead.</p>
+        {% endif %}
+    </div>
+
+    <div class="card" id="missed-card">
+        <span class="eyebrow">Option B</span>
+        <h2 style="margin: 6px 0 12px;">Missed – rebalance my week</h2>
+        {% if actions.missed %}
+        <p class="text-secondary" style="margin-bottom: 8px;">The session is recorded as skipped and the rest of this week is adjusted:</p>
+        <ul class="text-secondary" style="margin: 0 0 14px 18px; font-size: 0.92rem;">
+            <li>A missed long run or quality session moves to a later easy day only if no two hard days end up back to back; otherwise it's dropped.</li>
+            <li>At most a quarter of the missed kilometres come back, spread over easy runs (max +10% each). The rest isn't made up.</li>
+            <li>Rest days only become run days if they are in your available days.</li>
+            {% if reason == 'illness' %}<li>Illness: nothing is made up and hard sessions in the next 2 days become short easy runs.</li>{% endif %}
+        </ul>
+        <form method="GET" action="{{ url_for('session_adjust_preview', session_id=session.id) }}" id="missed-form">
+            <input type="hidden" name="mode" value="missed">
+            <input type="hidden" name="reason" value="{{ reason }}">
+            <input type="hidden" name="note" value="{{ note }}">
+            <button type="submit" class="btn btn-secondary">Preview rebalanced week</button>
+        </form>
+        {% else %}
+        <p class="text-secondary">Only a not-yet-done run of the current week can be marked as missed.</p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

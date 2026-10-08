@@ -37,14 +37,18 @@ def build_runner_context(db_path: Optional[str] = None) -> str:
         p = summary["latest_physio"]
         physio_text = f"Resting HR: {p.get('resting_hr', 'N/A')} bpm, HRV Score: {p.get('hrv_score', 'N/A')}, VO2max: {p.get('vo2max', 'N/A')}"
 
+    def pf(key):
+        v = profile.get(key)
+        return "Not set" if v is None or str(v).strip() == "" else v
+
     context = f"""
 === RUNNER GOALS & CONSTRAINTS ===
-- Target Race: {profile.get('race_distance_type')} (Target Date: {profile.get('race_date')})
-- Target Time: {profile.get('target_time_str')}
-- Max Weekly Hours: {profile.get('weekly_hours_available')} hours
-- Available Days: {profile.get('available_days')}
-- Injury History: {profile.get('injury_history')}
-- Current Niggles: {profile.get('current_niggles')}
+- Target Race: {pf('race_distance_type')} (Target Date: {pf('race_date')})
+- Target Time: {pf('target_time_str')}
+- Max Weekly Hours: {pf('weekly_hours_available')} hours
+- Available Days: {pf('available_days')}
+- Injury History: {pf('injury_history')}
+- Current Niggles: {pf('current_niggles')}
 
 === CURRENT TRAINING STATS & RECOVERY ===
 - Current Week Volume: {summary.get('weekly_volume_km')} km ({summary.get('weekly_runs_count')} runs, {summary.get('weekly_duration_hrs')} hrs)

@@ -40,6 +40,18 @@ def test_discard_plan_confirm_accept_then_generate_build_and_deload(page):
     assert page.get_by_text(re.compile(r"TARGET VOLUME")).inner_text() != build_volume
 
 
+def test_discard_with_several_plans_stays_discarded_after_reload(page):
+    page.goto("/plan")
+    page.get_by_role("button", name=re.compile("Generate Build Week")).click()
+    expect(page.get_by_text(re.compile("METHODOLOGY:"))).to_be_visible()
+    accept_next_dialog(page)
+    page.get_by_role("button", name=re.compile("Discard Plan")).click()
+    expect(page.get_by_text("No Active Training Plan Generated")).to_be_visible()
+    page.reload()
+    expect(page.get_by_text("No Active Training Plan Generated")).to_be_visible()
+    expect(page.get_by_role("button", name=re.compile("Discard Plan"))).to_have_count(0)
+
+
 def test_discard_plan_dialog_dismissed_keeps_plan(page):
     page.goto("/plan")
     page.once("dialog", lambda d: d.dismiss())

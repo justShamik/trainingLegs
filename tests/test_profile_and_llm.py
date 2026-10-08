@@ -78,6 +78,10 @@ def test_profile_get_and_post():
     assert "Profile Updated Successfully!" in res_post.get_data(as_text=True)
 
 def test_factual_context_builder():
+    from app.data.queries import save_user_profile
+    save_user_profile({"race_distance_type": "Marathon", "race_date": "2026-11-15", "target_time_str": "3:30:00",
+                       "weekly_hours_available": 9.5, "available_days": "Mon,Wed,Fri,Sat,Sun",
+                       "injury_history": "IT Band Syndrome 2024", "current_niggles": "None"}, db_path=TEST_PROFILE_DB)
     context_str = build_runner_context(db_path=TEST_PROFILE_DB)
     assert "Target Race: Marathon" in context_str
     assert "25.0km" in context_str

@@ -1145,6 +1145,24 @@ details > summary::-webkit-details-marker { display: none; }
 .home-hero__greeting { font-size: clamp(3rem, 1.6rem + 5.4vw, 6rem); line-height: 0.98; }
 .home-hero .lead { max-width: 48ch; }
 
+/* Scroll choreography (scroll-fx.js: GSAP + ScrollTrigger + Lenis, every page; html.gsap-fx) */
+html.lenis, html.lenis body { height: auto; }
+html.lenis { scroll-behavior: auto; }
+.lenis.lenis-stopped { overflow: clip; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+/* GSAP owns the hero text: the CSS rise-in keyframes (fill: both) would override its inline styles */
+.gsap-fx .page-hero__text, .gsap-fx .page-hero__text > *,
+.gsap-fx [data-fx-hero], .gsap-fx [data-fx-hero] > * { animation: none; }
+.gsap-fx .page-hero__text { transform-origin: left top; will-change: transform, opacity; }
+.gsap-fx [data-fx-hero] { transform-origin: center top; }
+/* cards waiting for / running their batch reveal: no CSS transition fighting the tween */
+.gsap-fx .fx-pending { transition: none !important; }
+.split-word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.14em; margin-bottom: -0.14em; }
+.split-inner { display: inline-block; }
+/* .sc capitalises via ::first-letter, which does not reach into inline-block word spans */
+.sc .split-first .split-inner::first-letter { text-transform: uppercase; }
+
 .home-sync {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

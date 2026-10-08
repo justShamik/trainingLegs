@@ -33,7 +33,10 @@ def temp_db():
     )
     conn.commit()
     conn.close()
-    
+    save_user_profile({"race_distance_type": "Marathon", "race_date": "2027-04-18", "target_time_str": "3:45:00",
+                       "weekly_hours_available": 8.0, "available_days": "Mon,Tue,Thu,Sat,Sun",
+                       "injury_history": "None", "current_niggles": "None"}, db_path=path)
+
     yield path
     try:
         os.remove(path)

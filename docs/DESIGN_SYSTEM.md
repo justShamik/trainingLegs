@@ -79,6 +79,20 @@ motion.js adds `.js-motion` to `<html>`. Hidden "before reveal" states exist **o
 
 `prefers-reduced-motion: reduce`: no hidden states, no parallax, transitions/animations off, dials drawn at their final value; `scroll-behavior: smooth` only when motion is allowed.
 
+## Scroll choreography (`scroll-fx.js`, every page)
+
+`base.html` loads self-hosted `vendor/gsap.min.js`, `ScrollTrigger.min.js`, `lenis.min.js` and `js/scroll-fx.js` **synchronously at the end of `<body>`** (after each page's `{% block scripts %}`), so it runs before the deferred motion.js. It adds `.gsap-fx` (and `.gsap-fx--<active_page>`) to `<html>` and claims the elements it animates by setting `data-reveal="none"` / removing `data-reveal-stagger` / `data-parallax`; everything it does not claim is still handled by motion.js. It does nothing (motion.js runs as before) when GSAP is missing, `prefers-reduced-motion: reduce` is on, or the URL has `?motion=classic`.
+
+| Effect | Default targets |
+|---|---|
+| Lenis smooth wheel scroll (driven by `gsap.ticker`; `html.lenis` disables CSS smooth scroll; anchor links offset by the navbar) | window; `.chat-feed`, `textarea`, `[data-lenis-prevent]` keep native scrolling |
+| Hero: h1 words rise in, other hero lines fade up, block recedes on scroll | `.page-hero > .page-hero__text`, `[data-fx-hero]` |
+| Headings light up word by word (scrubbed) | `.section-head h2`, `main > h2`, `.card h2`, `.form-section__title h2`, `[data-fx~="words"]` |
+| Count-up (real text shown until it starts, restored exactly at the end; formats `8,421`, `42.5`, `7:00`, `100.0%`, `4:50 /km`; anything else skipped) | `.card-value`, `.kpi-value`, `.kpi__value`, `.dial__value`, `[data-fx~="count"]` |
+| Batched card reveal (charts: no scale) | `.kpi-grid > *`, `.charts-grid > .chart-card`, `.race-grid > .card`, `.grid-auto > .card`, `.stack > .card / .panel`, `[data-fx-batch] > *`, `[data-fx~="batch"]` |
+
+Per-page additions live in the `PAGES` map at the top of scroll-fx.js (keyed by `body[data-fx-page]` = `active_page`). `data-fx="none"` opts an element and its subtree out. Cards inside `[hidden]` sections (plan weeks) are revealed when the section opens; layout changes (charts, `<details>`, toggles) trigger `ScrollTrigger.refresh()` automatically; at the bottom of the page nothing stays hidden. JS API: `ScrollFx.refresh()`, `ScrollFx.lenis`.
+
 ## Dial / ring component (for the home page: Sleep, Activity time, Steps, Calories)
 
 ```html

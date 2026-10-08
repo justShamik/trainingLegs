@@ -114,6 +114,10 @@ def test_plan_discard_route_endpoint():
     from app.engine.planner import TrainingPlanner
     from app.data.queries import save_training_plan, get_active_training_plan
 
+    from app.data.queries import save_user_profile
+    save_user_profile({"race_distance_type": "Marathon", "race_date": "2027-04-18", "target_time_str": "3:45:00",
+                       "weekly_hours_available": 8.0, "available_days": "Mon,Tue,Thu,Sat,Sun",
+                       "injury_history": "None", "current_niggles": "None"}, db_path=TEST_WEB_DB)
     app = create_app(db_path=TEST_WEB_DB)
     planner = TrainingPlanner(db_path=TEST_WEB_DB)
     plan = planner.generate_plan()

@@ -49,6 +49,22 @@
 </div>
 {% endif %}
 
+{% if profile_gaps %}
+<!-- Goal Profile incomplete: plans are never built from invented defaults (NFR-4.1) -->
+<div class="callout callout--warning" id="profile-gaps">
+    <div style="flex: 1; min-width: 0;">
+        <h3 class="callout__title sc">{% if generate_blocked %}PLAN NOT GENERATED: GOAL PROFILE INCOMPLETE{% else %}GOAL PROFILE INCOMPLETE{% endif %}</h3>
+        <p style="color: var(--text-secondary);">Training plans are built only from your own Goal Profile, so nothing is assumed. Missing or unreadable:</p>
+        <ul>
+            {% for g in profile_gaps %}
+            <li data-field="{{ g.field }}"><strong style="color: var(--text-primary);">{{ g.label }}</strong>: {{ g.problem }}</li>
+            {% endfor %}
+        </ul>
+        <p style="margin-top: 10px;"><a href="/profile" class="btn btn-primary btn-sm" id="complete-profile-link">Complete your Goal Profile</a></p>
+    </div>
+</div>
+{% endif %}
+
 {% if plan %}
 <style>.week-body[hidden] { display: none !important; }</style>
 <!-- Plan period banner -->
@@ -56,6 +72,11 @@
     <span class="eyebrow eyebrow--accent eyebrow--plain">Period</span>
     <span style="font-family: var(--font-display); font-size: 1.12rem; font-weight: 500; letter-spacing: -0.015em;">{{ plan_vm.period_text }}</span>
 </div>
+{% if adjusted_msg in ('swap', 'missed') %}
+<div class="callout callout--success" id="adjust-saved">
+    <span style="color: var(--text-primary);">{% if adjusted_msg == 'swap' %}Session swapped.{% else %}Session marked as missed and the week rebalanced.{% endif %} The original prescription is kept and compliance is measured against it.</span>
+</div>
+{% endif %}
 {% if plan_vm.notice %}
 <div class="callout plan-notice plan-notice-{{ plan_vm.notice.level }} {% if plan_vm.notice.level == 'ended' %}callout--danger{% else %}callout--warning{% endif %}" style="align-items: center;">
     <span style="color: var(--text-primary);">{{ plan_vm.notice.text }}</span>
@@ -125,6 +146,59 @@
     </p>
 </div>
 
+<!-- Plan Decisions & Evidence: which Goal Profile inputs and which studies/methods drove each decision -->
+{% set dec = plan_vm.decisions %}
+{% if dec %}
+<section class="card" id="plan-decisions" style="margin-bottom: var(--space-2xl);">
+    <div class="row-between" style="margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+        <div>
+            <span class="eyebrow">Why this plan</span>
+            <h2 style="margin-top: 4px;">Decisions &amp; evidence</h2>
+        </div>
+        <span class="chip chip--neutral chip--raw">Guardrails enforced in code</span>
+    </div>
+    <p style="color: var(--text-secondary); max-width: 80ch; margin-bottom: 16px;">Each key decision, the Goal Profile inputs and data behind it, and the studies or methods it follows.</p>
+    <div class="stack decision-list">
+        {% for d in dec['items'] %}
+        <div class="decision-item" data-topic="{{ d.topic }}" style="border-top: 1px solid var(--border-color); padding-top: 12px;">
+            <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">{{ d.topic }}</div>
+            <div style="color: var(--text-secondary); max-width: 90ch; overflow-wrap: anywhere;">{{ d.summary }}</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
+                {% for i in d.inputs %}<span class="chip chip--neutral chip--raw decision-input">{{ i }}</span>{% endfor %}
+                {% for l in d.source_labels %}<span class="chip chip--sky chip--raw decision-source">{{ l }}</span>{% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if dec['weeks'] %}
+    <div style="overflow-x: auto; margin-top: 20px;">
+        <table class="data-table decision-weeks" style="width: 100%; min-width: 560px;">
+            <thead><tr><th>Week</th><th>Phase</th><th>Type</th><th>Training km</th><th>Race km</th><th>Easy %</th><th>Hours</th><th>How it was set</th></tr></thead>
+            <tbody>
+            {% for w in dec['weeks'] %}
+            <tr><td>W{{ w.week_number }}</td><td>{{ w.phase|title }}</td><td>{{ w.kind|title }}</td><td>{{ w.training_km }}</td><td>{{ w.race_km if w.race_km else '-' }}</td><td>{{ w.easy_pct|round|int }}%</td><td>{{ w.hours }}</td><td style="color: var(--text-secondary);">{{ w.notes|join('; ') }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    {% if dec['sources'] %}
+    <div class="decision-references-block" style="margin-top: 16px;">
+        <div style="font-weight: 600; color: var(--text-primary);">References ({{ dec['sources']|length }})</div>
+        <ol class="decision-references" style="color: var(--text-secondary); padding-left: 20px; margin-top: 8px; font-size: 0.9rem;">
+            {% for src in dec['sources'] %}
+            <li style="margin-bottom: 6px;"><strong style="color: var(--text-primary);">{{ src.label }}</strong>: {{ src.citation }}</li>
+            {% endfor %}
+        </ol>
+    </div>
+    {% endif %}
+</section>
+{% else %}
+<div class="callout" id="plan-decisions-missing" style="margin-bottom: var(--space-2xl);">
+    <span style="color: var(--text-secondary);">This plan was generated before decision tracking was added. Generate a new plan to see which Goal Profile inputs and studies drive each decision.</span>
+</div>
+{% endif %}
+
 <!-- Sessions List Grid -->
 <div class="section-head">
     <div>
@@ -147,7 +221,7 @@
         </button>
         <div class="week-body stack" id="week-body-{{ w.number }}" {% if not week_open %}hidden{% endif %}>
     {% for sess in w.sessions %}
-    <div class="card session-card {% if sess.session_type in ['Threshold', 'VO2max', 'Long Run', 'Vert/Time-on-Feet'] %}is-key{% endif %} {% if sess.is_today %}is-today{% endif %}" {% if sess.is_today %}id="today-session"{% endif %}>
+    <div class="card session-card {% if sess.session_type in ['Threshold', 'VO2max', 'Long Run', 'Vert/Time-on-Feet', 'Marathon Pace', 'Race'] %}is-key{% endif %} {% if sess.is_today %}is-today{% endif %}" {% if sess.is_today %}id="today-session"{% endif %}>
         <div class="session-grid">
             <div>
                 <div class="session-date">{{ sess.date_label }}</div>
@@ -204,6 +278,23 @@
         {% if sess.post_run_feedback %}
         <div class="note" style="--tone: var(--pastel-sky);">
             <strong style="font-weight: 600;">Post-Run Feedback:</strong> {{ sess.post_run_feedback }}
+        </div>
+        {% endif %}
+
+        <!-- Session adjustment (swap / missed + rebalance): original prescription stays visible -->
+        {% if sess.original_session_type %}
+        <div class="note session-adjusted" style="--tone: var(--pastel-butter);">
+            <span class="chip chip--warning chip--raw">{% if sess.adjustment_kind == 'swap' %}Swapped{% elif sess.adjustment_kind == 'missed' %}Missed{% else %}Rebalanced{% endif %}{% if sess.adjustment_reason %} &middot; {{ sess.adjustment_reason }}{% endif %}</span>
+            {% if sess.original_session_type != sess.session_type or (sess.original_distance_km or 0) != (sess.distance_km or 0) %}
+            <span class="session-original">Originally: {{ sess.original_session_type }}{% if sess.original_distance_km %} {{ '%g'|format(sess.original_distance_km) }} km{% endif %}</span>
+            {% endif %}
+            {% if sess.adjustment_note %}<span class="text-secondary"> &middot; {{ sess.adjustment_note }}</span>{% endif %}
+            {% if sess.status in (none, 'Pending') and sess.session_type != 'Rest' %}<div class="text-muted" style="font-size: 0.85rem; margin-top: 4px;">Compliance is measured against the original prescription: once done, this counts as Modified.</div>{% endif %}
+        </div>
+        {% endif %}
+        {% if adjustable and adjustable.get(sess.id) %}
+        <div class="session-adjust-link">
+            <a href="/session/{{ sess.id }}/adjust" class="btn btn-ghost btn-sm" data-adjust="{{ sess.id }}">Can't do this? Swap or rebalance</a>
         </div>
         {% endif %}
 

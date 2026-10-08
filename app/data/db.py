@@ -62,7 +62,15 @@ def init_db(db_path: Optional[str] = None) -> None:
             ("adherence_score", "REAL"),
             ("adherence_rating", "TEXT"),
             ("session_date", "TEXT"),
-            ("week_number", "INTEGER")
+            ("week_number", "INTEGER"),
+            # Session adjustments (swap / missed + rebalance): the original prescription is kept for honest compliance
+            ("original_session_type", "TEXT"),
+            ("original_distance_km", "REAL"),
+            ("original_duration_min", "REAL"),
+            ("adjustment_kind", "TEXT"),
+            ("adjustment_reason", "TEXT"),
+            ("adjustment_note", "TEXT"),
+            ("adjusted_at", "TEXT")
         ]
         for col_name, col_def in new_cols:
             if col_name not in cols:
@@ -70,9 +78,17 @@ def init_db(db_path: Optional[str] = None) -> None:
 
         cursor.execute("PRAGMA table_info(training_plans)")
         plan_cols = {row["name"] for row in cursor.fetchall()}
-        for col_name, col_def in [("start_date", "TEXT"), ("end_date", "TEXT"), ("total_weeks", "INTEGER")]:
+        for col_name, col_def in [("start_date", "TEXT"), ("end_date", "TEXT"), ("total_weeks", "INTEGER"),
+                                 ("decisions_json", "TEXT")]:  # planner decisions + evidence (JSON)
             if col_name not in plan_cols:
                 cursor.execute(f"ALTER TABLE training_plans ADD COLUMN {col_name} {col_def}")
+        if "status" not in plan_cols:
+            # active | superseded | discarded. Only the newest pre-existing plan stays active.
+            cursor.execute("ALTER TABLE training_plans ADD COLUMN status TEXT NOT NULL DEFAULT 'active'")
+            cursor.execute("""
+                UPDATE training_plans SET status = 'superseded'
+                WHERE rowid != (SELECT rowid FROM training_plans ORDER BY created_at DESC, rowid DESC LIMIT 1)
+            """)
         _backfill_plan_dates(conn)
 
         cursor.execute("PRAGMA table_info(user_profile)")

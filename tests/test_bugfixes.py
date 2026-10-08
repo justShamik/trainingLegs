@@ -131,6 +131,14 @@ def test_legacy_targets_are_normalised_with_ranges():
 
 def test_plan_page_shows_focus_badge_and_range(temp_db, client):
     from app.engine.planner import TrainingPlanner
+    save_user_profile({"race_distance_type": "Marathon", "race_date": "2027-04-18", "target_time_str": "3:45:00",
+                       "weekly_hours_available": 8.0, "available_days": "Mon,Tue,Thu,Sat,Sun"}, db_path=temp_db)
+    # HR zones only come from an observed max HR in COROS data (none is invented)
+    conn = get_db_connection(temp_db)
+    conn.execute("INSERT INTO activities (id, date, sport_type, name, distance_m, duration_s, max_hr)"
+                 " VALUES ('hr1', '2026-09-01T07:00:00Z', 'Run', 'Run', 8000, 2900, 186)")
+    conn.commit()
+    conn.close()
     save_training_plan(TrainingPlanner(db_path=temp_db).generate_plan(), db_path=temp_db)
     html = client.get("/plan").data.decode("utf-8")
     assert "HEART RATE FOCUS" in html or "PACE FOCUS" in html

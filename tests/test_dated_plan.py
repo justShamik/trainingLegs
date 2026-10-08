@@ -9,7 +9,7 @@ from app.data.queries import (
     save_user_profile, save_training_plan, get_active_training_plan,
     auto_match_activities_to_sessions, calculate_weekly_compliance,
 )
-from app.engine.guardrails import validate_multiweek_plan, weekly_volumes
+from app.engine.guardrails import validate_multiweek_plan, weekly_volumes, training_volumes
 from app.engine.planner import TrainingPlanner
 from app.engine.targets import describe_target
 from app.web.routes import create_app
@@ -53,11 +53,11 @@ def test_five_weeks_contiguous_dates_from_monday_of_current_week(db):
 
 
 def test_periodisation_and_guardrails_hold_across_weeks(db):
-    for dist in ("10K", "Marathon", "50K Ultra"):
+    for dist, target in (("10K", "45:00"), ("Marathon", "3:45:00"), ("50K Ultra", "6:00:00")):
         for days in ("Mon,Tue,Thu,Sat,Sun", "Mon,Tue,Wed,Thu,Fri,Sat,Sun", "Tue,Thu,Sat", "Mon,Wed,Fri,Sun"):
-            _profile(db, race_distance_type=dist, available_days=days)
+            _profile(db, race_distance_type=dist, target_time_str=target, available_days=days)
             plan = TrainingPlanner(db_path=db).generate_plan(today=TODAY)
-            ok, violations = validate_multiweek_plan(plan, 30.0)
+            ok, violations = validate_multiweek_plan(plan, plan["prior_volume_km"])
             assert ok, (dist, days, violations)
             assert "Guardrail warning" not in plan["methodology_rationale"]
             vols = list(weekly_volumes(plan["sessions"]).values())
@@ -86,7 +86,7 @@ def test_deload_request_restarts_cycle_and_ultra_routing(db):
     vols = list(weekly_volumes(plan["sessions"]).values())
     assert plan["is_deload"] is True
     assert vols[0] < vols[1]                      # deload then rebuild
-    assert validate_multiweek_plan(plan, 30.0)[0]
+    assert validate_multiweek_plan(plan, plan["prior_volume_km"])[0]
     _profile(db, race_distance_type="50K Ultra")
     ultra = TrainingPlanner(db_path=db).generate_plan(today=TODAY)
     assert "Uphill Athlete" in ultra["methodology_name"]
@@ -97,10 +97,12 @@ def test_race_inside_window_tapers(db):
     race = MONDAY + timedelta(days=24)            # Thursday of week 4
     _profile(db, race_date=race.isoformat())
     plan = TrainingPlanner(db_path=db).generate_plan(today=TODAY)
-    vols = list(weekly_volumes(plan["sessions"]).values())
-    assert vols[3] < vols[2] * 0.6                # race week halved
-    assert vols[2] < vols[1]                      # week before race tapered
-    assert validate_multiweek_plan(plan, 30.0)[0]
+    vols = list(training_volumes(plan["sessions"]).values())   # race km excluded
+    assert vols[3] < vols[0] * 0.6                # race-week training well under half of the peak week
+    assert vols[2] < vols[1] < vols[0]            # progressive 2-week marathon taper (weeks 2-3)
+    race = [s for s in plan["sessions"] if s["session_type"] == "Race"]
+    assert len(race) == 1 and race[0]["session_date"] == (MONDAY + timedelta(days=24)).isoformat()
+    assert validate_multiweek_plan(plan, plan["prior_volume_km"])[0]
 
 
 def test_save_and_load_dated_plan_with_deterministic_ids(db):

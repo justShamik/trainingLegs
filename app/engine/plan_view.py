@@ -1,6 +1,28 @@
 """View-model for the dated multi-week Training Plan page (pure functions, no DB access)."""
+import json
 from datetime import date, timedelta
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
+
+_KIND_LABELS = {"build": "Build", "deload": "Deload", "taper": "Taper", "race": "Race week", "recovery": "Post-race recovery"}
+
+
+def plan_decisions(plan: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """Structured planner decisions stored with the plan (training_plans.decisions_json); None for older plans."""
+    if not plan:
+        return None
+    raw = plan.get("decisions") or plan.get("decisions_json")
+    if isinstance(raw, str):
+        try:
+            raw = json.loads(raw)
+        except ValueError:
+            return None
+    if not isinstance(raw, dict) or not raw.get("items"):
+        return None
+    labels = {s["key"]: s["label"] for s in raw.get("sources", []) if isinstance(s, dict) and "key" in s}
+    items: List[Dict[str, Any]] = []
+    for it in raw["items"]:
+        items.append({**it, "source_labels": [labels.get(k, k) for k in it.get("sources", [])]})
+    return {**raw, "items": items}
 
 
 def _d(value: Optional[str]) -> Optional[date]:
@@ -38,6 +60,8 @@ def build_plan_view(plan: Optional[Dict[str, Any]], today: Optional[date] = None
     else:
         current_week = min((today - start).days // 7 + 1, total_weeks)
 
+    decisions = plan_decisions(plan)
+    week_meta = {int(w.get("week_number") or 0): w for w in (decisions or {}).get("weeks", [])}
     weeks = []
     prev_vol = None
     for n in range(1, total_weeks + 1):
@@ -54,7 +78,12 @@ def build_plan_view(plan: Optional[Dict[str, Any]], today: Optional[date] = None
         delta = round((volume - prev_vol) / prev_vol * 100.0, 1) if prev_vol else None
         runs = [s for s in w_sessions if s.get("session_type") != "Rest"]
         done = sum(1 for s in runs if s.get("status") in ("Completed", "Modified"))
-        if n == 1 and plan.get("is_deload"):
+        meta = week_meta.get(n)
+        if meta:
+            kind = _KIND_LABELS.get(meta.get("kind"), str(meta.get("kind", "")).title())
+            if meta.get("kind") == "build" and meta.get("phase"):
+                kind += f" ({meta['phase']} phase)"
+        elif n == 1 and plan.get("is_deload"):
             kind = "Deload"
         elif delta is not None and delta <= -10.0:
             kind = "Deload / recovery"
@@ -83,5 +112,5 @@ def build_plan_view(plan: Optional[Dict[str, Any]], today: Optional[date] = None
         "period_text": f"Plan period: {fmt_long(start)} – {fmt_long(end)} "
                        f"({total_weeks} week{'s' if total_weeks != 1 else ''}"
                        f"{': current week + next 4' if total_weeks == 5 else ''})",
-        "weeks": weeks, "notice": notice, "today": today,
+        "weeks": weeks, "notice": notice, "today": today, "decisions": decisions,
     }

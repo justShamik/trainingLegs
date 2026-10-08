@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Changes - Personal Running Coach{% endblock %}
+
+{% block content %}
+<section class="page-hero">
+    <div class="page-hero__text">
+        <span class="eyebrow eyebrow--accent">Preview – nothing saved yet</span>
+        <h1>Review the changes</h1>
+        {% if proposal %}
+        <p class="lead">
+            {% if proposal.mode == 'swap' %}Swap{% else %}Missed – rebalance{% endif %}
+            for {{ proposal.session_label }} &middot; Reason: {{ proposal.reason_label }}{% if proposal.note %} &middot; "{{ proposal.note }}"{% endif %}
+        </p>
+        {% endif %}
+    </div>
+</section>
+
+{% if stale %}
+<div class="callout callout--warning" id="adjust-stale"><span>The plan changed since the preview. These are the current proposed changes; please review them again.</span></div>
+{% endif %}
+
+{% if error %}
+<div class="callout callout--danger" id="adjust-error"><span>{{ error }}</span></div>
+{% endif %}
+
+{% if proposal %}
+{% if not proposal.valid %}
+<div class="callout callout--danger" id="adjust-invalid">
+    <div>
+        <h3 class="callout__title">This change would break a training guardrail</h3>
+        <ul>{% for v in proposal.new_violations %}<li>{{ v }}</li>{% endfor %}</ul>
+    </div>
+</div>
+{% endif %}
+
+<div class="table-container" style="margin-bottom: var(--space-lg);">
+    <table class="data-table" id="adjust-changes">
+        <thead>
+            <tr><th>Day</th><th>Before</th><th>After</th><th>What &amp; why</th></tr>
+        </thead>
+        <tbody>
+            {% for c in proposal.changes %}
+            <tr data-session-id="{{ c.session_id }}">
+                <td><strong>{{ c.date_label }}</strong></td>
+                <td>{{ c.before_text }}</td>
+                <td><strong>{{ c.after_text }}</strong>{% if c.after.status == 'Skipped' %} <span class="chip chip--danger">Skipped</span>{% endif %}</td>
+                <td><span class="chip chip--info">{{ c.action }}</span><div class="text-secondary" style="font-size: 0.88rem; margin-top: 4px;">{{ c.why }}</div></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="empty">No changes.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="callout callout--accent" style="margin-bottom: var(--space-lg);">
+    <div>
+        <h3 class="callout__title">How the week was rebalanced</h3>
+        <ul>
+            {% for n in proposal.notes %}<li>{{ n }}</li>{% endfor %}
+            <li>Week {{ proposal.week_number }} running volume: {{ proposal.week_km_before }} km → {{ proposal.week_km_after }} km (as it will actually be run).</li>
+            <li>Compliance stays measured against the original prescription, which remains visible on each changed day.</li>
+        </ul>
+        {% if proposal.existing_violations %}
+        <p style="margin-top: 8px;">Already off-target before this change (not made worse): {{ proposal.existing_violations|join('; ') }}</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row" style="gap: 12px; flex-wrap: wrap; margin-bottom: var(--space-xl);">
+    {% if proposal.valid %}
+    <form method="POST" action="{{ url_for('session_adjust_confirm', session_id=session.id) }}" id="adjust-confirm-form">
+        <input type="hidden" name="mode" value="{{ proposal.mode }}">
+        <input type="hidden" name="option" value="{{ option or '' }}">
+        <input type="hidden" name="reason" value="{{ proposal.reason }}">
+        <input type="hidden" name="note" value="{{ proposal.note }}">
+        <input type="hidden" name="token" value="{{ proposal.token }}">
+        <button type="submit" class="btn btn-primary">Confirm changes</button>
+    </form>
+    {% endif %}
+    <a href="{{ url_for('session_adjust', session_id=session.id, reason=proposal.reason, note=proposal.note or None) }}" class="btn btn-secondary">Choose a different option</a>
+    <a href="/plan" class="btn btn-ghost" id="adjust-cancel">Cancel</a>
+</div>
+{% else %}
+<div class="row" style="gap: 12px; flex-wrap: wrap;">
+    <a href="{{ url_for('session_adjust', session_id=session.id, reason=reason, note=note or None) }}" class="btn btn-secondary">Back to options</a>
+    <a href="/plan" class="btn btn-ghost" id="adjust-cancel">Cancel</a>
+</div>
+{% endif %}
+{% endblock %}

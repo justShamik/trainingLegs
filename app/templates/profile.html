@@ -19,6 +19,20 @@
 </div>
 {% endif %}
 
+{% if profile_gaps %}
+<div class="callout callout--warning card--narrow" id="profile-gaps">
+    <div style="flex: 1; min-width: 0;">
+        <strong style="color: var(--text-primary);">Needed before a training plan can be generated:</strong>
+        <ul>
+            {% for g in profile_gaps %}
+            <li data-field="{{ g.field }}"><strong>{{ g.label }}</strong>: {{ g.problem }}</li>
+            {% endfor %}
+        </ul>
+        <span style="color: var(--text-secondary);">Nothing is assumed for missing fields. Injury history and current niggles are optional (blank = none).</span>
+    </div>
+</div>
+{% endif %}
+
 <div class="card card--narrow" style="padding: clamp(20px, 4vw, 40px);">
     <form method="POST" action="/profile">
         <div class="form-section">
@@ -29,7 +43,8 @@
             <div class="form-grid">
                 <div class="field">
                     <label>Race Distance Target</label>
-                    <select name="race_distance_type">
+                    <select name="race_distance_type" required>
+                        {% if not profile.race_distance_type %}<option value="" selected disabled>Choose a race distance</option>{% endif %}
                         <option value="5K" {% if profile.race_distance_type == '5K' %}selected{% endif %}>5K Road Race</option>
                         <option value="10K" {% if profile.race_distance_type == '10K' %}selected{% endif %}>10K Road Race</option>
                         <option value="Half Marathon" {% if profile.race_distance_type == 'Half Marathon' %}selected{% endif %}>Half Marathon (21.1 km)</option>
@@ -41,10 +56,12 @@
                 <div class="field">
                     <label>Race Date</label>
                     <input type="date" name="race_date" value="{{ profile.race_date or '' }}" required>
+                    <small style="color: var(--text-muted);">Sets base / build / peak / taper phases.</small>
                 </div>
                 <div class="field">
                     <label>Target Time (HH:MM:SS)</label>
-                    <input type="text" name="target_time_str" value="{{ profile.target_time_str or '3:45:00' }}" placeholder="e.g. 3:45:00" required>
+                    <input type="text" name="target_time_str" value="{{ profile.target_time_str or '' }}" placeholder="e.g. 3:45:00" required>
+                    <small style="color: var(--text-muted);">Sets your Daniels VDOT training paces.</small>
                 </div>
             </div>
         </div>
@@ -57,11 +74,13 @@
             <div class="form-grid">
                 <div class="field">
                     <label>Max Weekly Hours Available</label>
-                    <input type="number" step="0.5" name="weekly_hours_available" value="{{ profile.weekly_hours_available or 8.0 }}" required>
+                    <input type="number" step="0.5" name="weekly_hours_available" min="1" max="30" value="{{ profile.weekly_hours_available if profile.weekly_hours_available is not none else '' }}" placeholder="e.g. 6.5" required>
+                    <small style="color: var(--text-muted);">Hard ceiling on total weekly running time.</small>
                 </div>
                 <div class="field">
                     <label>Available Training Days (Comma Separated)</label>
-                    <input type="text" name="available_days" value="{{ profile.available_days or 'Mon,Tue,Thu,Sat,Sun' }}" required>
+                    <input type="text" name="available_days" value="{{ profile.available_days or '' }}" placeholder="e.g. Mon,Tue,Thu,Sat,Sun" required>
+                    <small style="color: var(--text-muted);">Long run, quality and easy days are placed only on these days.</small>
                 </div>
             </div>
         </div>
@@ -74,11 +93,13 @@
             <div class="stack">
                 <div class="field">
                     <label>Injury History</label>
-                    <textarea name="injury_history" rows="2">{{ profile.injury_history or 'None' }}</textarea>
+                    <textarea name="injury_history" rows="2" placeholder="None">{{ profile.injury_history or '' }}</textarea>
+                    <small style="color: var(--text-muted);">Any past injury makes progression more conservative (+5%/week, max 3 run days in a row).</small>
                 </div>
                 <div class="field">
                     <label>Current Niggles / Discomforts</label>
-                    <textarea name="current_niggles" rows="2">{{ profile.current_niggles or 'None' }}</textarea>
+                    <textarea name="current_niggles" rows="2" placeholder="None">{{ profile.current_niggles or '' }}</textarea>
+                    <small style="color: var(--text-muted);">Active niggles swap quality sessions for easy running.</small>
                 </div>
             </div>
         </div>
