@@ -96,6 +96,10 @@ def fresh_state(request, server):
     """Re-seed the temp DB and reset the COROS stub before every test; guard the server log."""
     seed(server.db_path)
     server.set_coros_mode("ok")
+    try:
+        os.remove(server.mode_file + ".calendar.json")      # fake COROS calendar (tests/e2e/fake_coros.py)
+    except OSError:
+        pass
     checker = LogChecker(server.log_path)
     allow = [p for m in request.node.iter_markers("allow_errors") for p in m.args]
     guards = []

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% import '_sync_controls.html' as sc %}
+
+{% block title %}Send to COROS - Personal Running Coach{% endblock %}
+
+{%- set state_chip = {
+    'new': ('chip--success', 'Will be added'),
+    'missing': ('chip--success', 'Will be added again'),
+    'update': ('chip--warning', 'Will update COROS'),
+    'unchanged': ('chip--neutral', 'Already on COROS'),
+    'duplicate': ('chip--neutral', 'Already on COROS'),
+    'orphan': ('chip--danger', 'Remove in COROS app'),
+    'skip': ('chip--neutral', 'Not sent'),
+} -%}
+
+{% block content %}
+<section class="page-hero">
+    <div class="page-hero__text">
+        <span class="eyebrow eyebrow--accent">Send to COROS</span>
+        <h1>Put your plan on the watch</h1>
+        <p class="lead">Check exactly what will be added to your COROS calendar. Nothing is sent until you confirm. COROS doesn't let apps move or delete workouts, so anything sent can only be removed in the COROS app.</p>
+    </div>
+    <div class="page-hero__actions">
+        <a href="/plan" class="btn btn-ghost" id="pushCancel">Back to plan</a>
+    </div>
+</section>
+
+{{ sc.sync_overlay() }}
+
+{% if error %}
+<div class="callout callout--danger" id="pushError"><span>{{ error }}</span></div>
+{% endif %}
+
+{% if results %}
+<div class="card" id="pushResults" style="margin-bottom: var(--space-lg);">
+    <span class="eyebrow">Result</span>
+    <h2 style="margin: 6px 0 12px;">{{ results|selectattr('ok')|list|length }} of {{ results|length }} sent</h2>
+    <ul style="list-style: none; margin: 0; padding: 0;">
+        {% for r in results %}
+        <li style="margin-bottom: 6px;" data-result="{{ 'ok' if r.ok else 'failed' }}">
+            <span style="color: {{ 'var(--status-success)' if r.ok else 'var(--status-error)' }};">{{ '✓' if r.ok else '✗' }}</span>
+            <strong>{{ r.day }}</strong> · {{ r.name }} — <span class="text-secondary">{{ r.message }}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    <p class="text-muted" style="margin-top: 10px;">Open the COROS app and sync your watch to see them.</p>
+</div>
+{% endif %}
+
+{% if preview.error %}
+<div class="card card--center"><p class="text-secondary">{{ preview.error }}</p><p><a href="/plan" class="link-arrow">Training plan <span class="arrow" aria-hidden="true">&rarr;</span></a></p></div>
+{% else %}
+{% if preview.coros_error %}
+<div class="callout callout--danger" id="corosReadError"><span>{{ preview.coros_error }}</span></div>
+{% endif %}
+
+<div class="segmented" role="group" aria-label="How far ahead" style="margin-bottom: var(--space-md);">
+    <span class="segmented__label">Send the next:</span>
+    {% for d in day_choices %}
+    <a href="/plan/push?days={{ d }}" class="segmented__item {% if d == days %}is-active{% endif %}">{{ d }} days</a>
+    {% endfor %}
+</div>
+
+<form method="POST" action="/plan/push" class="sync-form" id="pushForm"
+      data-title="Sending to COROS" data-message="Adding each workout to your COROS calendar. This can take a minute or two; don't close the page.">
+    <input type="hidden" name="token" value="{{ preview.token }}">
+    <input type="hidden" name="days" value="{{ days }}">
+    <div class="stack" style="margin-bottom: var(--space-lg);">
+        {% for i in preview['items'] %}
+        {% set chip = state_chip[i.state] %}
+        <label class="card push-item" data-state="{{ i.state }}" data-date="{{ i.date }}" style="display: flex; gap: 14px; align-items: flex-start; {% if i.state in ('new', 'missing', 'update') and not preview.coros_error %}cursor: pointer;{% endif %}">
+            {% if i.state in ('new', 'missing', 'update') and not preview.coros_error %}
+            <input type="checkbox" name="session" value="{{ i.session_id }}" checked style="margin-top: 5px;">
+            {% else %}
+            <span style="width: 13px;"></span>
+            {% endif %}
+            <span style="flex: 1; min-width: 0;">
+                <span class="row-between" style="gap: 8px; flex-wrap: wrap;">
+                    <strong>{{ i.day }} · {{ i.course.courseName if i.course else i.session_type }}</strong>
+                    <span class="chip {{ chip[0] }}">{{ chip[1] }}</span>
+                </span>
+                {% if i.steps %}
+                <ol class="text-secondary" style="margin: 6px 0 0 18px; font-size: 0.9rem;">
+                    {% for st in i.steps %}<li>{{ st }}</li>{% endfor %}
+                </ol>
+                {% elif i.reason %}
+                <span class="text-muted" style="display: block; font-size: 0.9rem; margin-top: 4px;">{{ i.reason }}</span>
+                {% endif %}
+                {% for n in i.notes %}<span class="text-secondary" style="display: block; font-size: 0.88rem; margin-top: 6px;">⚠ {{ n }}</span>{% endfor %}
+            </span>
+        </label>
+        {% else %}
+        <div class="card card--center"><p class="text-secondary">No planned sessions in this window.</p></div>
+        {% endfor %}
+    </div>
+    {% if preview.writable and not preview.coros_error %}
+    <div class="callout callout--warning" style="align-items: center;">
+        <span>Sending adds {{ preview.writable|length }} workout{{ '' if preview.writable|length == 1 else 's' }} to your COROS calendar. They can only be removed in the COROS app.</span>
+        <button type="submit" class="btn btn-primary sync-btn" id="pushConfirmBtn">Send to COROS</button>
+    </div>
+    {% elif not preview.coros_error %}
+    <p class="text-muted" id="pushNothing">Everything in this window is already on COROS or can't be sent.</p>
+    {% endif %}
+</form>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/sync.js') }}"></script>
+{% endblock %}

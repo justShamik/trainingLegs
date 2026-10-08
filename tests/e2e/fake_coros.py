@@ -102,6 +102,53 @@ class FakeCorosMCPClient:
                  "fatigue_index": 1.07, "resting_hr": 49, "hrv_score": 65.0}]
 
 
+    # ---- fake COROS calendar, kept in a JSON file next to the mode file (reset before every test)
+    @staticmethod
+    def _cal_path():
+        return (os.environ.get("COACH_E2E_MODE_FILE") or "e2e_mode") + ".calendar.json"
+
+    def _cal(self):
+        import json
+        try:
+            with open(self._cal_path(), encoding="utf-8") as f:
+                return json.load(f)
+        except (OSError, ValueError):
+            return {"next_id": 1000, "days": {}, "writes": 0}
+
+    def _save_cal(self, cal):
+        import json
+        with open(self._cal_path(), "w", encoding="utf-8") as f:
+            json.dump(cal, f)
+
+    def query_training_schedule(self, start, end):
+        if self._maybe_fail("queryTrainingSchedule"):
+            return None
+        days = self._cal()["days"]
+        return [{"date": d, "title": w["title"], "id_in_plan": w["id"], "in_plan": False, "standalone": True}
+                for d in sorted(days) if start.isoformat() <= d <= end.isoformat() for w in days[d]]
+
+    def create_scheduled_workout(self, day, course):
+        if self._maybe_fail("createScheduledWorkout"):
+            return False, None
+        cal = self._cal()
+        cal["next_id"] += 1
+        cal["writes"] += 1
+        cal["days"].setdefault(day.isoformat(), []).append({"id": str(cal["next_id"]), "title": course["courseName"]})
+        self._save_cal(cal)
+        return True, f"Workout created. idInPlan: {cal['next_id']}"
+
+    def query_scheduled_workout(self, day, id_in_plan):
+        return True, "editable: true"
+
+    def update_scheduled_workout(self, day, id_in_plan, course):
+        cal = self._cal()
+        cal["writes"] += 1
+        for w in cal["days"].get(day.isoformat(), []):
+            if w["id"] == id_in_plan:
+                w["title"] = course["courseName"]
+        self._save_cal(cal)
+        return True, f"Updated. idInPlan: {id_in_plan}"
+
     @staticmethod
     def running_sport_code(sport_name=None):
         return 100 if "run" in (sport_name or "").lower() else None

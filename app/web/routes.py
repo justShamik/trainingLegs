@@ -17,6 +17,7 @@ from app.data.queries import (
     get_plan_session, get_today_summary, get_sync_status
 )
 from app.races import service as race_service
+from app.coros_push.service import push_status_by_date
 from app.data.sync import perform_sync
 from app.mcp_client.coros_client import CorosMCPClient
 from app.engine.planner import TrainingPlanner, ProfileIncompleteError, profile_gaps
@@ -192,6 +193,7 @@ def create_app(db_path: str = None) -> Flask:
             adjusted_msg=request.args.get("adjusted"),
             profile_gaps=profile_gaps(get_user_profile(db_path=current_db)),
             generate_blocked=request.args.get("profile_incomplete") == "1",
+            coros_push=push_status_by_date(active_plan, db_path=current_db),
             active_page="plan"
         )
 
@@ -362,6 +364,8 @@ def create_app(db_path: str = None) -> Flask:
     register_adjust_routes(app)  # /session/<id>/adjust: swap or missed + rebalance (preview, then confirm)
     from app.web.zone_routes import register_zone_routes
     register_zone_routes(app)  # /zones: LTHR field test -> COROS heart-rate zones
+    from app.web.push_routes import register_push_routes
+    register_push_routes(app)  # /plan/push: preview, then send confirmed runs to the COROS calendar
 
     @app.errorhandler(404)
     def handle_not_found(e):

@@ -138,6 +138,20 @@ def init_db(db_path: Optional[str] = None) -> None:
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )""")
 
+        # Workouts this app put on the COROS calendar: at most one per date (plans have one run a day)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS coros_pushes (
+                session_date TEXT PRIMARY KEY,
+                session_id TEXT,
+                plan_id TEXT,
+                id_in_plan TEXT,
+                course_name TEXT,
+                course_hash TEXT,
+                course_json TEXT,
+                pushed_at TEXT,
+                updated_at TEXT
+            )""")
+
         # Race watchlist scan state (app/races)
         from app.races.store import ensure_table as _ensure_race_table
         _ensure_race_table(conn)

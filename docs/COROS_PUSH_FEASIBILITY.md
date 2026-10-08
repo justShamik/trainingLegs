@@ -1,5 +1,13 @@
 # Pushing the training plan to the COROS calendar: feasibility
 
+> **Status: built 2026-10-09** ("Send to COROS" on the plan page, `/plan/push`). Implementation:
+> `app/coros_push/workouts.py` (session -> course), `app/coros_push/service.py` (preview, duplicate check,
+> confirmed create/update, one app-owned workout per date in `coros_pushes`), `app/web/push_routes.py`.
+> Differences from the plan below: per-session `createScheduledWorkout` only (no `createTrainingPlan`);
+> warm-up/recovery/cool-down use the watch's HR zones; LTHR Test = 15 min + 10 min + 20 min + 10 min steps.
+> Not yet verified against the live account: the exact `createScheduledWorkout` reply (the idInPlan is parsed
+> from it, else found by re-reading that day's calendar).
+
 Researched 2026-09-29. Sources: `~/.coros-mcp-skill-gateway-ts/us/tool-catalog.json` (full descriptions and schemas), the official repo (https://github.com/coroslab/COROS-MCP, as summarised in COROS_CAPABILITIES.md), and read-only calls (`queryTrainingSchedule`, `queryDevices`, `queryTrainingPlanLibrary`, `queryWorkoutDetails`, `queryScheduledWorkoutDetails`). No write tool was called.
 
 ## 1. Verdict

@@ -15,7 +15,7 @@ ZONE_TEST_ACTIVITY_ID = "e2e_lthr_test"
 TABLES = [
     "activity_splits", "plan_sessions", "training_plans", "activities", "sleep_records",
     "daily_physiology", "sync_logs", "user_profile", "block_summaries", "strength_workouts",
-    "daily_activity", "race_watch_status", "hr_zone_tests",
+    "daily_activity", "race_watch_status", "hr_zone_tests", "coros_pushes",
 ]
 TODAY_STEPS = 8421
 TODAY_CALORIES = 1850.0

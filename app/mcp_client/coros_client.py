@@ -8,7 +8,7 @@ import re
 import json
 import subprocess
 import requests
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Dict, Any, List, Optional, Tuple
 
 DEFAULT_COROS_MCP_URL = os.getenv("COROS_MCP_SERVER_URL", "https://mcp.coros.com/mcp")
@@ -104,8 +104,9 @@ class CorosMCPClient:
         except Exception:
             return False
 
-    def _call_cli_tool(self, tool_name: str, arguments: dict) -> Optional[str]:
-        """Invoke an MCP tool via coros-mcp call-tool CLI."""
+    def _invoke(self, tool_name: str, arguments: dict) -> Tuple[bool, Optional[str]]:
+        """Run an MCP tool via the coros-mcp call-tool CLI. Returns (ok, text); ok is False when the CLI
+        failed or the tool reported isError (the text then carries the tool's explanation, if any)."""
         env = dict(os.environ)
         node_path = r"C:\Program Files\nodejs"
         if node_path not in env.get("PATH", ""):
@@ -113,28 +114,69 @@ class CorosMCPClient:
 
         args_json = json.dumps(arguments)
         cmd = [self.npx_bin, "-y", "coros-mcp", "call-tool", "--tool", tool_name, "--arguments-json", args_json]
-        
+
         try:
             res = subprocess.run(cmd, env=env, capture_output=True, text=True, encoding="utf-8", timeout=60)
-            if res.returncode == 0:
-                out = json.loads(res.stdout)
-                content = out.get("content", [])
-                if content and isinstance(content, list) and len(content) > 0:
-                    text_val = content[0].get("text", "")
-                    # Some COROS tools return the text as a JSON-encoded string ("...\\n...");
-                    # unwrap it so line breaks are real newlines the parsers can split on.
-                    if isinstance(text_val, str) and text_val.startswith('"') and text_val.endswith('"'):
-                        try:
-                            text_val = json.loads(text_val)
-                        except ValueError:
-                            pass
-                    return text_val
-                return None
-            self.call_failures.append(f"{tool_name}: {(res.stderr or '').strip()[:120] or 'exit code ' + str(res.returncode)}")
-            return None
+            if res.returncode != 0:
+                msg = (res.stderr or '').strip()[:120] or 'exit code ' + str(res.returncode)
+                self.call_failures.append(f"{tool_name}: {msg}")
+                return False, None
+            out = json.loads(res.stdout)
+            content = out.get("content", [])
+            text_val = None
+            if content and isinstance(content, list):
+                text_val = content[0].get("text", "")
+                # Some COROS tools return the text as a JSON-encoded string ("...\\n...");
+                # unwrap it so line breaks are real newlines the parsers can split on.
+                if isinstance(text_val, str) and text_val.startswith('"') and text_val.endswith('"'):
+                    try:
+                        text_val = json.loads(text_val)
+                    except ValueError:
+                        pass
+            if out.get("isError"):
+                self.call_failures.append(f"{tool_name}: {(text_val or 'tool error')[:160]}")
+                return False, text_val
+            return True, text_val
         except Exception as err:
             self.call_failures.append(f"{tool_name}: {type(err).__name__}")
-        return None
+        return False, None
+
+    def _call_cli_tool(self, tool_name: str, arguments: dict) -> Optional[str]:
+        """Invoke a read-only MCP tool; returns its text (None on CLI failure)."""
+        ok, text = self._invoke(tool_name, arguments)
+        return text if (ok or text) else None
+
+    # ---- COROS training calendar (writes are only ever triggered by an explicit user confirmation)
+    def query_training_schedule(self, start: date, end: date) -> Optional[List[Dict[str, Any]]]:
+        """Workouts on the COROS calendar between start and end (inclusive). None when the read failed."""
+        ok, text = self._invoke("queryTrainingSchedule",
+                                {"startDate": start.strftime("%Y%m%d"), "endDate": end.strftime("%Y%m%d")})
+        if not ok:
+            return None
+        return self.parse_training_schedule(text or "")
+
+    @staticmethod
+    def parse_training_schedule(text: str) -> List[Dict[str, Any]]:
+        items: List[Dict[str, Any]] = []
+        for block in re.split(r"\n\s*\n", text):
+            lines = [l.strip() for l in block.strip().splitlines() if l.strip()]
+            if len(lines) < 2 or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", lines[0]):
+                continue
+            m = re.search(r"idInPlan:\s*(\d+)", block)
+            items.append({"date": lines[0], "title": lines[1], "id_in_plan": m.group(1) if m else None,
+                          "in_plan": bool(re.search(r"Plan ID", block, re.I)),
+                          "standalone": "standalone" in block.lower()})
+        return items
+
+    def create_scheduled_workout(self, day: date, course: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+        return self._invoke("createScheduledWorkout", {"date": day.strftime("%Y%m%d"), "course": course})
+
+    def query_scheduled_workout(self, day: date, id_in_plan: str) -> Tuple[bool, Optional[str]]:
+        return self._invoke("queryScheduledWorkoutDetails", {"date": day.strftime("%Y%m%d"), "idInPlan": str(id_in_plan)})
+
+    def update_scheduled_workout(self, day: date, id_in_plan: str, course: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+        return self._invoke("updateScheduledWorkout",
+                            {"date": day.strftime("%Y%m%d"), "idInPlan": str(id_in_plan), "course": course})
 
     def fetch_workouts(self, since_date: Optional[str] = None) -> List[Dict[str, Any]]:
         """Fetch workout summaries from COROS MCP querySportRecords tool."""
