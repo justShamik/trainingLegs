@@ -55,6 +55,11 @@ QUALITY_SHARE = {"base": 0.12, "build": 0.16, "peak": 0.18, "taper": 0.18, "race
 LONG_RUN_SHARE = {"road": {5: 0.28, 4: 0.30, 3: 0.36, 2: 0.50, 1: 1.0},
                   "ultra": {5: 0.34, 4: 0.36, 3: 0.40, 2: 0.55, 1: 1.0}}
 LONG_RUN_MAX_MIN = {"road": 150.0, "ultra": 240.0}
+# COROS Lactate Threshold model bands (% of LTHR), used when a usable zone test exists
+LT_ZONES = {"E": (0.80, 0.90), "R": (0.70, 0.80), "M": (0.90, 0.95), "T": (0.95, 1.02), "I": (1.02, 1.06),
+            "V": (0.90, 0.95)}
+ZONE_TEST_TYPE = "LTHR Test"
+ZONE_TEST_RACE_GAP_DAYS = 10
 # Daniels %HRmax bands; ultra vert Zone 3 band is an app mapping of Uphill Athlete's zone model
 HR_ZONES = {"E": (0.65, 0.79), "R": (0.60, 0.70), "M": (0.80, 0.90), "T": (0.88, 0.92), "I": (0.95, 1.00),
             "V": (0.80, 0.87)}
@@ -99,6 +104,16 @@ SOURCES: Dict[str, Dict[str, str]] = {
     "adr002": {"label": "ADR-002 guardrails", "citation":
                "Project ADR-002 deterministic guardrails (app/engine/guardrails.py): <=10% weekly volume increase, "
                "no back-to-back hard days, max 4 consecutive run days, >=80% easy volume."},
+    "mcgehee": {"label": "McGehee et al. (2005)", "citation":
+                "McGehee, J. C., Tanner, C. J. & Houmard, J. A. (2005). A comparison of methods for estimating the "
+                "lactate threshold. J Strength Cond Res, 19(3), 553-558. doi:10.1519/15444.1. 30-min time-trial HR "
+                "matched lab threshold HR (typical error ~8 bpm)."},
+    "friel": {"label": "Friel (TrainingPeaks)", "citation":
+              "Friel, J. Quick guide to setting zones. TrainingPeaks. LTHR = average HR of the last 20 min of a "
+              "30-min solo time trial. https://www.trainingpeaks.com/learn/articles/joe-friel-s-quick-guide-to-setting-zones/"},
+    "coros_lt": {"label": "COROS LT zones", "citation":
+                 "COROS Heart Rate Zones: The Ultimate Guide (coros.com). Lactate Threshold model: Z1 < 80%, Z2 80-90%, "
+                 "Z3 90-95%, Z4 95-102%, Z5 102-106%, Z6 > 106% of threshold HR."},
     "app": {"label": "App rule", "citation":
             "Conservative app rule (engineering choice, not taken from a specific study)."},
 }
@@ -289,6 +304,7 @@ class TrainingPlanner:
             ctx["growth"] = min(ctx["growth"], HELD_GROWTH)
 
         weeks, sessions = self._schedule(ctx, start, is_deload, overtraining, low_compliance)
+        ctx["zone_test"] = self._schedule_zone_test(ctx, weeks, sessions, today)
 
         tvols = training_volumes(sessions)
         easy = easy_share_by_week(sessions)
@@ -355,6 +371,8 @@ class TrainingPlanner:
 
         history = get_run_history(start, weeks=4, db_path=self.db_path)
         max_hr = history["observed_max_hr"]
+        from app.analysis.zone_service import current_lthr
+        lthr_test = current_lthr(db_path=self.db_path)
         paces = self._paces(dist, dist_km, target_min, is_ultra)
         ceiling_km = round(hours * 60.0 / paces["E_mid"], 1)
         history_km = history["weekly_km"]
@@ -377,6 +395,7 @@ class TrainingPlanner:
             "growth": CONSERVATIVE_GROWTH if (injury or niggles) else BUILD_GROWTH,
             "history": history, "history_km": history_km, "baseline": baseline,
             "baseline_from_history": baseline_from_history, "max_hr": max_hr, "paces": paces,
+            "lthr": lthr_test["lthr"] if lthr_test else None, "lthr_test": lthr_test,
             "taper_len": TAPER_WEEKS[taper_key], "recovery": RECOVERY[taper_key],
             "lr_share": LONG_RUN_SHARE[key], "lr_cap_min": LONG_RUN_MAX_MIN[key],
         }
@@ -673,8 +692,75 @@ class TrainingPlanner:
             sessions.append(s)
         return sessions
 
+    # ------------------------------------------------------------------ zone test
+    def _violations(self, ctx, weeks, sessions) -> List[str]:
+        stub = {"sessions": sessions, "week_summaries": [{"kind": w["kind"]} for w in weeks]}
+        _, v = validate_evidence_rules(stub, ctx["baseline"], ctx["history_km"] if ctx["baseline_from_history"] else [],
+                                       max_increase_pct=10.0, max_consecutive=ctx["max_consecutive"],
+                                       long_run_max_min=ctx["lr_cap_min"])
+        return v
+
+    def _schedule_zone_test(self, ctx, weeks, sessions, today: date) -> Dict[str, Any]:
+        """When a retest is due, swap the first eligible quality session of weeks 1-2 for the 30-min LTHR test:
+        not in a deload/taper/race/recovery week, not within 10 days of the race, and only if no guardrail breaks."""
+        from app.analysis.zone_service import test_due
+        due = test_due(db_path=self.db_path, today=today)
+        if not due["due"]:
+            return {"scheduled": None, "due": due}
+        by_week = {w["week_number"]: w for w in weeks}
+        quality = {"Threshold", "VO2max", "Marathon Pace", "Vert/Time-on-Feet"}
+        before = len(self._violations(ctx, weeks, sessions))
+        for i, s in enumerate(sessions):
+            wk = by_week.get(s["week_number"])
+            if (s["week_number"] > 2 or s["session_type"] not in quality or s["session_date"] < today.isoformat()
+                    or wk is None or wk["kind"] != "build" or wk["phase"] in ("taper", "race", "recovery")):
+                continue
+            d = date.fromisoformat(s["session_date"])
+            if ctx["race"] is not None and abs((ctx["race"] - d).days) <= ZONE_TEST_RACE_GAP_DAYS:
+                continue
+            test = self._zone_test(ctx)
+            test.update({k: s[k] for k in ("week_number", "session_date", "day_of_week")})
+            # keep the week's volume unchanged: the extra test km come off that week's easy runs
+            extra = test["distance_km"] - float(s["distance_km"] or 0.0)
+            easy_idx = [j for j, e in enumerate(sessions)
+                        if e["week_number"] == s["week_number"] and e["session_type"] == "Easy Aerobic"]
+            easy_total = sum(sessions[j]["distance_km"] for j in easy_idx)
+            if extra > 0 and easy_total - extra < 0.5 * easy_total:
+                continue
+            saved = {j: dict(sessions[j]) for j in easy_idx}
+            sessions[i] = test
+            if extra > 0:
+                for j in easy_idx:
+                    e = sessions[j]
+                    factor = 1.0 - extra / easy_total
+                    e["distance_km"] = round(e["distance_km"] * factor, 1)
+                    e["duration_min"] = round(e["duration_min"] * factor, 0)
+            if len(self._violations(ctx, weeks, sessions)) <= before:
+                return {"scheduled": s["session_date"], "replaced": s["session_type"], "due": due,
+                        "trimmed_km": round(max(extra, 0.0), 1)}
+            sessions[i] = s
+            for j, e in saved.items():
+                sessions[j] = e
+        return {"scheduled": None, "due": due, "blocked": True}
+
+    def _zone_test(self, ctx) -> Dict[str, Any]:
+        p = ctx["paces"]
+        test_pace = (p["T"] + 0.1) if p.get("T") else p["E_mid"] * 0.85
+        km = round(25.0 / p["E_mid"] + 30.0 / test_pace, 1)
+        start_cue = f"start about {fmt_pace(test_pace)} /km" if p.get("T") else "start controlled"
+        return {"session_type": ZONE_TEST_TYPE, "distance_km": km, "duration_min": 55.0,
+                "target_pace_or_hr": f"Pace Focus: best even 30-min effort ({start_cue}, RPE 7-8/10, press LAP at 10:00)",
+                "stated_purpose": "30-min threshold HR field test (Friel; McGehee 2005): 15 min easy with 3 x 20 s "
+                                  "strides, 30 min solo at the best even effort you can hold - press LAP at 10:00 - "
+                                  "then 10 min easy. Cool conditions, no pausing. Sync, then analyse it on the HR Zones "
+                                  "page to set your COROS zones."}
+
     # ------------------------------------------------------------------ session builders
     def _hr(self, ctx, zone: str) -> Optional[str]:
+        if ctx.get("lthr"):
+            from app.analysis.hr_zones import band_bpm
+            lo, hi = band_bpm(ctx["lthr"], *LT_ZONES[zone])
+            return f"{lo} – {hi} bpm"
         mx = ctx["max_hr"]
         if not mx:
             return None
@@ -847,7 +933,14 @@ class TrainingPlanner:
                 "Daniels advises training at current-fitness VDOT: if T/I paces feel unsustainable, your current "
                 "fitness is below the goal and the target time should be reviewed.",
                 [target_in, dist_in], ["daniels_gilbert", "daniels"])
-        if ctx["max_hr"]:
+        if ctx.get("lthr"):
+            t = ctx["lthr_test"]
+            add("Heart-rate zones",
+                f"Threshold HR {t['lthr']} bpm from your 30-min zone test on {t['test_date']} ({t['confidence']} "
+                f"confidence, ± 8 bpm) -> COROS Lactate Threshold zones: easy (Z2) {self._hr(ctx, 'E')}, "
+                f"threshold (Z4) {self._hr(ctx, 'T')}. Measured threshold HR replaces max-HR estimates.",
+                [f"Zone test: {t['test_date']}"], ["friel", "mcgehee", "coros_lt"])
+        elif ctx["max_hr"]:
             add("Heart-rate zones",
                 f"Observed max HR {ctx['max_hr']} bpm (highest in your COROS runs, last 365 days) -> easy "
                 f"{self._hr(ctx, 'E')}, threshold {self._hr(ctx, 'T')}. Observed max may understate true max.",
@@ -958,6 +1051,19 @@ class TrainingPlanner:
         elif is_deload and weeks[0]["kind"] == "deload":
             add("Requested deload", "You asked for a deload: week 1 at 75% of baseline, then the 3:1 cycle restarts.",
                 ["Generate Deload Week"], ["bompa"])
+
+        zt = ctx.get("zone_test") or {}
+        if zt.get("scheduled"):
+            add("Heart-rate zone test",
+                f"{zt['due']['reason']} -> the {zt['replaced']} session on {_fmt_date(date.fromisoformat(zt['scheduled']))} "
+                "is replaced by a 30-min threshold HR field test. Afterwards, analyse it on the HR Zones page; the result "
+                "sets your COROS zones and the heart-rate targets of future plans.",
+                ["Zone tests: " + (zt["due"].get("last_date") or "none yet")], ["friel", "mcgehee"])
+        elif zt.get("due", {}).get("due"):
+            add("Heart-rate zone test",
+                f"{zt['due']['reason']} No session in weeks 1-2 could become the test without breaking a guardrail or "
+                "landing in a deload/taper week or within 10 days of the race, so none was scheduled.",
+                ["Zone tests: " + (zt["due"].get("last_date") or "none yet")], ["friel", "app"])
 
         add("Guardrail check",
             "All deterministic guardrails passed (10% rule, ACWR <= 1.3, 80/20, no back-to-back hard days, "

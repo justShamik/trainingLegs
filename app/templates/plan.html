@@ -221,7 +221,7 @@
         </button>
         <div class="week-body stack" id="week-body-{{ w.number }}" {% if not week_open %}hidden{% endif %}>
     {% for sess in w.sessions %}
-    <div class="card session-card {% if sess.session_type in ['Threshold', 'VO2max', 'Long Run', 'Vert/Time-on-Feet', 'Marathon Pace', 'Race'] %}is-key{% endif %} {% if sess.is_today %}is-today{% endif %}" {% if sess.is_today %}id="today-session"{% endif %}>
+    <div class="card session-card {% if sess.session_type in ['Threshold', 'VO2max', 'Long Run', 'Vert/Time-on-Feet', 'Marathon Pace', 'Race', 'LTHR Test'] %}is-key{% endif %} {% if sess.is_today %}is-today{% endif %}" {% if sess.is_today %}id="today-session"{% endif %}>
         <div class="session-grid">
             <div>
                 <div class="session-date">{{ sess.date_label }}</div>
@@ -255,6 +255,7 @@
             </div>
             <div class="session-purpose">
                 <div style="font-size: 0.9rem; color: var(--text-secondary);">{{ sess.stated_purpose }}</div>
+                {% if sess.session_type == 'LTHR Test' %}<a href="/zones#protocol" class="link-arrow zone-test-link" style="font-size: 0.88rem;">Test protocol &amp; analysis <span class="arrow" aria-hidden="true">&rarr;</span></a>{% endif %}
             </div>
             <div class="session-status">
                 {% if sess.status == 'Completed' %}

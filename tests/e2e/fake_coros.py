@@ -102,6 +102,26 @@ class FakeCorosMCPClient:
                  "fatigue_index": 1.07, "resting_hr": 49, "hrv_score": 65.0}]
 
 
+    @staticmethod
+    def running_sport_code(sport_name=None):
+        return 100 if "run" in (sport_name or "").lower() else None
+
+    def fetch_lap_list(self, label_id, sport_code=100):
+        if self._maybe_fail("queryActivityLapData"):
+            return []
+        total, laps = 0.0, []
+        for t, hr in ((900, 135), (600, 162), (1200, 168), (600, 140)):
+            total += t
+            laps.append({"time": t, "totalLength": total, "avgHr": hr})
+        return laps
+
+    def fetch_fit_bytes(self, label_id, sport_code=100):
+        if self._maybe_fail("queryActivityFitFileDownloadUrls"):
+            return None
+        from tests.fit_builder import build_fit, synthetic_test_run
+        return build_fit(synthetic_test_run(test_hr=168))
+
+
 def _fake_ask_coach(self, question, runner_context, template_name="coach_chat_v1.txt", db_path=None):
     """Deterministic coach: echoes the question (to exercise HTML escaping) + data-driven fallback."""
     return f"E2E COACH ECHO: {question}\n\n" + self._generate_intelligent_fallback(question, runner_context)

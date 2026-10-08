@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% import '_sync_controls.html' as sc %}
+
+{% block title %}Heart-Rate Zones - Personal Running Coach{% endblock %}
+
+{%- macro conf_chip(c) -%}
+<span class="chip {{ {'Good': 'chip--success', 'Fair': 'chip--warning'}.get(c, 'chip--danger') }} zone-conf">{{ c }} confidence</span>
+{%- endmacro -%}
+
+{% block content %}
+<section class="page-hero">
+    <div class="page-hero__text">
+        <span class="eyebrow eyebrow--accent">Heart-rate zones</span>
+        <h1>Your training zones</h1>
+        <p class="lead">Run a 30-minute solo time trial, sync it, and get your lactate threshold heart rate plus the six COROS zones ready to type into the app.</p>
+    </div>
+    <div class="page-hero__actions">
+        <a href="#protocol" class="btn btn-secondary">How to do the test</a>
+        <a href="#analyse" class="btn btn-primary">Analyse a run</a>
+    </div>
+</section>
+
+{{ sc.sync_overlay() }}
+
+{% if error %}
+<div class="callout callout--danger" id="zoneError"><span><strong>Couldn't analyse that run:</strong> {{ error }}</span></div>
+{% elif saved == 'entered' %}
+<div class="callout callout--success"><span>Noted: COROS now uses these zones.</span></div>
+{% elif saved == 'deleted' %}
+<div class="callout callout--success"><span>Test result removed.</span></div>
+{% endif %}
+
+<!-- Current status -->
+<div class="kpi-grid" style="margin-bottom: var(--space-xl);" id="zoneStatus">
+    <div class="kpi-card tone-rose">
+        <div class="kpi-label">Threshold heart rate in use</div>
+        {% if current %}
+        <div class="kpi-value" id="currentLthr">{{ current.lthr }}<span class="card-unit">bpm</span></div>
+        <div class="kpi-subtitle">± {{ sem }} bpm · test on {{ current.test_date }} · {{ current.confidence }} confidence</div>
+        {% else %}
+        <div class="kpi-value"><span class="badge-na">Not Available</span></div>
+        <div class="kpi-subtitle">No usable test yet: plan targets stay pace-based or use your highest recorded HR.</div>
+        {% endif %}
+    </div>
+    <div class="kpi-card tone-sky">
+        <div class="kpi-label">Next test</div>
+        <div class="kpi-value" style="font-size: 1.6rem;" id="testDue">{% if due.due %}Due now{% else %}{{ due.next_due }}{% endif %}</div>
+        <div class="kpi-subtitle">{{ due.reason }} Retest every 6-8 weeks, never within 10 days of a race.</div>
+    </div>
+    <div class="kpi-card tone-mint">
+        <div class="kpi-label">COROS updated</div>
+        <div class="kpi-value" style="font-size: 1.6rem;">{% if current and current.entered_in_coros_at %}Yes{% elif current %}Not yet{% else %}—{% endif %}</div>
+        <div class="kpi-subtitle">{% if current and current.entered_in_coros_at %}Entered on {{ current.entered_in_coros_at[:10] }}{% else %}Mark it below once you've typed the zones in.{% endif %}</div>
+    </div>
+</div>
+
+{% if latest %}
+{% set rec = latest.recommendation %}
+<!-- Selected result -->
+<section class="section" id="result">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Result · {{ latest.test_date }}</span>
+            <h2>Threshold HR {{ latest.lthr }} bpm</h2>
+            <p class="text-muted">{{ latest.activity_name or latest.activity_id }} · {{ latest.stats.window_source }} · {{ 'per-second file' if latest.method == 'fit' else 'lap averages' }}</p>
+        </div>
+        {{ conf_chip(latest.confidence) }}
+    </div>
+
+    <div class="callout {{ 'callout--success' if rec.update_coros else 'callout--warning' }}" id="zoneRecommendation">
+        <div>
+            <strong>{{ 'Update COROS' if rec.update_coros else "Don't change COROS" }}.</strong> {{ rec.why }}
+            <span class="text-muted">Likely true value {{ latest.lthr - sem }}–{{ latest.lthr + sem }} bpm (field-test error ± {{ sem }} bpm, McGehee 2005).</span>
+            {% for n in rec.notes %}<div style="margin-top: 6px;">{{ n }}</div>{% endfor %}
+        </div>
+    </div>
+
+    <div class="grid-auto" style="margin-bottom: var(--space-lg);">
+        <div class="card">
+            <span class="eyebrow">Quality checks</span>
+            <ul class="zone-checks" style="list-style: none; margin: 10px 0 0; padding: 0;">
+                {% for c in latest.criteria %}
+                <li data-check="{{ c.key }}" style="margin-bottom: 8px;">
+                    <span style="color: {{ 'var(--status-success)' if c.ok else 'var(--status-warning)' }};">{{ '✓' if c.ok else '✗' }}</span>
+                    <strong>{{ c.label }}</strong> <span class="text-muted">— {{ c.detail }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% for f in latest.flags %}<p class="text-secondary" style="margin-top: 8px;">⚠ {{ f }}</p>{% endfor %}
+            <p class="text-muted" style="margin-top: 10px; font-size: 0.85rem;">Good = all checks pass · Fair = one missed · Poor = two or more, or the test was invalid.</p>
+        </div>
+
+        <div class="card">
+            <span class="eyebrow">COROS Lactate Threshold zones</span>
+            <div class="table-container" style="margin-top: 10px;">
+                <table class="data-table" id="zoneTable">
+                    <thead><tr><th>Zone</th><th>Name</th><th>% of threshold</th><th>Heart rate</th></tr></thead>
+                    <tbody>
+                    {% for z in latest.zones %}
+                    <tr data-zone="{{ z.zone }}">
+                        <td><strong>{{ z.zone }}</strong></td>
+                        <td>{{ z.name }}</td>
+                        <td>{% if z.low_pct is none %}&lt; {{ (z.high_pct * 100)|round|int }}%{% elif z.high_pct is none %}&gt; {{ (z.low_pct * 100)|round|int }}%{% else %}{{ (z.low_pct * 100)|round|int }}–{{ (z.high_pct * 100)|round|int }}%{% endif %}</td>
+                        <td class="num">{% if z.low is none %}≤ {{ z.high }}{% elif z.high is none %}≥ {{ z.low }}{% else %}{{ z.low }}–{{ z.high }}{% endif %} bpm</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" id="corosSteps" style="margin-bottom: var(--space-lg);">
+        <span class="eyebrow">How to enter it in COROS</span>
+        <ol style="margin: 10px 0 0 18px; color: var(--text-secondary);">
+            <li>COROS app → Profile → Heart Rate Zone → choose <strong>Lactate Threshold</strong>.</li>
+            <li>Set <strong>Threshold HR = {{ latest.lthr }} bpm</strong>. The default COROS percentages then give the zones in the table above.</li>
+            <li>If your app version won't let you edit Threshold HR, use <strong>COROS Training Hub (training.coros.com) → Settings → Zones</strong>, then sync the watch.</li>
+            <li>For marathon and ultra training, check that the top of Zone 2 ({{ latest.zones[1].high }} bpm) still lets you talk in full sentences. In Delhi heat, keep easy runs nearer 85% ({{ (latest.lthr * 0.85)|round|int }} bpm).</li>
+        </ol>
+        <div class="row" style="gap: 10px; margin-top: 14px; flex-wrap: wrap;">
+            {% if latest.entered_in_coros_at %}
+            <span class="chip chip--success" id="enteredChip">Entered in COROS on {{ latest.entered_in_coros_at[:10] }}</span>
+            {% else %}
+            <form method="POST" action="{{ url_for('zones_entered', test_id=latest.id) }}">
+                <button type="submit" class="btn btn-primary" id="markEnteredBtn">I've updated COROS</button>
+            </form>
+            {% endif %}
+            <form method="POST" action="{{ url_for('zones_delete', test_id=latest.id) }}" onsubmit="return confirm('Remove this test result?');">
+                <button type="submit" class="btn btn-ghost" id="deleteTestBtn">Remove this result</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Protocol -->
+<section class="section" id="protocol">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">The test</span>
+            <h2>30-minute threshold time trial</h2>
+        </div>
+    </div>
+    <div class="grid-auto">
+        <div class="card">
+            <span class="eyebrow">Before</span>
+            <ul style="margin: 10px 0 0 18px; color: var(--text-secondary);">
+                <li>Two easy or rest days first; no long run in the previous 48 h; normal sleep.</li>
+                <li>Cool and calm: ≤ 25 °C. In Delhi that means pre-dawn from October to March, otherwise an AC treadmill at 1% incline.</li>
+                <li>Skip days with AQI above about 200.</li>
+                <li>Flat track or loop with no traffic lights. Chest strap if you have one; otherwise wear the watch snug.</li>
+            </ul>
+        </div>
+        <div class="card">
+            <span class="eyebrow">During</span>
+            <ol style="margin: 10px 0 0 18px; color: var(--text-secondary);">
+                <li><strong>15 min warm-up:</strong> 10 min easy, 3 × 20 s strides, 2 min easy.</li>
+                <li><strong>30 min solo</strong> at the best <em>even</em> effort you can hold (10-15 km race effort). Don't sprint the start.</li>
+                <li><strong>Press LAP at exactly 10:00</strong> of the 30 minutes. Never pause the watch; a stop over 15 s spoils the test.</li>
+                <li><strong>10 min easy</strong> cool-down.</li>
+            </ol>
+        </div>
+        <div class="card">
+            <span class="eyebrow">After</span>
+            <ul style="margin: 10px 0 0 18px; color: var(--text-secondary);">
+                <li>Sync COROS, then analyse the run below.</li>
+                <li>Threshold HR = average HR of minutes 10-30, after removing pauses, dropouts, spikes and cadence lock.</li>
+                <li>Not a group run or a race: both raise heart rate.</li>
+                <li>Read the evidence in <code>docs/HR_ZONES_RESEARCH.md</code>.</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Analyse -->
+<section class="section" id="analyse">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Analyse</span>
+            <h2>Use a synced run as the test</h2>
+        </div>
+    </div>
+    <div class="card">
+        {% if candidates %}
+        <form method="POST" action="{{ url_for('zones_analyse') }}" class="form-grid sync-form" id="analyseForm"
+              data-title="Analysing your test" data-message="Downloading the run's per-second data from COROS and checking it. This can take up to a minute…">
+            <div class="field span-all">
+                <label for="activity_id">Run</label>
+                <select name="activity_id" id="activity_id" required>
+                    {% for c in candidates %}
+                    <option value="{{ c.id }}" {% if loop.first and not candidates|selectattr('likely')|list %}selected{% elif c.likely and c == (candidates|selectattr('likely')|first) %}selected{% endif %}>
+                        {{ c.date[:10] }} · {{ c.name or c.sport_type }} · {{ c.distance_km }} km · {{ c.duration_min }} min{% if c.likely %} · looks like a test{% endif %}{% if c.tested %} · analysed before{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>Heart-rate sensor</label>
+                <div class="row" style="gap: 16px; flex-wrap: wrap; padding-top: 6px;">
+                    {% for key, label in sensors.items() %}
+                    <label style="display: flex; gap: 6px; align-items: center;"><input type="radio" name="sensor" value="{{ key }}" required> {{ label }}</label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="field">
+                <label for="temperature_c">Air temperature during the test (°C)</label>
+                <input type="number" step="0.5" min="-10" max="50" name="temperature_c" id="temperature_c" placeholder="e.g. 22">
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn btn-primary sync-btn" id="analyseBtn">Analyse run</button>
+            </div>
+        </form>
+        <p class="text-muted" style="margin-top: 10px; font-size: 0.85rem;">The watch's own temperature reading is skewed by body heat, so enter the weather instead. Each new analysis downloads one activity file from COROS (limit 50 a day); repeats use a saved copy.</p>
+        {% else %}
+        <p class="text-secondary">No runs of 40 minutes or more in the last 120 days. Do the test, sync COROS from the home page, then come back.</p>
+        {% endif %}
+    </div>
+</section>
+
+{% if tests %}
+<!-- History -->
+<section class="section" id="history">
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">History</span>
+            <h2>Previous tests</h2>
+        </div>
+    </div>
+    <div class="table-container">
+        <table class="data-table">
+            <thead><tr><th>Date</th><th>Run</th><th>Threshold HR</th><th>Confidence</th><th>Sensor</th><th>In COROS</th><th></th></tr></thead>
+            <tbody>
+            {% for t in tests %}
+            <tr data-test-id="{{ t.id }}">
+                <td>{{ t.test_date }}</td>
+                <td>{{ t.activity_name or t.activity_id }}</td>
+                <td class="num"><strong>{{ t.lthr }}</strong> bpm{% if t.recommendation.delta is not none %} <span class="text-muted">({{ '%+d'|format(t.recommendation.delta) }})</span>{% endif %}</td>
+                <td>{{ conf_chip(t.confidence) }}</td>
+                <td>{{ t.sensor_label }}</td>
+                <td>{{ t.entered_in_coros_at[:10] if t.entered_in_coros_at else '—' }}</td>
+                <td><a href="{{ url_for('zones_view', test=t.id) }}#result" class="link-arrow">View <span class="arrow" aria-hidden="true">&rarr;</span></a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/sync.js') }}"></script>
+{% endblock %}

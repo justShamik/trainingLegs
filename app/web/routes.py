@@ -360,6 +360,8 @@ def create_app(db_path: str = None) -> Flask:
 
     from app.web.adjust_routes import register_adjust_routes
     register_adjust_routes(app)  # /session/<id>/adjust: swap or missed + rebalance (preview, then confirm)
+    from app.web.zone_routes import register_zone_routes
+    register_zone_routes(app)  # /zones: LTHR field test -> COROS heart-rate zones
 
     @app.errorhandler(404)
     def handle_not_found(e):

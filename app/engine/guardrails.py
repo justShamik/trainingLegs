@@ -14,8 +14,20 @@ week-over-week volume cap (training_volumes), but it counts as a hard day for ba
 from typing import Dict, Any, List, Optional, Tuple
 
 # Hard quality sessions for back-to-back checking
-HARD_SESSION_TYPES = {"Threshold", "VO2max", "Long Run", "Vert/Time-on-Feet", "Marathon Pace", "Race"}
+HARD_SESSION_TYPES = {"Threshold", "VO2max", "Long Run", "Vert/Time-on-Feet", "Marathon Pace", "Race", "LTHR Test"}
 RACE_SESSION_TYPES = {"Race"}
+
+# Sessions whose warm-up/cool-down are easy running: share of their km that is hard.
+# LTHR Test = 15 min easy + 30 min test + 10 min easy -> about 60% of the distance is the hard core.
+PARTIAL_HARD_SHARE = {"LTHR Test": 0.6}
+
+
+def easy_km(session: Dict[str, Any]) -> float:
+    km = float(session.get("distance_km") or 0.0)
+    t = session.get("session_type")
+    if t in EASY_SESSION_TYPES:
+        return km
+    return km * (1.0 - PARTIAL_HARD_SHARE.get(t, 1.0))
 
 # Aerobic easy volume sessions for 80-20 intensity check
 EASY_SESSION_TYPES = {"Easy Aerobic", "Long Run", "Rest", "S&C", "Recovery"}
@@ -56,11 +68,7 @@ def validate_80_20_intensity(sessions: List[Dict[str, Any]], min_easy_percent: f
     if total_vol <= 0:
         return True
         
-    easy_vol = sum(
-        float(s.get("distance_km") or 0.0) 
-        for s in sessions 
-        if s.get("session_type") in EASY_SESSION_TYPES
-    )
+    easy_vol = sum(easy_km(s) for s in sessions)
     
     easy_percent = (easy_vol / total_vol) * 100.0
     return easy_percent >= (min_easy_percent - 0.1)
@@ -110,7 +118,7 @@ def easy_share_by_week(sessions: List[Dict[str, Any]]) -> Dict[int, float]:
     for week, ws in split_weeks(sessions).items():
         ws = [s for s in ws if s.get("session_type") not in RACE_SESSION_TYPES]
         total = sum(float(s.get("distance_km") or 0.0) for s in ws)
-        easy = sum(float(s.get("distance_km") or 0.0) for s in ws if s.get("session_type") in EASY_SESSION_TYPES)
+        easy = sum(easy_km(s) for s in ws)
         out[week] = round(easy / total * 100.0, 1) if total > 0 else 100.0
     return out
 

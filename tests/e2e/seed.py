@@ -10,11 +10,12 @@ ESCAPE_ACTIVITY_ID = "e2e_escape"
 FULL_ACTIVITY_NAME = "Dynamics Tempo"
 OLD_ACTIVITY_NAME = "Ancient Base Run"
 ESCAPE_ACTIVITY_NAME = "Escape <b>bold</b> & <i>test</i>"
+ZONE_TEST_ACTIVITY_ID = "e2e_lthr_test"
 
 TABLES = [
     "activity_splits", "plan_sessions", "training_plans", "activities", "sleep_records",
     "daily_physiology", "sync_logs", "user_profile", "block_summaries", "strength_workouts",
-    "daily_activity", "race_watch_status",
+    "daily_activity", "race_watch_status", "hr_zone_tests",
 ]
 TODAY_STEPS = 8421
 TODAY_CALORIES = 1850.0
@@ -85,6 +86,9 @@ def seed(db_path: str, with_plan: bool = True, with_strength: bool = True) -> No
                          distance_m=3000, duration_s=1200)
         _insert_activity(conn, id=ESCAPE_ACTIVITY_ID, date=_iso(3), sport_type="Run", name=ESCAPE_ACTIVITY_NAME,
                          distance_m=5000, duration_s=1700, avg_pace_s_km=340, avg_hr=150)
+        # A 55-min run done as the 30-min LTHR field test (fake COROS serves its laps and per-second file)
+        _insert_activity(conn, id=ZONE_TEST_ACTIVITY_ID, date=_iso(4, hour=1), sport_type="Run", name="LTHR Test",
+                         distance_m=10600, duration_s=3300, avg_pace_s_km=311, avg_hr=158, max_hr=172)
         # Older than 90 days: only visible under "All Time"
         _insert_activity(conn, id=OLD_ACTIVITY_ID, date=_iso(200), sport_type="Run", name=OLD_ACTIVITY_NAME,
                          distance_m=8000, duration_s=2800, avg_pace_s_km=350, avg_hr=145)

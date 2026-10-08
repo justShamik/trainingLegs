@@ -349,6 +349,44 @@ class CorosMCPClient:
             return self._parse_activity_detail_text(detail_text) or None
         return None
 
+    def fetch_lap_list(self, label_id: str, sport_code: int = 100) -> List[Dict[str, Any]]:
+        """Workout-step laps (type 11), else manual laps (type 2), in order. [] when unavailable."""
+        text = self._call_cli_tool("queryActivityLapData", {"labelId": str(label_id), "sportType": sport_code})
+        try:
+            groups = json.loads(text or "").get("lapGroups") or []
+        except (ValueError, AttributeError):
+            return []
+        by_type = {g.get("type"): g.get("laps") or [] for g in groups}
+        return by_type.get(11) or by_type.get(2) or []
+
+    FIT_MAX_BYTES = 20 * 1024 * 1024
+
+    def fetch_fit_bytes(self, label_id: str, sport_code: int = 100) -> Optional[bytes]:
+        """Download the activity's FIT file (per-second records). Only https URLs on coros.com are fetched.
+        COROS allows 50 FIT downloads per 24 h, so callers should cache the result."""
+        import requests
+        from urllib.parse import urlsplit
+
+        text = self._call_cli_tool("queryActivityFitFileDownloadUrls",
+                                   {"labelId": str(label_id), "sportType": sport_code, "limit": 1})
+        for url in re.findall(r"https://\S+?\.fit\b", text or ""):
+            host = (urlsplit(url).hostname or "").lower()
+            if not (host == "coros.com" or host.endswith(".coros.com")):
+                self.call_failures.append(f"fit download: untrusted host {host}")
+                continue
+            try:
+                with requests.get(url, timeout=30, stream=True) as resp:
+                    resp.raise_for_status()
+                    data = bytearray()
+                    for chunk in resp.iter_content(65536):
+                        data.extend(chunk)
+                        if len(data) > self.FIT_MAX_BYTES:
+                            raise ValueError("FIT file too large")
+                    return bytes(data)
+            except Exception as err:
+                self.call_failures.append(f"fit download: {type(err).__name__}")
+        return None
+
     @staticmethod
     def _pace_to_s(text: str) -> Optional[int]:
         m = re.match(r'\s*(\d+):(\d{2})', text or "")

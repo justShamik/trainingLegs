@@ -41,6 +41,8 @@ def generate_post_run_feedback(session: Dict[str, Any], actual_metrics: Dict[str
             feedback_parts.append(f"Pace was fast for an easy session ({int(act_pace_s//60)}:{int(act_pace_s%60):02d}/km). Keep easy runs truly aerobic to protect muscular recovery.")
         else:
             feedback_parts.append("Executed with disciplined easy effort, supporting recovery and mitochondrial growth.")
+    elif session_type == "LTHR Test":
+        feedback_parts.append("Zone test done. Open the HR Zones page and analyse this run to get your threshold heart rate and COROS zones.")
     elif session_type in ("Threshold", "VO2max"):
         feedback_parts.append(f"Quality workout executed for {session_type}. Ensure carbohydrate refueling and rest before the next session.")
     elif session_type in ("Long Run", "Vert/Time-on-Feet"):

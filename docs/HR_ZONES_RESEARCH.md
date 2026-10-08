@@ -1,6 +1,6 @@
 # Heart-Rate Zones From a Field Test: Research, Protocol and App Proposal
 
-Status: research only. Nothing in this document is built. Section 8 is a proposal.
+Status: **built (2026-10-09)** - see "Implementation status" at the end of section 8. Sections 1-7 are the research it follows.
 Date: 2026-10-08. Athlete context: recreational marathon/ultra runner in Delhi NCR, COROS PACE 3, age 33 (from `queryUserInfo`), COROS EvoLab threshold pace 5:12 /km (from `queryFitnessAssessmentOverview`).
 
 ---
@@ -207,7 +207,7 @@ Evidence from the samples (activity `480672546503557126`, PACE 3, 8.40 km interv
 
 ---
 
-## 8. Proposed implementation outline (PROPOSAL, NOT BUILT)
+## 8. Implementation outline
 
 1. **"Zone test" session type.**
    - Add a plan session type `lthr_test` with the protocol text from section 3.
@@ -238,6 +238,18 @@ Evidence from the samples (activity `480672546503557126`, PACE 3, 8.40 km interv
    - Unit tests for cleaning (pause, dropout, spike, cadence lock) using a synthetic 1 Hz series plus the sample FIT fixture.
    - Detection tests on lap structures.
    - A golden test: the Friel window average equals the `queryCustomActivityLapData` `avgHr` within 1 bpm on clean data.
+
+### Implementation status (built 2026-10-09)
+
+| Item | Status | Where |
+|---|---|---|
+| 1. Zone test session | Built. When no Good/Fair test exists in the last 56 days, the planner swaps the first eligible quality session in weeks 1-2 (build week only, > 10 days from the race, all guardrails still pass) for an `LTHR Test` session. The week's volume is kept by trimming that week's easy runs; only the 30-min core (60% of its km) counts as hard for the 80/20 rule. Pushing it to the watch as a structured workout is **not** built (no COROS writes). | `app/engine/planner.py`, `app/engine/guardrails.py` |
+| 2. Detection | Partly built: the HR Zones page lists runs of 40+ min from the last 120 days, pre-selects one titled like a test, and you choose. No automatic analysis on sync (keeps the 50 FIT/day quota for runs you pick). | `app/analysis/zone_service.py` |
+| 3. Computation | Built as specified in section 4 (window from 10:00 + 20:00 or 30:00 laps, else fastest 30 min; stops, dropouts, spikes, cadence lock; drift; confidence). FIT files are cached in `fit_cache/` beside the database (git-ignored). Lap-average fallback when the FIT can't be downloaded (never better than Fair). The `queryCustomActivityLapData` cross-check is not used. | `app/analysis/hr_zones.py` |
+| 4. Zones display | Built for the COROS LT model only (HRR/Max HR defaults are unverified, so not shown). History table with change vs the previous usable test; no chart yet. | `/zones`, `app/templates/zones.html` |
+| 5. "How to enter in COROS" | Built, with the "I've updated COROS" record. | `/zones` |
+| 6. Coach integration | Partly built: plan heart-rate targets use COROS LT bands of the latest Good/Fair LTHR instead of max-HR estimates, and the plan's decisions cite the test. Time-in-zone classification of runs is not built. | `app/engine/planner.py` |
+| 7. Tests | Built: `tests/test_hr_zones.py` (synthetic FIT files from `tests/fit_builder.py`, no personal data), `tests/e2e/test_e2e_zones.py`. | |
 
 Open questions for the user:
 - Does a chest strap exist?

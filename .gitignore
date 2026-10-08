@@ -24,3 +24,7 @@ Thumbs.db
 # E2E
 tests/e2e/artifacts/
 logs/
+
+# COROS activity files (personal GPS/HR data)
+fit_cache/
+*.fit

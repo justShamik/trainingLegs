@@ -118,6 +118,26 @@ def init_db(db_path: Optional[str] = None) -> None:
                 synced_at TEXT
             )""")
 
+        # Heart-rate zone field tests (app/analysis/hr_zones.py); criteria/flags/stats are JSON
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS hr_zone_tests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                activity_id TEXT NOT NULL,
+                test_date TEXT NOT NULL,
+                lthr INTEGER NOT NULL,
+                confidence TEXT NOT NULL,
+                method TEXT NOT NULL,
+                sensor TEXT,
+                temperature_c REAL,
+                invalid_reason TEXT,
+                criteria_json TEXT,
+                flags_json TEXT,
+                stats_json TEXT,
+                observed_max_hr INTEGER,
+                entered_in_coros_at TEXT,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )""")
+
         # Race watchlist scan state (app/races)
         from app.races.store import ensure_table as _ensure_race_table
         _ensure_race_table(conn)

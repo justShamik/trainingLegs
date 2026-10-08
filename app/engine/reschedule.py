@@ -27,13 +27,13 @@ import re
 from datetime import date, timedelta
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from app.engine.guardrails import EASY_SESSION_TYPES, HARD_SESSION_TYPES, validate_multiweek_plan, weekly_volumes
+from app.engine.guardrails import EASY_SESSION_TYPES, HARD_SESSION_TYPES, easy_km, validate_multiweek_plan, weekly_volumes
 
 REASONS: List[Tuple[str, str]] = [
     ("illness", "Illness"), ("travel", "Travel"), ("time", "Short on time"), ("weather", "Weather"), ("other", "Other"),
 ]
 REASON_LABELS = dict(REASONS)
-QUALITY_TYPES = {"Threshold", "VO2max", "Vert/Time-on-Feet"}
+QUALITY_TYPES = {"Threshold", "VO2max", "Vert/Time-on-Feet", "LTHR Test"}
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 DEFAULT_AVAILABLE_DAYS = {0, 1, 3, 5, 6}     # profile default Mon,Tue,Thu,Sat,Sun
 
@@ -187,7 +187,7 @@ def _week(sessions: List[Dict[str, Any]], week: int) -> List[Dict[str, Any]]:
 def _easy_ok(sessions: List[Dict[str, Any]], week: int) -> bool:
     eff = _week(effective_sessions(sessions), week)
     total = sum(_km(s) for s in eff)
-    easy = sum(_km(s) for s in eff if s.get("session_type") in EASY_SESSION_TYPES)
+    easy = sum(easy_km(s) for s in eff)
     return total <= 0 or easy / total * 100.0 >= 79.9
 
 
@@ -216,7 +216,14 @@ def swap_options(session: Dict[str, Any], reason: str) -> List[Dict[str, Any]]:
         return [rest, very_easy]
 
     opts: List[Dict[str, Any]] = []
-    if t in QUALITY_TYPES:
+    if t == "LTHR Test":
+        easy_km = min(km, minutes / 6.0)
+        opts.append(_option("easy", f"Easy aerobic run instead ({int(minutes)} min)",
+                            "A shortened or tired test gives a wrong threshold HR, so postpone it and run easy today. "
+                            "Do the test on a fresh, cool day within the next week or two.",
+                            "Easy Aerobic", easy_km, minutes, EASY_TARGET,
+                            f"Easy aerobic run replacing the zone test (postponed)."))
+    elif t in QUALITY_TYPES:
         opts.append(_option("short", f"Shortened {t} ({fmt_km(_r1(km * 0.6))} km)",
                             "Same stimulus with fewer reps: about 60% of the planned work.",
                             t, km * 0.6, minutes * 0.6, session.get("target_pace_or_hr") or EASY_TARGET,
@@ -457,7 +464,7 @@ def _repair_80_20(sessions: List[Dict[str, Any]], candidates: List[Dict[str, Any
     """Trim pending quality sessions (not below MIN_QUALITY_KEEP) so easy volume is >= 80% again, if achievable."""
     eff = _week(effective_sessions(sessions), week)
     total = sum(_km(s) for s in eff)
-    hard = sum(_km(s) for s in eff if s.get("session_type") not in EASY_SESSION_TYPES)
+    hard = total - sum(easy_km(s) for s in eff)
     need = (hard - 0.2 * total) / 0.8          # km of quality to remove so hard <= 20% of the new total
     quality = [s for s in candidates if s.get("session_type") in QUALITY_TYPES and _km(s) > 0]
     room = sum(_km(s) * (1 - MIN_QUALITY_KEEP) for s in quality)
