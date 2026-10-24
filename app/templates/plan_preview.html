@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Preview Season Plan - Personal Running Coach{% endblock %}
+
+{% block content %}
+{% set gc = plan.goal_check %}
+{% set rw = plan.runway %}
+<section class="page-hero">
+    <div class="page-hero__text">
+        <span class="eyebrow eyebrow--accent">Preview</span>
+        <h1>{{ plan.goal.distance }} on {{ plan.goal.race_date }}</h1>
+        <p class="lead">Target {{ plan.goal.target_time }} · {{ vm.total_weeks }} weeks from {{ plan.start_date }}. Nothing is saved until you create the plan.</p>
+    </div>
+    <div class="page-hero__actions">
+        <a href="/plan?new=1#plan-setup" class="btn btn-ghost" id="previewBack">Change</a>
+        <form method="POST" action="/plan/create">
+            {% if overrides.race_distance_type %}<input type="hidden" name="distance" value="{{ overrides.race_distance_type }}">{% endif %}
+            {% if overrides.target_time_str %}<input type="hidden" name="target_time" value="{{ overrides.target_time_str }}">{% endif %}
+            <button type="submit" class="btn btn-primary" id="createPlanBtn">Create this plan</button>
+        </form>
+    </div>
+</section>
+
+<div class="grid-auto" style="margin-bottom: var(--space-lg);">
+    <div class="card" id="runwayCard">
+        <span class="eyebrow">Season length</span>
+        <h2 style="margin: 6px 0;">{{ vm.total_weeks }} weeks</h2>
+        <span class="chip {{ {'ok': 'chip--success', 'long': 'chip--sky', 'tight': 'chip--warning', 'short': 'chip--danger'}.get(rw.verdict, 'chip--neutral') }}" id="runwayVerdict">{{ {'ok': 'Good length', 'long': 'Extra base time', 'tight': 'A little short', 'short': 'Too short'}.get(rw.verdict, rw.verdict) }}</span>
+        <p class="text-secondary" style="margin-top: 8px;">{{ rw.text }}</p>
+    </div>
+    <div class="card" id="goalCheckCard">
+        <span class="eyebrow">Goal check</span>
+        {% if gc %}
+        <h2 style="margin: 6px 0;" id="goalVerdict">{{ gc.verdict|capitalize }}</h2>
+        <p class="text-secondary">Goal {{ plan.goal.target_time }} needs VDOT {{ gc.goal_vdot }}. Your current fitness is about VDOT {{ gc.current_vdot }} ({{ plan.fitness.source }}), worth about <strong>{{ gc.predicted_now }}</strong> today. With {{ gc.weeks }} weeks you can expect to gain roughly {{ gc.allowed_gain }} points.</p>
+        <p class="text-muted" style="font-size: 0.85rem;">{{ plan.fitness.detail }}. The gain allowance is an app rule of thumb, not a study result.</p>
+        {% else %}
+        <h2 style="margin: 6px 0;">Not enough data</h2>
+        <p class="text-secondary">No runs of 3 km or more in the last 8 weeks, so current fitness can't be estimated. Paces follow your target time.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if plan.tune_ups %}
+<div class="card" id="tuneUpCard" style="margin-bottom: var(--space-lg);">
+    <span class="eyebrow">Tune-up races</span>
+    <ul style="margin: 10px 0 0 18px; color: var(--text-secondary);">
+        {% for t in plan.tune_ups %}
+        <li data-tuneup="{{ t.date }}"><strong>{{ t.name }}</strong> ({{ t.distance }}, {{ t.date }}): {{ 'race it' if t.mode == 'race' else 'run it controlled at goal-race effort' }} — {{ t.mode_reason }}. Rest the day before, {{ t.recovery_days }} easy days after.
+            {% for wmsg in t.warnings %}<br><span style="color: var(--status-warning);">⚠ {{ wmsg }}</span>{% endfor %}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div class="section-head">
+    <div>
+        <span class="eyebrow">Season outline</span>
+        <h2>Phases</h2>
+    </div>
+</div>
+{% if vm.phases|length > 1 %}
+<div class="phase-timeline" aria-hidden="true">
+    {% for ph in vm.phases %}
+    <div class="phase-timeline__seg phase--{{ ph.key }}" style="flex: {{ ph.n_weeks }};"><span>{{ ph.name }}</span><small>{{ ph.n_weeks }} wk</small></div>
+    {% endfor %}
+</div>
+{% endif %}
+<div class="stack" id="previewPhases" style="margin-bottom: var(--space-xl);">
+    {% for ph in vm.phases %}
+    <div class="card phase-card phase--{{ ph.key }}" data-phase="{{ ph.key }}">
+        <div class="phase-card__head">
+            <span class="phase-card__title"><strong class="phase-card__name">{{ ph.name }}</strong>
+                <span class="text-muted">Week{{ 's' if ph.n_weeks > 1 else '' }} {{ ph.first_week }}{% if ph.n_weeks > 1 %}–{{ ph.last_week }}{% endif %} · {{ ph.range_label }}</span></span>
+            <span class="phase-card__meta"><span class="num">{% if ph.km_min == ph.km_max %}{{ ph.km_min }}{% else %}{{ ph.km_min }}–{{ ph.km_max }}{% endif %} km/week</span></span>
+            <span class="phase-card__purpose text-secondary">{{ ph.purpose }}</span>
+            {% if ph.sessions_by_type %}<span class="phase-card__keys">{% for t, c in ph.sessions_by_type.items() %}<span class="chip chip--neutral chip--raw">{{ c }} × {{ t }}</span>{% endfor %}</span>{% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

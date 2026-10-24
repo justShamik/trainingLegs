@@ -52,8 +52,9 @@ def test_dials_visible_with_numbers(page):
     expect(page.locator('.dial-tile[data-metric="calories"] .dial__value')).to_contain_text("1,850")
     expect(page.locator('.dial-tile[data-metric="sleep"] .dial__value')).to_have_text(re.compile(r"^\d+:\d\dh$"))
     expect(page.locator('.dial-tile[data-metric="activity"] .dial__value')).to_have_text(re.compile(r"^(\d+min|—)$"))
-    # the ring is drawn from data-pct (steps 8,421 / 10,000)
-    assert page.locator('.dial-tile[data-metric="steps"] .dial').get_attribute("data-pct").startswith("84")
+    # rings compare with the user's own 7-day average, never an invented goal
+    expect(page.locator(".dial-tile__goal", has_text="Goal")).to_have_count(0)
+    expect(page.locator('.dial-tile[data-metric="steps"] .dial-tile__goal')).to_have_text(re.compile(r"7-day avg|No 7-day average yet"))
 
 
 def test_races_listed_with_status_and_safe_links(page):

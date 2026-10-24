@@ -12,12 +12,13 @@ NAV = [
     ("Home", r"/$", GREETING),
     ("Dashboard", r"/dashboard$", "TRAINING DASHBOARD"),
     ("Training Plan", r"/plan$", "PRESCRIBED TRAINING PLAN"),
-    ("Strength & S&C", r"/strength$", "RUNNER STRENGTH"),
-    ("Block Summary", r"/block-summary$", "4-WEEK TRAINING BLOCK SUMMARY"),
+    ("S&C", r"/strength$", "RUNNER STRENGTH"),
+    ("HR Zones", r"/zones$", "Your training zones"),
     ("Goal Profile", r"/profile$", "RUNNER PROFILE"),
     ("Coach Chat", r"/chat$", "AI RUNNING COACH CHAT"),
 ]
-START_PAGES = ["/", "/dashboard", "/plan", "/strength", "/block-summary", "/profile", "/chat", f"/activity/{FULL_ACTIVITY_ID}"]
+START_PAGES = ["/", "/dashboard", "/plan", "/plan?tab=history", "/strength", "/zones", "/profile", "/chat",
+               f"/activity/{FULL_ACTIVITY_ID}"]
 
 
 @pytest.mark.parametrize("start", START_PAGES)

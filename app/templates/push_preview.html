@@ -54,17 +54,20 @@
 <div class="callout callout--danger" id="corosReadError"><span>{{ preview.coros_error }}</span></div>
 {% endif %}
 
-<div class="segmented" role="group" aria-label="How far ahead" style="margin-bottom: var(--space-md);">
-    <span class="segmented__label">Send the next:</span>
-    {% for d in day_choices %}
-    <a href="/plan/push?days={{ d }}" class="segmented__item {% if d == days %}is-active{% endif %}">{{ d }} days</a>
+<div class="segmented" role="group" aria-label="Which workouts" style="margin-bottom: var(--space-md);" id="pushWindows">
+    <span class="segmented__label">Send:</span>
+    {% for m in months %}
+    <a href="/plan/push?month={{ m.key }}" class="segmented__item {% if month == m.key %}is-active{% endif %}" data-month="{{ m.key }}">{{ m.label }}{% if m.partial %}*{% endif %}</a>
     {% endfor %}
+    <a href="/plan/push?days=14" class="segmented__item {% if not month and days == 14 %}is-active{% endif %}">Next 14 days</a>
 </div>
+<p class="text-muted" style="margin: -6px 0 var(--space-md); font-size: 0.85rem;">COROS accepts workouts up to 90 days ahead, so send your season a month at a time. * Only part of the month is in range.</p>
 
 <form method="POST" action="/plan/push" class="sync-form" id="pushForm"
       data-title="Sending to COROS" data-message="Adding each workout to your COROS calendar. This can take a minute or two; don't close the page.">
     <input type="hidden" name="token" value="{{ preview.token }}">
     <input type="hidden" name="days" value="{{ days }}">
+    {% if month %}<input type="hidden" name="month" value="{{ month }}">{% endif %}
     <div class="stack" style="margin-bottom: var(--space-lg);">
         {% for i in preview['items'] %}
         {% set chip = state_chip[i.state] %}

@@ -40,8 +40,8 @@ def save_training_plan(plan_data: Dict[str, Any], db_path: Optional[str] = None)
         INSERT INTO training_plans (
             id, version, goal_distance, race_date, total_volume_km,
             methodology_name, methodology_rationale, is_deload,
-            start_date, end_date, total_weeks, decisions_json
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            start_date, end_date, total_weeks, decisions_json, plan_kind
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             plan_id,
@@ -53,7 +53,8 @@ def save_training_plan(plan_data: Dict[str, Any], db_path: Optional[str] = None)
             plan_data.get("methodology_rationale", "Base building phase"),
             1 if plan_data.get("is_deload") else 0,
             start_date, end_date, total_weeks,
-            json.dumps(plan_data["decisions"]) if plan_data.get("decisions") else None
+            json.dumps(plan_data["decisions"]) if plan_data.get("decisions") else None,
+            plan_data.get("plan_kind") or "block"
         )
     )
 
@@ -612,8 +613,9 @@ def auto_match_activities_to_sessions(plan_id: Optional[str] = None, db_path: Op
     """Match COROS run activities to plan sessions by calendar date.
 
     Only past/today sessions (session_date <= today) are candidates - future sessions are never matched.
-    Pass 1 matches an activity on the SAME date as the session; pass 2 falls back to +-1 day. In both passes the
-    distance must be within max(3 km, 35%) of the prescription and the closest distance wins.
+    Pass 1 matches a run on the SAME date as the session at any distance; pass 2 falls back to +-1 day, where the
+    distance must be within max(3 km, 35%) of the prescription. The closest distance wins. A run under 80% of the
+    prescribed distance is saved as Modified, not Completed.
     """
     from datetime import date as _date, timedelta
     from app.engine.tracking import generate_post_run_feedback, calculate_workout_adherence
@@ -674,7 +676,9 @@ def auto_match_activities_to_sessions(plan_id: Optional[str] = None, db_path: Op
                 if max_gap == 1 and adate == sdate:
                     continue  # same-date candidates were handled in pass 1
                 dist_diff = abs(act["distance_m"] / 1000.0 - target_dist)
-                if dist_diff <= max(3.0, target_dist * 0.35) and dist_diff < best_diff:
+                # a run on the session's own date is its execution whatever the distance (shortened long run
+                # = low adherence, not "missed"); a run a day off must also be a similar distance
+                if (max_gap == 0 or dist_diff <= max(3.0, target_dist * 0.35)) and dist_diff < best_diff:
                     best, best_diff = act, dist_diff
             if best:
                 used_activity_ids.add(best["id"])
@@ -703,7 +707,8 @@ def auto_match_activities_to_sessions(plan_id: Optional[str] = None, db_path: Op
         cursor.execute("""
             UPDATE plan_sessions
             SET matched_activity_id = ?,
-                status = CASE WHEN original_session_type IS NULL THEN 'Completed' ELSE 'Modified' END,
+                status = CASE WHEN original_session_type IS NULL AND ? >= 0.8 * distance_km THEN 'Completed'
+                              ELSE 'Modified' END,
                 actual_distance_km = ?,
                 actual_duration_min = ?,
                 actual_avg_pace_s_km = ?,
@@ -712,51 +717,13 @@ def auto_match_activities_to_sessions(plan_id: Optional[str] = None, db_path: Op
                 adherence_score = ?,
                 adherence_rating = ?
             WHERE id = ?
-        """, (best_match["id"], act_dist_km, act_dur_min, act_pace, act_hr, feedback, score, rating, sess["id"]))
+        """, (best_match["id"], act_dist_km, act_dist_km, act_dur_min, act_pace, act_hr, feedback, score, rating,
+              sess["id"]))
         matched_count += 1
 
     conn.commit()
     conn.close()
     return matched_count
-
-def save_block_summary(block_data: Dict[str, Any], db_path: Optional[str] = None) -> str:
-    """Save 4-week block summary performance report."""
-    conn = get_db_connection(db_path)
-    block_id = block_data.get("id") or f"block_{uuid.uuid4().hex[:8]}"
-    
-    conn.execute(
-        """
-        INSERT INTO block_summaries (
-            id, block_number, start_date, end_date, total_prescribed_km,
-            total_completed_km, compliance_pct, key_achievements,
-            areas_for_improvement, fatigue_signals_summary
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            block_id,
-            block_data.get("block_number", 1),
-            block_data.get("start_date", "2026-09-01"),
-            block_data.get("end_date", "2026-09-28"),
-            float(block_data.get("total_prescribed_km", 0.0)),
-            float(block_data.get("total_completed_km", 0.0)),
-            float(block_data.get("compliance_pct", 0.0)),
-            block_data.get("key_achievements", "Consistent aerobic base building."),
-            block_data.get("areas_for_improvement", "Maintain slower recovery pace."),
-            block_data.get("fatigue_signals_summary", "ACWR stable within safe 0.8-1.2 zone.")
-        )
-    )
-    conn.commit()
-    conn.close()
-    return block_id
-
-def get_block_summaries(db_path: Optional[str] = None) -> List[Dict[str, Any]]:
-    """Retrieve history of 4-week block performance summaries."""
-    conn = get_db_connection(db_path)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM block_summaries ORDER BY block_number DESC, created_at DESC")
-    rows = [dict(r) for r in cursor.fetchall()]
-    conn.close()
-    return rows
 
 DEFAULT_STRENGTH_EXERCISES = [
     {
@@ -893,6 +860,7 @@ DEFAULT_STRENGTH_EXERCISES = [
     }
 ]
 
+
 def seed_strength_exercises_if_empty(db_path: Optional[str] = None) -> None:
     """Seed default exercise library into database if empty."""
     conn = get_db_connection(db_path)
@@ -956,8 +924,8 @@ def save_strength_workout(workout_data: Dict[str, Any], db_path: Optional[str] =
     conn.execute(
         """
         INSERT INTO strength_workouts (
-            id, phase, focus_area, total_duration_min, workout_data_json, status
-        ) VALUES (?, ?, ?, ?, ?, ?)
+            id, phase, focus_area, total_duration_min, workout_data_json, status, plan_id, session_date, week_number
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             workout_id,
@@ -965,7 +933,10 @@ def save_strength_workout(workout_data: Dict[str, Any], db_path: Optional[str] =
             workout_data.get("focus_area", "Full Body Runner Stability"),
             workout_data.get("total_duration_min", 40),
             json.dumps(workout_data),
-            workout_data.get("status", "Prescribed")
+            workout_data.get("status", "Prescribed"),
+            workout_data.get("plan_id"),
+            workout_data.get("session_date"),
+            workout_data.get("week_number"),
         )
     )
     conn.commit()
@@ -995,6 +966,34 @@ def get_active_strength_workout(db_path: Optional[str] = None) -> Optional[Dict[
             pass
     return data
 
+def _strength_row(row) -> Dict[str, Any]:
+    import json
+    data = dict(row)
+    try:
+        parsed = json.loads(data.get("workout_data_json") or "{}")
+    except ValueError:
+        parsed = {}
+    parsed.update({"db_id": data["id"], "status": data["status"], "plan_id": data.get("plan_id"),
+                   "session_date": data.get("session_date"), "week_number": data.get("week_number"),
+                   "created_at": data.get("created_at")})
+    return parsed
+
+def get_strength_workout(workout_id: str, db_path: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    conn = get_db_connection(db_path)
+    row = conn.execute("SELECT * FROM strength_workouts WHERE id = ?", (workout_id,)).fetchone()
+    conn.close()
+    return _strength_row(row) if row else None
+
+def get_plan_strength_sessions(plan_id: Optional[str], db_path: Optional[str] = None) -> List[Dict[str, Any]]:
+    """S&C sessions scheduled with a running plan, in date order."""
+    if not plan_id:
+        return []
+    conn = get_db_connection(db_path)
+    rows = conn.execute("SELECT * FROM strength_workouts WHERE plan_id = ? ORDER BY session_date, rowid",
+                        (plan_id,)).fetchall()
+    conn.close()
+    return [_strength_row(r) for r in rows]
+
 def update_strength_workout_status(workout_id: str, status: str, db_path: Optional[str] = None) -> None:
     """Update execution status of strength workout (Prescribed, Completed, Skipped)."""
     conn = get_db_connection(db_path)
@@ -1008,17 +1007,14 @@ def update_strength_workout_status(workout_id: str, status: str, db_path: Option
 
 # ---- Home page: today's dials + sync status ----------------------------------------------
 
-DEFAULT_SLEEP_GOAL = 480        # minutes
-DEFAULT_ACTIVITY_GOAL = 60      # minutes
-DEFAULT_STEPS_GOAL = 10000
-DEFAULT_CALORIES_GOAL = 2500    # kcal
+BASELINE_DAYS = 7               # dials compare today with your own average of the previous 7 days
 NOT_SYNCED_TODAY = "Not synced yet today"
 
-def _pct(value: Optional[float], goal: float) -> Optional[int]:
-    """Dial fill 0-100 (capped); None when the value is unknown."""
-    if value is None or not goal:
+def _pct(value: Optional[float], reference: Optional[float]) -> Optional[int]:
+    """Dial fill 0-100 (capped) of value vs reference; None when either is unknown."""
+    if value is None or not reference:
         return None
-    return int(round(max(0.0, min(100.0, value * 100.0 / goal))))
+    return int(round(max(0.0, min(100.0, value * 100.0 / reference))))
 
 def local_date_of(ts: Optional[str], tz: Optional[tzinfo] = None) -> Optional[date]:
     """Local calendar date of an activities.date value.
@@ -1043,7 +1039,8 @@ def local_date_of(ts: Optional[str], tz: Optional[tzinfo] = None) -> Optional[da
 
 def get_today_summary(db_path: Optional[str] = None, today: Optional[date] = None,
                       tz: Optional[tzinfo] = None) -> Dict[str, Any]:
-    """Today's sleep / activity time / steps / calories with goal fill % for the home dials.
+    """Today's sleep / activity time / steps / calories, each compared with your own average of the previous
+    7 days (dial fill %; no invented goals).
 
     `today` defaults to the system local date. Sleep is dated by wake-up day, so last night's
     sleep is the sleep_records row dated today. Unknown values stay None with a reason (NFR-4.1)."""
@@ -1064,13 +1061,29 @@ def get_today_summary(db_path: Optional[str] = None, today: Optional[date] = Non
         except sqlite3.OperationalError:  # table not migrated yet
             act_row = None
         # Coarse SQL window (+/- 1 day covers any UTC offset), exact local-date match in Python
+        first = today - timedelta(days=BASELINE_DAYS)
         rows = conn.execute(
             "SELECT date, duration_s FROM activities WHERE substr(date, 1, 10) BETWEEN ? AND ?",
-            ((today - timedelta(days=1)).isoformat(), (today + timedelta(days=1)).isoformat())).fetchall()
+            ((first - timedelta(days=1)).isoformat(), (today + timedelta(days=1)).isoformat())).fetchall()
+        prev = (first.isoformat(), (today - timedelta(days=1)).isoformat())
+        sleep_avg = conn.execute("SELECT AVG(total_sleep_minutes) AS v, COUNT(total_sleep_minutes) AS n "
+                                 "FROM sleep_records WHERE date BETWEEN ? AND ?", prev).fetchone()
+        try:
+            day_avg = conn.execute("SELECT AVG(steps) AS steps, COUNT(steps) AS n_steps, AVG(calories_kcal) AS kcal, "
+                                   "COUNT(calories_kcal) AS n_kcal FROM daily_activity WHERE date BETWEEN ? AND ?",
+                                   prev).fetchone()
+        except sqlite3.OperationalError:
+            day_avg = None
+        synced_days = conn.execute(
+            "SELECT COUNT(*) AS n FROM (SELECT date FROM daily_activity WHERE date BETWEEN ? AND ? "
+            "UNION SELECT date FROM sleep_records WHERE date BETWEEN ? AND ?)", prev + prev).fetchone()["n"]             if day_avg is not None else 0
     finally:
         conn.close()
 
     todays = [r for r in rows if local_date_of(r["date"], tz) == today]
+    earlier = [r for r in rows if (d := local_date_of(r["date"], tz)) and first <= d < today]
+    # activity minutes average over the days that were synced (a day without runs counts as 0 min)
+    activity_avg = round(sum((r["duration_s"] or 0) for r in earlier) / 60.0 / synced_days, 1) if synced_days else None
     activity_min = round(sum((r["duration_s"] or 0) for r in todays) / 60.0, 1)
 
     sleep = None
@@ -1088,6 +1101,12 @@ def get_today_summary(db_path: Optional[str] = None, today: Optional[date] = Non
 
     steps = act_row["steps"] if act_row else None
     calories = act_row["calories_kcal"] if act_row else None
+    baseline = {
+        "sleep_minutes": round(sleep_avg["v"]) if sleep_avg and sleep_avg["n"] else None,
+        "activity_minutes": activity_avg,
+        "steps": round(day_avg["steps"]) if day_avg and day_avg["n_steps"] else None,
+        "calories_kcal": round(day_avg["kcal"]) if day_avg and day_avg["n_kcal"] else None,
+    }
     return {
         "date": day,
         "sleep": sleep,
@@ -1100,17 +1119,13 @@ def get_today_summary(db_path: Optional[str] = None, today: Optional[date] = Non
         "steps": steps,
         "calories_kcal": calories,
         "daily_activity_reason": None if act_row else NOT_SYNCED_TODAY,
-        "goals": {
-            "sleep_minutes": DEFAULT_SLEEP_GOAL,
-            "activity_minutes": DEFAULT_ACTIVITY_GOAL,
-            "steps": DEFAULT_STEPS_GOAL,
-            "calories_kcal": DEFAULT_CALORIES_GOAL,
-        },
+        "baseline_days": BASELINE_DAYS,
+        "baseline": baseline,
         "pct": {
-            "sleep": _pct(sleep["total_minutes"] if sleep else None, DEFAULT_SLEEP_GOAL),
-            "activity": _pct(activity_min, DEFAULT_ACTIVITY_GOAL),
-            "steps": _pct(steps, DEFAULT_STEPS_GOAL),
-            "calories": _pct(calories, DEFAULT_CALORIES_GOAL),
+            "sleep": _pct(sleep["total_minutes"] if sleep else None, baseline["sleep_minutes"]),
+            "activity": _pct(activity_min, baseline["activity_minutes"]),
+            "steps": _pct(steps, baseline["steps"]),
+            "calories": _pct(calories, baseline["calories_kcal"]),
         },
     }
 
@@ -1184,3 +1199,41 @@ def get_run_history(before: date, weeks: int = 4, db_path: Optional[str] = None)
     conn.close()
     return {"weeks": weekly, "weekly_km": [w["km"] for w in weekly],
             "observed_max_hr": int(hr) if hr else None, "first_run_date": first}
+
+
+# ---- Tune-up races (B/C) --------------------------------------------------------------------------------------
+TUNE_UP_MODES = ("auto", "race", "effort")
+
+
+def get_tune_up_races(db_path: Optional[str] = None, from_date: Optional[str] = None) -> List[Dict[str, Any]]:
+    conn = get_db_connection(db_path)
+    try:
+        sql, args = "SELECT * FROM tune_up_races", ()
+        if from_date:
+            sql, args = sql + " WHERE race_date >= ?", (from_date,)
+        rows = [dict(r) for r in conn.execute(sql + " ORDER BY race_date, id", args)]
+    except sqlite3.OperationalError:
+        rows = []
+    conn.close()
+    return rows
+
+
+def save_tune_up_race(race: Dict[str, Any], db_path: Optional[str] = None) -> int:
+    conn = get_db_connection(db_path)
+    cur = conn.execute(
+        "INSERT INTO tune_up_races (name, race_date, distance, priority, target_time_str, mode) VALUES (?,?,?,?,?,?)",
+        ((race.get("name") or "").strip() or None, race["race_date"], race["distance"],
+         race.get("priority") if race.get("priority") in ("B", "C") else "B",
+         (race.get("target_time_str") or "").strip() or None,
+         race.get("mode") if race.get("mode") in TUNE_UP_MODES else "auto"))
+    conn.commit()
+    rid = cur.lastrowid
+    conn.close()
+    return rid
+
+
+def delete_tune_up_race(race_id: int, db_path: Optional[str] = None) -> None:
+    conn = get_db_connection(db_path)
+    conn.execute("DELETE FROM tune_up_races WHERE id = ?", (race_id,))
+    conn.commit()
+    conn.close()

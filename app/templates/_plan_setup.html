@@ -1,0 +1,49 @@
+{# Season plan set-up: Goal Profile checklist (Option A), then distance + target time -> preview #}
+<section class="card plan-setup" id="plan-setup" style="margin-bottom: var(--space-lg);">
+    <span class="eyebrow eyebrow--accent">Set up your plan</span>
+    {% if not setup.ready %}
+    <h2 style="margin: 6px 0 6px;">Answer a few questions before we set up your plan</h2>
+    <p class="text-secondary" style="margin-bottom: 14px;">Your plan is built only from your Goal Profile, so nothing is guessed. Finish these sections, then come back here to create it.</p>
+    {% else %}
+    <h2 style="margin: 6px 0 6px;">Your Goal Profile is ready</h2>
+    <p class="text-secondary" style="margin-bottom: 14px;">Pick the race distance and target time, preview the season, then create it.</p>
+    {% endif %}
+
+    <ul class="setup-checklist" id="setupChecklist">
+        {% for item in setup['items'] %}
+        <li data-check="{{ item.key }}" class="{{ 'is-ok' if item.ok else 'is-missing' }}">
+            <span class="setup-checklist__mark" aria-hidden="true">{{ '✓' if item.ok else '✗' }}</span>
+            <span><strong>{{ item.label }}</strong> <span class="text-muted">— {{ item.detail if item.ok else (item.detail ~ ': not answered yet') }}</span></span>
+            <a href="/profile?next=/plan#{{ item.anchor }}" class="link-arrow">{{ 'Edit' if item.ok else 'Answer' }} <span class="arrow" aria-hidden="true">&rarr;</span></a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    {% if not setup.ready %}
+    <a href="/profile?next=/plan" class="btn btn-primary" id="completeProfileBtn">Complete your Goal Profile</a>
+    {% else %}
+    <form method="GET" action="/plan/preview" class="form-grid" id="createPlanForm" style="margin-top: 6px;">
+        <div class="field">
+            <label for="planDistance">Race distance</label>
+            <select name="distance" id="planDistance" required>
+                {% for d in goal_distances %}<option value="{{ d }}" {% if d == user_profile.race_distance_type %}selected{% endif %}>{{ d }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="field">
+            <label for="planTarget">Target time</label>
+            <input type="text" name="target_time" id="planTarget" value="{{ user_profile.target_time_str or '' }}" placeholder="e.g. 3:30:00" required>
+        </div>
+        <div class="field">
+            <label>Race date</label>
+            <input type="text" value="{{ user_profile.race_date }}" disabled>
+            <small class="text-muted">From your Goal Profile.</small>
+        </div>
+        <div class="actions">
+            <button type="submit" class="btn btn-primary" id="previewPlanBtn">Preview season</button>
+        </div>
+    </form>
+    {% if tune_ups %}
+    <p class="text-muted" style="margin-top: 10px; font-size: 0.9rem;">Tune-up races included: {% for t in tune_ups %}{{ t.name or t.distance }} ({{ t.distance }}, {{ t.race_date }}){{ ', ' if not loop.last }}{% endfor %}.</p>
+    {% endif %}
+    {% endif %}
+</section>

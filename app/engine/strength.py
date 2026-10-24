@@ -108,3 +108,59 @@ class StrengthEngine:
             "exercises": selected_exercises,
             "status": "Prescribed"
         }
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# S&C schedule generated together with a running plan
+#
+# Sessions per week follow the running phase (strength is built in base/build, maintained in peak, kept light in a
+# deload or taper week and dropped in race and post-race recovery weeks). A session never goes on the day BEFORE a
+# hard run (long run, quality, race, test) so legs are fresh for it, never on race day, never within 4 days of the
+# race, and two S&C sessions are at least 2 days apart. Easy-run and rest days are preferred; a quality day (after
+# the run, "keep hard days hard") is the last resort. Past days of the current week are skipped.
+SC_PER_WEEK = {"base": 2, "build": 2, "peak": 1, "taper": 1, "race": 0, "recovery": 0}
+SC_PHASE = {"base": "Base", "build": "Build", "peak": "Peak", "taper": "Taper", "race": "Taper", "recovery": "Taper"}
+SC_HARD = {"Threshold", "VO2max", "Long Run", "Vert/Time-on-Feet", "Marathon Pace", "Race", "LTHR Test", "Tune-up Race"}
+SC_RACES = {"Race", "Tune-up Race"}
+
+
+def schedule_strength_for_plan(plan: Dict[str, Any], today=None, db_path: Optional[str] = None) -> List[Dict[str, Any]]:
+    """S&C workouts (with session_date / week_number) for a generated running plan."""
+    from datetime import date, timedelta
+
+    today = today or date.today()
+    engine = StrengthEngine(db_path=db_path)
+    sessions = {s["session_date"]: s for s in plan.get("sessions", [])}
+    race_dates = [date.fromisoformat(d) for d, s in sessions.items() if s.get("session_type") in SC_RACES]
+    out: List[Dict[str, Any]] = []
+    for w in plan.get("week_summaries", []):
+        kind, phase = w.get("kind"), w.get("phase", "base")
+        n = 1 if kind == "deload" and SC_PER_WEEK.get(phase, 1) else SC_PER_WEEK.get(phase, 1)
+        if n == 0:
+            continue
+        start = date.fromisoformat(w["start_date"])
+        days = [start + timedelta(days=i) for i in range(7)]
+
+        def stype(d):
+            return (sessions.get(d.isoformat()) or {}).get("session_type", "Rest")
+
+        def allowed(d):
+            if d < today or stype(d) in SC_RACES or stype(d + timedelta(days=1)) in SC_HARD:
+                return False
+            return not any(0 <= (r - d).days <= 4 for r in race_dates)
+
+        rank = {"Easy Aerobic": 0, "Rest": 1}
+        candidates = sorted((d for d in days if allowed(d) and stype(d) != "Long Run"),
+                            key=lambda d: (rank.get(stype(d), 2), d))
+        chosen: List[date] = []
+        for d in candidates:
+            if len(chosen) == n:
+                break
+            if all(abs((d - c).days) >= 2 for c in chosen):
+                chosen.append(d)
+        workout_phase = "Taper" if kind == "deload" else SC_PHASE.get(phase, "Base")
+        for d in sorted(chosen):
+            wk = engine.generate_workout(phase=workout_phase)
+            wk.update({"session_date": d.isoformat(), "week_number": w["week_number"]})
+            out.append(wk)
+    return out

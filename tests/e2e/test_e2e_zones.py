@@ -71,8 +71,9 @@ def test_plan_uses_measured_threshold_after_test(page):
         expect(test_sessions.first.locator(".zone-test-link")).to_have_attribute("href", "/zones#protocol")
     _analyse(page)
     page.goto("/plan")
-    page.get_by_role("button", name=re.compile("Generate Build Week")).click()
-    expect(page.get_by_text(re.compile("METHODOLOGY:"))).to_be_visible()
+    from tests.e2e.test_e2e_plan import create_season
+    page.goto("/plan?new=1")
+    create_season(page)
     expect(page.locator(".session-card", has_text="LTHR Test")).to_have_count(0)
     expect(page.get_by_text(re.compile(r"Threshold HR 168 bpm from your 30-min zone test"))).to_have_count(1)
 

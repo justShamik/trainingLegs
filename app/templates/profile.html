@@ -34,11 +34,17 @@
 {% endif %}
 
 <div class="card card--narrow" style="padding: clamp(20px, 4vw, 40px);">
+    {% if next_url %}
+    <div class="callout callout--warning" id="profileNext" style="margin-bottom: var(--space-md);">
+        <span>Answer the sections below, then save: you'll go straight back to set up your training plan.</span>
+    </div>
+    {% endif %}
     <form method="POST" action="/profile">
-        <div class="form-section">
+        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+        <div class="form-section" id="goal">
             <div class="form-section__title">
                 <span class="form-section__index">01</span>
-                <h2>Target race &amp; goals</h2>
+                <h2>Goal race (A race)</h2>
             </div>
             <div class="form-grid">
                 <div class="field">
@@ -66,7 +72,7 @@
             </div>
         </div>
 
-        <div class="form-section">
+        <div class="form-section" id="availability">
             <div class="form-section__title">
                 <span class="form-section__index">02</span>
                 <h2>Availability &amp; constraints</h2>
@@ -85,7 +91,7 @@
             </div>
         </div>
 
-        <div class="form-section">
+        <div class="form-section" id="history">
             <div class="form-section__title">
                 <span class="form-section__index">03</span>
                 <h2>Medical &amp; physical history</h2>
@@ -105,8 +111,51 @@
         </div>
 
         <div style="margin-top: var(--space-xl); display: flex; justify-content: flex-end;">
-            <button type="submit" class="btn btn-primary btn-lg">Save Goal Profile</button>
+            <button type="submit" class="btn btn-primary btn-lg">{% if next_url %}Save and continue to plan{% else %}Save Goal Profile{% endif %}</button>
         </div>
+    </form>
+</div>
+
+<!-- Tune-up races: B/C races on the way to the goal race -->
+<div class="card card--narrow" id="races" style="padding: clamp(20px, 4vw, 40px); margin-top: var(--space-lg);">
+    <div class="form-section__title">
+        <span class="form-section__index">04</span>
+        <h2>Tune-up races</h2>
+    </div>
+    <p class="text-secondary" style="margin-bottom: 12px;">Half marathons, 10Ks or 5Ks you plan to run before your goal race. The plan gives each one a mini-taper and easy days afterwards, and suggests whether to race it or run it at goal-race effort.</p>
+    {% if race_error %}<div class="callout callout--danger" id="raceError"><span>{{ race_error }}</span></div>{% endif %}
+    {% if race_saved %}<div class="callout callout--success" id="raceSaved"><span>Tune-up race added. Create or refresh your plan to include it.</span></div>{% endif %}
+    {% if tune_ups %}
+    <div class="table-container" style="margin-bottom: var(--space-md);">
+        <table class="data-table" id="tuneUpTable">
+            <thead><tr><th>Date</th><th>Race</th><th>Distance</th><th>Priority</th><th>Target</th><th>Plan to</th><th></th></tr></thead>
+            <tbody>
+            {% for r in tune_ups %}
+            <tr data-race-id="{{ r.id }}">
+                <td>{{ r.race_date }}</td>
+                <td>{{ r.name or '—' }}</td>
+                <td>{{ r.distance }}</td>
+                <td>{{ r.priority }}</td>
+                <td>{{ r.target_time_str or '—' }}</td>
+                <td>{{ {'auto': 'Let the plan suggest', 'race': 'Race it', 'effort': 'Goal-race effort'}.get(r.mode, r.mode) }}</td>
+                <td><form method="POST" action="/profile/races/{{ r.id }}/delete" onsubmit="return confirm('Remove this tune-up race?');"><button type="submit" class="btn btn-ghost btn-sm">Remove</button></form></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    <form method="POST" action="/profile/races" class="form-grid" id="tuneUpForm">
+        <div class="field"><label for="tuName">Name (optional)</label><input type="text" name="name" id="tuName" maxlength="80" placeholder="e.g. Delhi Half Marathon"></div>
+        <div class="field"><label for="tuDate">Date</label><input type="date" name="tu_race_date" id="tuDate" min="{{ min_race_date }}" required></div>
+        <div class="field"><label for="tuDistance">Distance</label>
+            <select name="tu_distance" id="tuDistance" required>{% for d in tune_up_distances %}<option value="{{ d }}">{{ d }}</option>{% endfor %}</select></div>
+        <div class="field"><label for="tuPriority">Priority</label>
+            <select name="priority" id="tuPriority"><option value="B">B (matters)</option><option value="C">C (training race)</option></select></div>
+        <div class="field"><label for="tuTarget">Target time (optional)</label><input type="text" name="tu_target_time" id="tuTarget" placeholder="e.g. 1:39:00"></div>
+        <div class="field"><label for="tuMode">Plan to</label>
+            <select name="mode" id="tuMode"><option value="auto">Let the plan suggest</option><option value="race">Race it</option><option value="effort">Run at goal-race effort</option></select></div>
+        <div class="actions"><button type="submit" class="btn btn-secondary" id="addTuneUpBtn">Add tune-up race</button></div>
     </form>
 </div>
 {% endblock %}

@@ -7,7 +7,7 @@
     <div class="page-hero__text">
         <span class="eyebrow eyebrow--accent">Strength &amp; conditioning</span>
         <h1 class="sc">RUNNER STRENGTH & CONDITIONING</h1>
-        <p class="lead">Runner-specific resistance training, tendon resilience, and niggle-safe exercise selection (FR-4.1 - FR-4.5).</p>
+        <p class="lead">Runner-specific resistance training, tendon resilience, and niggle-safe exercise selection. Generating a training plan also schedules your S&amp;C; the phase buttons create an extra one-off session.</p>
     </div>
     <div class="page-hero__actions">
         <form method="POST" action="/strength/generate">
@@ -50,6 +50,7 @@
         <div class="row" style="gap: 10px;">
             <span class="chip chip--orange">RUNNING PHASE: {{ workout.phase|upper }}</span>
             <span class="chip chip--neutral chip--raw num">{{ workout.total_duration_min }} min session</span>
+            {% if workout.session_date %}<span class="chip chip--lavender chip--raw" id="scDate">Scheduled {{ workout.session_date|nice_date }}</span>{% else %}<span class="chip chip--neutral chip--raw">One-off session</span>{% endif %}
         </div>
         <h3 class="serif" style="font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.4rem); line-height: 1.1;">{{ workout.focus_area }}</h3>
     </div>
@@ -65,6 +66,35 @@
         {% endif %}
     </div>
 </div>
+
+{% if schedule %}
+<!-- S&C schedule generated with the running plan -->
+<div class="section-head">
+    <div>
+        <span class="eyebrow">Your plan</span>
+        <h2>S&amp;C schedule</h2>
+        <p class="text-muted">Generated with your running plan: never the day before a long run or quality session, and lighter in deload and taper weeks.</p>
+    </div>
+</div>
+<div class="table-container" style="margin-bottom: var(--space-xl);">
+    <table class="data-table" id="scSchedule">
+        <thead><tr><th>Date</th><th>Week</th><th>Phase</th><th>Focus</th><th>Duration</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        {% for w in schedule %}
+        <tr data-sc="{{ w.db_id }}" {% if w.db_id == workout.db_id %}class="is-current"{% endif %}>
+            <td><strong>{{ w.session_date|nice_date }}</strong>{% if w.session_date == today %} <span class="chip chip--orange">Today</span>{% endif %}</td>
+            <td>{{ w.week_number }}</td>
+            <td>{{ w.phase }}</td>
+            <td>{{ w.focus_area }}</td>
+            <td class="num">{{ w.total_duration_min }} min</td>
+            <td>{% if w.status == 'Completed' %}<span class="chip chip--success">✓ Done</span>{% elif w.session_date < today %}<span class="chip chip--neutral">Not logged</span>{% else %}<span class="chip chip--neutral">Planned</span>{% endif %}</td>
+            <td>{% if w.db_id == workout.db_id %}<span class="text-muted">Showing</span>{% else %}<a href="/strength?session={{ w.db_id }}" class="link-arrow">View <span class="arrow" aria-hidden="true">&rarr;</span></a>{% endif %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
 
 <!-- Exercise Cards List -->
 <div class="section-head">

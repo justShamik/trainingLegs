@@ -4,8 +4,7 @@ from datetime import date, timedelta, timezone
 import pytest
 
 from app.data.db import get_db_connection, init_db
-from app.data.queries import (DEFAULT_ACTIVITY_GOAL, DEFAULT_SLEEP_GOAL, _pct, get_sync_status,
-                              get_today_summary, local_date_of)
+from app.data.queries import (BASELINE_DAYS, _pct, get_sync_status, get_today_summary, local_date_of)
 from app.data.sync import perform_sync, save_activity, save_daily_activity, save_sleep_record
 from app.mcp_client import coros_client
 from app.mcp_client.coros_client import CorosMCPClient
@@ -136,7 +135,7 @@ def test_today_summary_empty(tmp_path):
     assert s["steps"] is None and s["calories_kcal"] is None and s["exercise_minutes"] is None
     assert s["daily_activity_reason"] == "Not synced yet today"
     assert s["activity_time_minutes"] == 0 and s["activity_count"] == 0
-    assert s["pct"] == {"sleep": None, "activity": 0, "steps": None, "calories": None}
+    assert s["pct"] == {"sleep": None, "activity": None, "steps": None, "calories": None}  # no history, no goal
 
 
 def test_today_summary_with_data_and_date_boundaries(tmp_path):
@@ -162,7 +161,9 @@ def test_today_summary_with_data_and_date_boundaries(tmp_path):
                           "rem_minutes": 60, "awake_minutes": 20}
     assert s["activity_count"] == 3 and s["activity_time_minutes"] == 80.0
     assert s["exercise_minutes"] == 50.0 and s["steps"] == 15000
-    assert s["pct"] == {"sleep": 88, "activity": 100, "steps": 100, "calories": 50}
+    # vs the previous 7 days: sleep 420 vs 300 avg, 80 min vs 16.6 min avg; no earlier steps/calories
+    assert s["baseline"] == {"sleep_minutes": 300, "activity_minutes": 16.6, "steps": None, "calories_kcal": None}
+    assert s["pct"] == {"sleep": 100, "activity": 100, "steps": None, "calories": None}
 
     # Same data seen from UTC: the 20:00Z activity belongs to 2026-10-02
     s_utc = get_today_summary(db, today=TODAY, tz=timezone.utc)
@@ -177,7 +178,7 @@ def test_today_summary_sleep_missing_but_synced(tmp_path):
     conn.close()
     s = get_today_summary(db, today="2026-10-03", tz=IST)
     assert s["sleep"] is None and s["sleep_reason"] == "No sleep recorded last night"
-    assert s["calories_kcal"] is None and s["pct"]["calories"] is None and s["pct"]["steps"] == 1
+    assert s["calories_kcal"] is None and s["pct"]["calories"] is None and s["pct"]["steps"] is None
 
 
 def test_local_date_of():
@@ -189,11 +190,44 @@ def test_local_date_of():
 
 
 def test_pct_capping():
-    assert _pct(None, DEFAULT_SLEEP_GOAL) is None
-    assert _pct(960, DEFAULT_SLEEP_GOAL) == 100
-    assert _pct(-5, DEFAULT_ACTIVITY_GOAL) == 0
-    assert _pct(30, DEFAULT_ACTIVITY_GOAL) == 50
-    assert _pct(0, DEFAULT_ACTIVITY_GOAL) == 0
+    assert _pct(None, 480) is None
+    assert _pct(480, None) is None                 # no baseline -> no fill, never an invented goal
+    assert _pct(960, 480) == 100
+    assert _pct(-5, 60) == 0
+    assert _pct(30, 60) == 50
+    assert _pct(0, 60) == 0
+
+
+def test_dials_compare_with_own_7_day_average_not_goals(tmp_path):
+    db = _db(tmp_path)
+    conn = get_db_connection(db)
+    for i in range(1, BASELINE_DAYS + 1):                       # previous 7 days
+        d = (TODAY - timedelta(days=i)).isoformat()
+        save_sleep_record({"id": f"s{i}", "date": d, "total_sleep_minutes": 400}, conn)
+        save_daily_activity({"date": d, "steps": 8000, "calories_kcal": 2000.0}, conn)
+    save_activity({"id": "r1", "date": (TODAY - timedelta(days=2)).isoformat() + "T08:00:00", "sport_type": "Run",
+                   "name": "Run", "distance_m": 10000.0, "duration_s": 7 * 600.0}, conn)   # 70 min over 7 days
+    d8 = (TODAY - timedelta(days=BASELINE_DAYS + 1)).isoformat()                           # outside the window
+    save_daily_activity({"date": d8, "steps": 90000, "calories_kcal": 9000.0}, conn)
+    save_sleep_record({"id": "s_today", "date": TODAY.isoformat(), "total_sleep_minutes": 200}, conn)
+    save_daily_activity({"date": TODAY.isoformat(), "steps": 4000, "calories_kcal": 1000.0}, conn)
+    conn.commit()
+    conn.close()
+    t = get_today_summary(db_path=db, today=TODAY)
+    assert "goals" not in t
+    assert t["baseline"] == {"sleep_minutes": 400, "activity_minutes": 10.0, "steps": 8000, "calories_kcal": 2000}
+    assert t["pct"] == {"sleep": 50, "activity": 0, "steps": 50, "calories": 50}
+
+
+def test_no_history_means_no_baseline(tmp_path):
+    db = _db(tmp_path)
+    conn = get_db_connection(db)
+    save_daily_activity({"date": TODAY.isoformat(), "steps": 4000, "calories_kcal": 1000.0}, conn)
+    conn.commit()
+    conn.close()
+    t = get_today_summary(db_path=db, today=TODAY)
+    assert t["baseline"] == {"sleep_minutes": None, "activity_minutes": None, "steps": None, "calories_kcal": None}
+    assert t["pct"]["steps"] is None and t["steps"] == 4000
 
 
 # ---- sync status ----------------------------------------------------------------------------

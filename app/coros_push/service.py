@@ -62,7 +62,8 @@ def push_status_by_date(plan: Optional[Dict[str, Any]], db_path: Optional[str] =
 
 
 def build_preview(db_path: Optional[str] = None, today: Optional[date] = None, days: int = 14,
-                  client=None) -> Dict[str, Any]:
+                  client=None, window_start: Optional[date] = None,
+                  window_end: Optional[date] = None) -> Dict[str, Any]:
     """What would be sent for the next `days` days, compared with what COROS already has. Writes nothing."""
     from app.mcp_client.coros_client import CorosMCPClient
 
@@ -71,12 +72,14 @@ def build_preview(db_path: Optional[str] = None, today: Optional[date] = None, d
     if not plan:
         return {"plan": None, "items": [], "error": "No active training plan. Generate one first."}
     days = max(1, min(int(days), MAX_AHEAD_DAYS + 1))
-    end = min(today + timedelta(days=days - 1), today + timedelta(days=MAX_AHEAD_DAYS),
-              date.fromisoformat(plan["end_date"]) if plan.get("end_date") else today + timedelta(days=days - 1))
-    sessions = [s for s in plan["sessions"] if today.isoformat() <= s["session_date"] <= end.isoformat()]
+    first = max(today, window_start or today)
+    last = window_end or (today + timedelta(days=days - 1))
+    end = min(last, today + timedelta(days=MAX_AHEAD_DAYS),
+              date.fromisoformat(plan["end_date"]) if plan.get("end_date") else last)
+    sessions = [s for s in plan["sessions"] if first.isoformat() <= s["session_date"] <= end.isoformat()]
 
     client = client or CorosMCPClient()
-    calendar = client.query_training_schedule(today, end) if sessions else []
+    calendar = client.query_training_schedule(first, end) if sessions else []
     coros_error = None
     if calendar is None:
         failures = "; ".join(getattr(client, "call_failures", [])[-2:])
@@ -124,7 +127,7 @@ def build_preview(db_path: Optional[str] = None, today: Optional[date] = None, d
         items.append(item)
 
     token_src = [(i["session_id"], i["date"], i["state"], i["hash"]) for i in items]
-    return {"plan": plan, "items": items, "start": today.isoformat(), "end": end.isoformat(), "days": days,
+    return {"plan": plan, "items": items, "start": first.isoformat(), "end": end.isoformat(), "days": days,
             "coros_error": coros_error, "error": None,
             "token": hashlib.sha256(json.dumps(token_src).encode("utf-8")).hexdigest()[:20],
             "writable": [i for i in items if i["state"] in WRITE_STATES]}
@@ -157,12 +160,14 @@ def _save(db_path, item, plan_id, id_in_plan, created: bool) -> None:
 
 
 def push(selected: List[str], token: str, db_path: Optional[str] = None, today: Optional[date] = None,
-         days: int = 14, client=None) -> List[Dict[str, Any]]:
+         days: int = 14, client=None, window_start: Optional[date] = None,
+         window_end: Optional[date] = None) -> List[Dict[str, Any]]:
     """Send the selected sessions exactly as previewed. Raises StalePreview if anything changed since."""
     from app.mcp_client.coros_client import CorosMCPClient
 
     client = client or CorosMCPClient()
-    preview = build_preview(db_path=db_path, today=today, days=days, client=client)
+    preview = build_preview(db_path=db_path, today=today, days=days, client=client,
+                            window_start=window_start, window_end=window_end)
     if preview.get("error") or preview.get("coros_error"):
         raise PushError(preview.get("error") or preview["coros_error"])
     if token != preview["token"]:

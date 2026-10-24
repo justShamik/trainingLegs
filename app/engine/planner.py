@@ -25,7 +25,15 @@ from app.data.queries import get_user_profile, get_run_history, calculate_weekly
 from app.engine.guardrails import validate_evidence_rules, training_volumes, easy_share_by_week
 from app.engine.tracking import detect_overtraining_risk
 
-PLAN_WEEKS = 5                      # current week + next 4
+PLAN_WEEKS = 5                      # block plan: current week + next 4
+MAX_SEASON_WEEKS = 30               # a season plan runs to race week, at most this many weeks
+# Typical full-plan length in weeks (min, ideal max) per goal distance: Daniels / Pfitzinger schedules
+# (5K-10K 6-12 weeks, half 10-14, marathon 12-20 with 16-20 preferred, ultra 16-30).
+SEASON_WEEKS = {"5K": (6, 10), "10K": (8, 12), "Half Marathon": (10, 14), "Marathon": (12, 20),
+                "50K Ultra": (16, 24), "100K Ultra": (20, 30), "50K": (16, 24), "100K": (20, 30)}
+IDEAL_MIN_WEEKS = {"Marathon": 16}
+TUNEUP_WEEK_FACTOR = 0.85           # training km in a tune-up race week vs the planned week (mini-taper)
+RACE_TYPES = ("Race", "Tune-up Race")
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 FULL_DAY_NAMES = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
@@ -117,6 +125,83 @@ SOURCES: Dict[str, Dict[str, str]] = {
     "app": {"label": "App rule", "citation":
             "Conservative app rule (engineering choice, not taken from a specific study)."},
 }
+
+
+def suggest_tune_up_mode(tune_km: float, days_before_goal: Optional[int], goal_km: float) -> Tuple[str, str]:
+    """'race' (all-out, a fitness check) or 'effort' (controlled at goal-race effort) for a tune-up race."""
+    if tune_km >= goal_km * 0.9:
+        return "effort", "as long as the goal race: run it controlled so it does not cost weeks of recovery"
+    if days_before_goal is not None and days_before_goal < 21:
+        return "effort", f"only {days_before_goal} days before the goal race: run it controlled at goal-race effort"
+    return "race", "far enough from the goal race: race it as a fitness check and use the result to update paces"
+
+
+def tune_up_recovery_days(km: float, mode: str) -> int:
+    """Easy-only days after a tune-up (no quality, no long run)."""
+    if km <= 5:
+        return 2
+    if km <= 10:
+        return 3 if mode == "race" else 2
+    if km <= 21.1:
+        return 5 if mode == "race" else 3
+    return 7 if mode == "race" else 4
+
+
+def estimate_current_fitness(db_path: Optional[str], start: date) -> Optional[Dict[str, Any]]:
+    """Current VDOT: the latest tune-up race result (last 12 weeks), else the best effort among runs of 3+ km in
+    the last 8 weeks (an estimate: easy runs understate fitness). None without data."""
+    from app.data.db import get_db_connection
+    conn = get_db_connection(db_path)
+    try:
+        tune = conn.execute(
+            "SELECT session_date, actual_distance_km, actual_duration_min FROM plan_sessions WHERE session_type = "
+            "'Tune-up Race' AND status IN ('Completed', 'Modified') AND actual_distance_km >= 3 AND "
+            "actual_duration_min > 0 AND session_date >= ? ORDER BY session_date DESC LIMIT 1",
+            ((start - timedelta(weeks=12)).isoformat(),)).fetchone()
+        runs = conn.execute(
+            "SELECT date, distance_m, duration_s FROM activities WHERE LOWER(COALESCE(sport_type, '')) LIKE '%run%' "
+            "AND distance_m >= 3000 AND duration_s > 0 AND substr(date, 1, 10) >= ?",
+            ((start - timedelta(weeks=8)).isoformat(),)).fetchall()
+    finally:
+        conn.close()
+    if tune:
+        v = vdot_from_performance(tune["actual_distance_km"] * 1000.0, tune["actual_duration_min"])
+        return {"vdot": round(v, 1), "source": "tune-up race", "date": tune["session_date"],
+                "detail": f"{tune['actual_distance_km']:g} km in {fmt_minutes(tune['actual_duration_min'])}"}
+    best = None
+    for r in runs:
+        minutes = r["duration_s"] / 60.0
+        if minutes < 12:
+            continue
+        v = vdot_from_performance(r["distance_m"], minutes)
+        if 20 <= v <= 85 and (best is None or v > best[0]):
+            best = (v, r)
+    if not best:
+        return None
+    v, r = best
+    return {"vdot": round(v, 1), "source": "best recent run", "date": str(r["date"])[:10],
+            "detail": f"{r['distance_m'] / 1000:.1f} km in {fmt_minutes(r['duration_s'] / 60.0)} (an estimate: "
+                      "easy runs understate fitness, so race a tune-up for a better reading)"}
+
+
+def goal_check(goal_vdot: Optional[float], fitness: Optional[Dict[str, Any]], weeks_left: Optional[int],
+               distance: str, dist_km: float) -> Optional[Dict[str, Any]]:
+    """Realistic / ambitious / unlikely: goal VDOT vs current VDOT, allowing ~1 VDOT point per 6 weeks of training
+    (app rule of thumb for recreational runners, not a study result)."""
+    if goal_vdot is None or not fitness or not weeks_left:
+        return None
+    gap = round(goal_vdot - fitness["vdot"], 1)
+    allowed = max(1.0, weeks_left / 6.0)
+    if gap <= allowed:
+        verdict = "realistic"
+    elif gap <= 2 * allowed:
+        verdict = "ambitious"
+    else:
+        verdict = "unlikely"
+    now_min = predict_race_minutes(fitness["vdot"], dist_km * 1000.0)
+    return {"verdict": verdict, "goal_vdot": goal_vdot, "current_vdot": fitness["vdot"], "gap": gap,
+            "allowed_gain": round(allowed, 1), "weeks": weeks_left,
+            "predicted_now": fmt_minutes(now_min), "source": fitness["source"]}
 
 
 class ProfileIncompleteError(ValueError):
@@ -281,21 +366,29 @@ class TrainingPlanner:
         self.db_path = db_path
 
     # ------------------------------------------------------------------ public API
-    def generate_plan(self, is_deload: bool = False, today: Optional[date] = None) -> Dict[str, Any]:
-        """Generate a dated 5-week plan from the Goal Profile, training history, compliance and fatigue state.
+    def generate_plan(self, is_deload: bool = False, today: Optional[date] = None,
+                      season: bool = False, profile_overrides: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Generate a dated plan from the Goal Profile, training history, compliance and fatigue state.
 
+        season=False: 5-week block (current week + next 4). season=True: every week from the current week to the
+        goal race week (at most MAX_SEASON_WEEKS), with tune-up races and pace progression.
         Raises ProfileIncompleteError when required profile fields are missing (no defaults are invented).
         """
         today = today or date.today()
         start = today - timedelta(days=today.weekday())            # Monday of the current week
-        end = start + timedelta(days=7 * PLAN_WEEKS - 1)             # Sunday of week 5
 
-        profile = get_user_profile(db_path=self.db_path)
+        profile = {**get_user_profile(db_path=self.db_path), **(profile_overrides or {})}
         gaps = profile_gaps(profile)
         if gaps:
             raise ProfileIncompleteError(gaps)
 
         ctx = self._context(profile, start)
+        n_weeks = PLAN_WEEKS
+        if season and ctx["race"] is not None:
+            n_weeks = max(1, min(MAX_SEASON_WEEKS, (ctx["race"] - start).days // 7 + 1))
+        ctx["n_weeks"], ctx["season"] = n_weeks, season
+        ctx["runway"] = self._runway(ctx, n_weeks) if season else None
+        end = start + timedelta(days=7 * n_weeks - 1)
         compliance = calculate_weekly_compliance(db_path=self.db_path, today=today)
         compliance_pct = compliance.get("volume_compliance_pct", 100.0)
         overtraining = detect_overtraining_risk(db_path=self.db_path)
@@ -315,7 +408,7 @@ class TrainingPlanner:
             w["volume_km"] = round(sum(s["distance_km"] for s in ws), 1)
             w["race_km"] = round(w["volume_km"] - w["training_km"], 1)
             w["easy_pct"] = easy.get(n, 100.0)
-            w["hours"] = round(sum(s["duration_min"] for s in ws if s["session_type"] != "Race") / 60.0, 2)
+            w["hours"] = round(sum(s["duration_min"] for s in ws if s["session_type"] not in RACE_TYPES) / 60.0, 2)
 
         week1_deload = weeks[0]["kind"] == "deload"
         methodology = ("Training for the Uphill Athlete (House, Johnston & Jornet)" if ctx["is_ultra"]
@@ -328,7 +421,12 @@ class TrainingPlanner:
             "race_date": profile.get("race_date"),
             "start_date": start.isoformat(),
             "end_date": end.isoformat(),
-            "total_weeks": PLAN_WEEKS,
+            "total_weeks": n_weeks,
+            "plan_kind": "season" if season else "block",
+            "goal": {"distance": ctx["distance"], "target_time": ctx["target_str"],
+                     "race_date": ctx["race_date"].isoformat()},
+            "fitness": ctx["fitness"], "goal_check": ctx["goal_check"], "runway": ctx["runway"],
+            "tune_ups": [{**t, "date": t["date"].isoformat()} for t in ctx["tune_ups"]],
             "total_volume_km": weeks[0]["volume_km"],  # week 1 (current week) volume
             "prior_volume_km": ctx["baseline"],
             "methodology_name": methodology,
@@ -357,6 +455,66 @@ class TrainingPlanner:
 
     # ------------------------------------------------------------------ context from the profile
     def _context(self, profile: Dict[str, Any], start: date) -> Dict[str, Any]:
+        ctx = self._base_context(profile, start)
+        ctx["fitness"] = estimate_current_fitness(self.db_path, start)
+        ctx["tune_ups"] = self._tune_ups(ctx, start)
+        weeks_left = max(1, (ctx["race"] - start).days // 7 + 1) if ctx["race"] else None
+        ctx["goal_check"] = goal_check(ctx["paces"].get("vdot"), ctx["fitness"], weeks_left, ctx["distance"],
+                                       ctx["dist_km"])
+        ctx["goal_paces"] = ctx["paces"]
+        return ctx
+
+    def _tune_ups(self, ctx: Dict[str, Any], start: date) -> List[Dict[str, Any]]:
+        """Tune-up races between the plan start and the goal race, each with its mode and recovery days."""
+        from app.data.queries import get_tune_up_races
+        out = []
+        race = ctx["race"]
+        for r in get_tune_up_races(db_path=self.db_path, from_date=start.isoformat()):
+            try:
+                d = date.fromisoformat(r["race_date"][:10])
+            except ValueError:
+                continue
+            km = RACE_DISTANCE_KM.get(r["distance"])
+            if km is None or (race is not None and d >= race):
+                continue
+            days_before = (race - d).days if race else None
+            suggested, why = suggest_tune_up_mode(km, days_before, ctx["dist_km"])
+            mode = r.get("mode") if r.get("mode") in ("race", "effort") else suggested
+            warnings = []
+            if race is not None and days_before <= (ctx["taper_len"] + 1) * 7:
+                warnings.append(f"falls inside the {ctx['distance']} taper ({days_before} days before it): run it "
+                                "easy or drop it")
+            target_min = parse_target_minutes(r.get("target_time_str"), r["distance"]) if r.get("target_time_str") else None
+            out.append({"id": r["id"], "name": r.get("name") or f"{r['distance']} tune-up", "date": d,
+                        "distance": r["distance"], "km": km, "priority": r.get("priority") or "B", "mode": mode,
+                        "mode_reason": why if mode == suggested else "set in your Goal Profile",
+                        "chosen": r.get("mode") in ("race", "effort"), "target_min": target_min,
+                        "recovery_days": tune_up_recovery_days(km, mode), "warnings": warnings})
+        out.sort(key=lambda t: t["date"])
+        for a, b in zip(out, out[1:]):
+            gap = (b["date"] - a["date"]).days
+            if gap < (14 if max(a["km"], b["km"]) >= 21 else 7):
+                b["warnings"].append(f"only {gap} days after {a['name']}: not enough recovery between races")
+        return out
+
+    def _runway(self, ctx: Dict[str, Any], n_weeks: int) -> Dict[str, Any]:
+        lo, hi = SEASON_WEEKS.get(ctx["distance"], (8, 16))
+        ideal_lo = IDEAL_MIN_WEEKS.get(ctx["distance"], lo)
+        if n_weeks < lo:
+            verdict, text = "short", (f"{n_weeks} weeks to race day is shorter than the {lo}-week minimum for a "
+                                      f"{ctx['distance']}: the plan compresses the build. Consider a later race or a "
+                                      "softer target time.")
+        elif n_weeks < ideal_lo:
+            verdict, text = "tight", (f"{n_weeks} weeks is enough, but {ideal_lo}-{hi} weeks is ideal for a "
+                                      f"{ctx['distance']}.")
+        elif n_weeks > hi:
+            verdict, text = "long", (f"{n_weeks} weeks to race day: the first {n_weeks - hi} week(s) are extra base "
+                                     f"training before the usual {hi}-week build.")
+        else:
+            verdict, text = "ok", f"{n_weeks} weeks to race day: within the typical {lo}-{hi} weeks for a {ctx['distance']}."
+        return {"weeks": n_weeks, "min": lo, "max": hi, "verdict": verdict, "text": text}
+
+    def _base_context(self, profile: Dict[str, Any], start: date) -> Dict[str, Any]:
         dist = profile["race_distance_type"].strip()
         is_ultra = dist in ULTRA_DISTANCES
         dist_km = RACE_DISTANCE_KM[dist]
@@ -438,12 +596,18 @@ class TrainingPlanner:
         weeks: List[Dict[str, Any]] = []
         sessions: List[Dict[str, Any]] = []
         baseline = ctx["baseline"]
-        prev, peak, streak = baseline, baseline, 0
+        prev, prev2, peak, streak = baseline, baseline, baseline, 0
+        last_kind = None
         rolling = list(ctx["history_km"]) if ctx["baseline_from_history"] else []
         first_recovery = True
-        for n in range(1, PLAN_WEEKS + 1):
+        n_weeks = ctx.get("n_weeks", PLAN_WEEKS)
+        phases = [self._phase(ctx, start + timedelta(days=7 * i))[0] for i in range(n_weeks)]
+        peak_idx = next((i + 1 for i, ph in enumerate(phases) if ph in ("peak", "taper", "race")), n_weeks)
+        for n in range(1, n_weeks + 1):
             wstart = start + timedelta(days=7 * (n - 1))
             phase, race_offset = self._phase(ctx, wstart)
+            ctx["paces"] = self._week_paces(ctx, n, peak_idx)
+            tune_ups = [t for t in ctx.get("tune_ups", []) if wstart <= t["date"] <= wstart + timedelta(days=6)]
             next_phase, _ = self._phase(ctx, wstart + timedelta(days=7))
             notes: List[str] = []
             tl = ctx["taper_len"]
@@ -483,12 +647,20 @@ class TrainingPlanner:
             elif streak >= BUILDS_BEFORE_DELOAD and next_phase not in ("taper", "race"):
                 target, kind = prev * DELOAD_FACTOR, "deload"
                 notes.append(f"3:1 deload: -{1 - DELOAD_FACTOR:.0%}")
+            elif last_kind in ("deload", "tuneup") and peak > prev:
+                target, kind = peak * ctx["growth"], "build"
+                notes.append(f"back to the last loading week {peak:.1f} km +{ctx['growth'] - 1:.0%}")
             else:
                 target, kind = prev * ctx["growth"], "build"
                 notes.append(f"+{ctx['growth'] - 1:.0%}")
 
-            if prev > 0 and target > prev * MAX_WEEKLY_INCREASE:
-                target = prev * MAX_WEEKLY_INCREASE
+            if tune_ups and phase in ("base", "build", "peak") and kind == "build":
+                target, kind = target * TUNEUP_WEEK_FACTOR, "tuneup"
+                notes.append(f"tune-up race week ({', '.join(t['name'] for t in tune_ups)}): training "
+                             f"{TUNEUP_WEEK_FACTOR:.0%} of plan, mini-taper and easy recovery days")
+            ref = max(prev, prev2)
+            if ref > 0 and target > ref * MAX_WEEKLY_INCREASE:
+                target = ref * MAX_WEEKLY_INCREASE
                 notes.append("capped by 10% rule")
             chronic = rolling[-4:]
             if chronic and sum(chronic) > 0 and target > ACWR_MAX * sum(chronic) / len(chronic):
@@ -498,7 +670,7 @@ class TrainingPlanner:
             wk = {"week_number": n, "start": wstart, "phase": phase, "kind": kind, "race_offset": race_offset,
                   "target_km": round(target, 1), "peak": peak}
             week_sessions, actual, flags = self._build_week(ctx, wk, round(target, 1))
-            caps = [prev * MAX_WEEKLY_INCREASE] if prev > 0 else []
+            caps = [ref * MAX_WEEKLY_INCREASE] if ref > 0 else []
             if chronic and sum(chronic) > 0:
                 caps.append(ACWR_MAX * sum(chronic) / len(chronic))
             limit = min(caps) if caps else None
@@ -515,11 +687,41 @@ class TrainingPlanner:
             weeks.append(wk)
             sessions.extend(week_sessions)
             rolling.append(actual)
-            prev = actual
+            prev2, prev = prev, actual
+            last_kind = kind
             if kind == "build" and phase in ("base", "build", "peak"):
                 peak = actual
             streak = streak + 1 if kind == "build" and phase != "recovery" else 0
+        ctx["paces"] = ctx.get("goal_paces", ctx["paces"])
         return weeks, sessions
+
+    def _week_paces(self, ctx: Dict[str, Any], n: int, peak_idx: int) -> Dict[str, Any]:
+        """Season plans: E/T/I paces step from current fitness (VDOT) to goal VDOT by the peak phase (Daniels:
+        train at current fitness, not goal fitness). Marathon/race pace always stays at goal pace."""
+        gp = ctx.get("goal_paces") or ctx["paces"]
+        f = ctx.get("fitness")
+        if not ctx.get("season") or ctx["is_ultra"] or not gp.get("vdot") or not f or f["vdot"] >= gp["vdot"]:
+            return gp
+        progress = 1.0 if n >= peak_idx else (n - 1) / max(1, peak_idx - 1)
+        v = f["vdot"] + (gp["vdot"] - f["vdot"]) * progress
+        e = (_pace_for_fraction(v, 0.70), _pace_for_fraction(v, 0.62))
+        return {**gp, "train_vdot": round(v, 1), "E": e, "E_mid": sum(e) / 2, "L": e,
+                "T": _pace_for_fraction(v, 0.88), "I": _pace_for_fraction(v, 0.975)}
+
+    @staticmethod
+    def _tune_up_days(ctx: Dict[str, Any], wk: Dict[str, Any]):
+        """(offset -> tune-up race, rest-day offsets before a race, offsets where no quality/long run may go)."""
+        tu_day, tu_rest, no_hard = {}, set(), set()
+        for t in ctx.get("tune_ups", []):
+            for o in range(7):
+                delta = (wk["start"] + timedelta(days=o) - t["date"]).days
+                if delta == 0:
+                    tu_day[o] = t
+                elif delta == -1:
+                    tu_rest.add(o)
+                elif -2 <= delta <= t["recovery_days"]:
+                    no_hard.add(o)
+        return tu_day, tu_rest, no_hard
 
     # ------------------------------------------------------------------ weekly layout
     @staticmethod
@@ -605,6 +807,10 @@ class TrainingPlanner:
         race = ctx["race"]
         blocked = {o for o in range(7) if race is not None and abs((wk["start"] + timedelta(days=o) - race).days) == 1}
         run_days = [d for d in run_days if d not in blocked]
+        tu_day, tu_rest, no_hard = self._tune_up_days(ctx, wk)
+        for o, t in tu_day.items():
+            roles[o] = ("tuneup", t["km"])
+        run_days = [d for d in run_days if d not in tu_day and d not in tu_rest]
         if not run_days:
             return roles, False
 
@@ -614,16 +820,16 @@ class TrainingPlanner:
             return roles, False
 
         lr_km = 0.0
-        if lr_day in run_days:
+        if lr_day in run_days and lr_day not in no_hard:
             lr_km = vol * ctx["lr_share"][k]
             lr_mid = sum(ctx["paces"]["L"]) / 2
             if lr_km * lr_mid > ctx["lr_cap_min"]:
                 lr_km, lr_capped = ctx["lr_cap_min"] / lr_mid, True
             roles[lr_day] = ("long", lr_km)
-        has_q = bool(q_type) and q_day in run_days
+        has_q = bool(q_type) and q_day in run_days and q_day not in no_hard
         q_km = vol * QUALITY_SHARE[phase] if has_q else 0.0
         after_lr = (lr_day + 1) % 7 if lr_day in run_days else None
-        easy_days = [d for d in run_days if d != lr_day and not (has_q and d == q_day)]
+        easy_days = [d for d in run_days if not (d == lr_day and lr_km) and not (has_q and d == q_day)]
         weights = {d: ((1.6 if ctx["is_ultra"] else 0.8) if d == after_lr else 1.0) for d in easy_days}
         wsum = sum(weights.values()) or 1.0
         easy_total = max(0.0, vol - lr_km - q_km) if easy_days else 0.0
@@ -643,13 +849,13 @@ class TrainingPlanner:
         for _ in range(4):
             roles, lr_capped = self._allocate(ctx, wk, vol)
             sessions = self._sessions_for(ctx, wk, roles)
-            minutes = sum(s["duration_min"] for s in sessions if s["session_type"] != "Race")
+            minutes = sum(s["duration_min"] for s in sessions if s["session_type"] not in RACE_TYPES)
             if minutes <= ctx["ceiling_min"] + 0.5:
                 break
             flags["hours_capped"] = True
             vol = vol * ctx["ceiling_min"] / minutes * 0.995
         flags["lr_capped"] = lr_capped
-        actual = round(sum(s["distance_km"] for s in sessions if s["session_type"] != "Race"), 1)
+        actual = round(sum(s["distance_km"] for s in sessions if s["session_type"] not in RACE_TYPES), 1)
         return sessions, actual, flags
 
     def _sessions_for(self, ctx, wk, roles) -> List[Dict[str, Any]]:
@@ -659,6 +865,7 @@ class TrainingPlanner:
                   "taper": " (Taper: volume reduced, intensity kept - Bosquet 2007.)",
                   "recovery": " (Post-race recovery: easy running only.)"}.get(wk["kind"], "")
         ro = wk["race_offset"]
+        tu_day, tu_rest, _ = self._tune_up_days(ctx, wk)
         sessions = []
         for offset in range(7):
             d = wk["start"] + timedelta(days=offset)
@@ -668,12 +875,16 @@ class TrainingPlanner:
                 role = "rest"
             if role == "race":
                 s = self._race(ctx)
+            elif role == "tuneup":
+                s = self._tune_up(ctx, tu_day[offset])
             elif role == "long":
                 s = self._long_run(ctx, km)
             elif role == "quality":
                 s = self._quality(ctx, q_type, km)
             elif role in ("easy", "recovery", "b2b", "niggle_easy", "post_race"):
                 s = self._easy(ctx, km, role, offset)
+            elif offset in tu_rest:
+                s = self._rest("Rest before your tune-up race.", "Rest & Mobility")
             elif ro is not None and offset == ro - 1:
                 s = self._rest("Rest before race day (taper).", "Rest & Mobility")
             elif ro is not None and offset > ro:
@@ -770,6 +981,29 @@ class TrainingPlanner:
     @staticmethod
     def _rest(purpose: str, target: str) -> Dict[str, Any]:
         return {"session_type": "Rest", "distance_km": 0.0, "duration_min": 0.0,
+                "target_pace_or_hr": target, "stated_purpose": purpose}
+
+    def _tune_up(self, ctx, t: Dict[str, Any]) -> Dict[str, Any]:
+        gp = ctx.get("goal_paces") or ctx["paces"]
+        km = t["km"]
+        if t["mode"] == "race":
+            if t.get("target_min"):
+                pace, how = t["target_min"] / km, f"your target {fmt_minutes(t['target_min'])}"
+            elif gp.get("vdot"):
+                v = (ctx.get("fitness") or {}).get("vdot") or gp["vdot"]
+                pace, how = predict_race_minutes(v, km * 1000.0) / km, f"predicted from VDOT {v:g}"
+            else:
+                pace, how = gp["race"] * 0.92, "a little faster than goal-race pace"
+            target = f"Pace Focus: {fmt_pace(pace)} /km (race effort, even pacing; {how})"
+            purpose = (f"TUNE-UP RACE ({t['priority']}): {t['name']}. Race it as a fitness check: the result updates "
+                       f"your training paces when the plan refreshes. {t['mode_reason'].capitalize()}.")
+        else:
+            pace = gp["race"]
+            target = f"Pace Focus: {fmt_pace(pace)} /km (controlled at goal-race effort, not all-out)"
+            purpose = (f"TUNE-UP RACE ({t['priority']}): {t['name']}. Run it controlled at goal-race effort: race "
+                       f"practice without the recovery cost. {t['mode_reason'].capitalize()}.")
+        purpose += f" Then {t['recovery_days']} easy day(s) before any hard session."
+        return {"session_type": "Tune-up Race", "distance_km": round(km, 1), "duration_min": round(km * pace, 0),
                 "target_pace_or_hr": target, "stated_purpose": purpose}
 
     def _race(self, ctx) -> Dict[str, Any]:
@@ -898,7 +1132,7 @@ class TrainingPlanner:
         days_in = f"Available days: {prof.get('available_days')}"
         method_src = ["uphill"] if ctx["is_ultra"] else ["daniels", "pfitzinger"]
         start = weeks[0]["start"]
-        plan_end = start + timedelta(days=7 * PLAN_WEEKS - 1)
+        plan_end = start + timedelta(days=7 * ctx.get("n_weeks", PLAN_WEEKS) - 1)
 
         # 1. Goal, methodology and phases (race distance + race date)
         if ctx["race_passed"]:
@@ -1051,6 +1285,38 @@ class TrainingPlanner:
         elif is_deload and weeks[0]["kind"] == "deload":
             add("Requested deload", "You asked for a deload: week 1 at 75% of baseline, then the 3:1 cycle restarts.",
                 ["Generate Deload Week"], ["bompa"])
+
+        if ctx.get("runway"):
+            add("Season length", ctx["runway"]["text"], [date_in, dist_in], method_src + ["bompa"])
+        gc = ctx.get("goal_check")
+        if gc:
+            f = ctx["fitness"]
+            add("Goal check",
+                f"Goal {ctx['target_str']} needs VDOT {gc['goal_vdot']:g}; your current fitness is about VDOT "
+                f"{gc['current_vdot']:g} ({f['source']}: {f['detail']}), worth about {gc['predicted_now']} today. "
+                f"Gap {gc['gap']:+g} with {gc['weeks']} weeks to go (allowing ~{gc['allowed_gain']:g} points) -> "
+                f"{gc['verdict'].upper()}.",
+                [target_in, "COROS runs" if f["source"] != "tune-up race" else "Tune-up race result"],
+                ["daniels_gilbert", "app"])
+        elif ctx.get("season"):
+            add("Goal check", "No recent runs of 3 km or more, so your current fitness can't be estimated yet: "
+                "paces follow the target time.", [target_in], ["app"])
+        if ctx.get("season") and gc and gc["gap"] > 0 and not ctx["is_ultra"]:
+            add("Pace progression",
+                f"Easy, threshold and interval paces start at your current VDOT {gc['current_vdot']:g} and step up to "
+                f"goal VDOT {gc['goal_vdot']:g} by the peak phase. Marathon/goal pace stays at goal pace so you "
+                "rehearse it.", [target_in], ["daniels"])
+        if ctx.get("tune_ups"):
+            parts = []
+            for t in ctx["tune_ups"]:
+                txt = (f"{t['name']} ({t['distance']}, {_fmt_date(t['date'])}): "
+                       f"{'race it' if t['mode'] == 'race' else 'controlled at goal-race effort'} "
+                       f"({t['mode_reason']}); rest the day before, no hard session 2 days before or "
+                       f"{t['recovery_days']} days after")
+                if t["warnings"]:
+                    txt += ". Warning: " + "; ".join(t["warnings"])
+                parts.append(txt)
+            add("Tune-up races", ". ".join(parts) + ".", ["Tune-up races (Goal Profile)"], ["pfitzinger", "app"])
 
         zt = ctx.get("zone_test") or {}
         if zt.get("scheduled"):

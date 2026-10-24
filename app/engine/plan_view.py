@@ -3,7 +3,8 @@ import json
 from datetime import date, timedelta
 from typing import Any, Dict, List, Optional
 
-_KIND_LABELS = {"build": "Build", "deload": "Deload", "taper": "Taper", "race": "Race week", "recovery": "Post-race recovery"}
+_KIND_LABELS = {"build": "Build", "deload": "Deload", "taper": "Taper", "race": "Race week", "recovery": "Post-race recovery",
+                "tuneup": "Tune-up race week"}
 
 
 def plan_decisions(plan: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
@@ -42,6 +43,42 @@ def fmt_short(d: date) -> str:
 
 def fmt_range(a: date, b: date) -> str:
     return f"{a.day} {a.strftime('%b')} - {b.day} {b.strftime('%b')}"  # 29 Sep - 5 Oct
+
+
+PHASE_INFO = {
+    "base": ("Base", "Aerobic foundation: mostly easy running, steady long-run growth, one controlled quality session."),
+    "build": ("Build", "Race-specific strength: threshold work and longer long runs on top of the aerobic base."),
+    "peak": ("Peak", "Highest load and race-pace rehearsal: sharpest workouts and the longest runs."),
+    "taper": ("Taper", "Volume comes down, intensity stays: arrive fresh (Bosquet 2007)."),
+    "race": ("Race", "Race week: short sharpeners, rest and the goal race."),
+    "recovery": ("Recovery", "Easy running only while the body recovers from the race."),
+}
+
+
+def build_phases(weeks: List[Dict[str, Any]], week_meta: Dict[int, Dict[str, Any]], today: date) -> List[Dict[str, Any]]:
+    """Group consecutive weeks into phases (base / build / peak / taper / race) for the season outline."""
+    phases: List[Dict[str, Any]] = []
+    for w in weeks:
+        key = (week_meta.get(w["number"]) or {}).get("phase") or "base"
+        if not phases or phases[-1]["key"] != key:
+            name, purpose = PHASE_INFO.get(key, (key.title(), ""))
+            phases.append({"key": key, "name": name, "purpose": purpose, "weeks": [], "sessions_by_type": {}})
+        ph = phases[-1]
+        ph["weeks"].append(w)
+        for s in w["sessions"]:
+            t = s.get("session_type")
+            if t and t not in ("Rest", "Easy Aerobic"):
+                ph["sessions_by_type"][t] = ph["sessions_by_type"].get(t, 0) + 1
+    for ph in phases:
+        vols = [w["volume_km"] for w in ph["weeks"]]
+        ph.update(start=ph["weeks"][0]["start"], end=ph["weeks"][-1]["end"],
+                  range_label=fmt_range(ph["weeks"][0]["start"], ph["weeks"][-1]["end"]),
+                  n_weeks=len(ph["weeks"]), km_min=min(vols), km_max=max(vols),
+                  is_current=any(w["is_current"] for w in ph["weeks"]),
+                  is_past=ph["weeks"][-1]["end"] < today,
+                  first_week=ph["weeks"][0]["number"], last_week=ph["weeks"][-1]["number"],
+                  runs_done=sum(w["runs_done"] for w in ph["weeks"]), runs_total=sum(w["runs_total"] for w in ph["weeks"]))
+    return phases
 
 
 def build_plan_view(plan: Optional[Dict[str, Any]], today: Optional[date] = None) -> Optional[Dict[str, Any]]:
@@ -107,7 +144,11 @@ def build_plan_view(plan: Optional[Dict[str, Any]], today: Optional[date] = None
     else:
         notice = None
 
+    if plan.get("plan_kind") == "season":
+        notice = {"level": "ended", "text": f"This plan ended on {fmt_long(end)}. Create a plan for your next race."} if ended else None
+
     return {
+        "phases": build_phases(weeks, week_meta, today),
         "start": start, "end": end, "total_weeks": total_weeks, "current_week": current_week, "ended": ended,
         "period_text": f"Plan period: {fmt_long(start)} – {fmt_long(end)} "
                        f"({total_weeks} week{'s' if total_weeks != 1 else ''}"

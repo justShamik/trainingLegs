@@ -14,8 +14,9 @@ week-over-week volume cap (training_volumes), but it counts as a hard day for ba
 from typing import Dict, Any, List, Optional, Tuple
 
 # Hard quality sessions for back-to-back checking
-HARD_SESSION_TYPES = {"Threshold", "VO2max", "Long Run", "Vert/Time-on-Feet", "Marathon Pace", "Race", "LTHR Test"}
-RACE_SESSION_TYPES = {"Race"}
+HARD_SESSION_TYPES = {"Threshold", "VO2max", "Long Run", "Vert/Time-on-Feet", "Marathon Pace", "Race", "LTHR Test",
+                      "Tune-up Race"}
+RACE_SESSION_TYPES = {"Race", "Tune-up Race"}
 
 # Sessions whose warm-up/cool-down are easy running: share of their km that is hard.
 # LTHR Test = 15 min easy + 30 min test + 10 min easy -> about 60% of the distance is the hard core.
@@ -159,11 +160,14 @@ def validate_multiweek_plan(plan: Dict[str, Any], prior_volume_km: float, max_in
     date-ordered session list (so week boundaries are checked too)."""
     violations: List[str] = []
     sessions = plan.get("sessions", [])
-    prev = prior_volume_km
+    # The 10% rule compares with the higher of the previous two weeks, so returning to the last loading week
+    # after a one-week deload / tune-up mini-taper is not counted as an increase (3:1 step loading, Bompa & Haff).
+    prev, prev2 = prior_volume_km, prior_volume_km
     for week, vol in training_volumes(sessions).items():
-        if not validate_plan_volume_increase(prev, vol, max_increase_pct):
-            violations.append(f"Week {week} volume increase exceeds {max_increase_pct:g}% limit (Prior: {prev}km, Proposed: {vol}km)")
-        prev = vol
+        ref = max(prev, prev2)
+        if not validate_plan_volume_increase(ref, vol, max_increase_pct):
+            violations.append(f"Week {week} volume increase exceeds {max_increase_pct:g}% limit (Prior: {ref}km, Proposed: {vol}km)")
+        prev2, prev = prev, vol
     for week, ws in split_weeks(sessions).items():
         if not validate_80_20_intensity(ws):
             violations.append(f"Week {week} violates 80-20 intensity distribution (Easy volume < 80%)")

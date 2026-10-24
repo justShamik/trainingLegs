@@ -133,7 +133,7 @@ def test_chat_blank_input_is_blocked(page):
 
 
 # --------------------------------------------------------------------- mobile
-@pytest.mark.parametrize("path", ["/", "/dashboard", "/plan", "/strength", "/block-summary", "/profile", "/chat", "/activity/e2e_full_dynamics"])
+@pytest.mark.parametrize("path", ["/", "/dashboard", "/plan", "/strength", "/zones", "/profile", "/chat", "/activity/e2e_full_dynamics"])
 def test_mobile_390_smoke(mobile_page, path):
     mobile_page.goto(path)
     expect(mobile_page.get_by_role("heading", level=1)).to_be_visible()

@@ -242,7 +242,7 @@ def test_decisions_saved_and_rendered_after_methodology_card(db):
     assert {s["key"] for s in stored["sources"]} >= {"daniels", "bosquet", "mujika", "seiler", "gabbett"}
 
     html = create_app(db_path=db).test_client().get("/plan").data.decode("utf-8")
-    assert html.index("<!-- Methodology & Overview Card -->") < html.index('id="plan-decisions"') < html.index("Five weeks, day by day")
+    assert html.index("<!-- Methodology & Overview Card -->") < html.index('id="plan-decisions"') < html.index("5 weeks, day by day")
     assert "Decisions &amp; evidence" in html and "Bosquet et al. (2007)" in html
     assert "Med Sci Sports Exerc, 39(8), 1358-1365" in html
     assert "Rationale:" in html and plan["methodology_rationale"][:40] in html

@@ -144,10 +144,11 @@ def build_course(session: Dict[str, Any]) -> Tuple[Optional[Dict[str, Any]], Opt
         sections = _warm_cool(km, fast_km, [_section(TRAIN, DIST, _round_m(fast_km, 100), _main_intensity(t, prefer_pace=True, fallback_zone=3))])
         name = f"Marathon pace {_fmt_km(round(fast_km, 1))} km"
         how = f"Warm up easy, then about {_fmt_km(round(fast_km, 1))} km at goal marathon pace, then cool down."
-    elif stype == "Race":
+    elif stype in ("Race", "Tune-up Race"):
         sections = [_section(TRAIN, DIST, _round_m(km, 10), _main_intensity(t, prefer_pace=True, fallback_zone=4))]
-        name = f"Race day {_fmt_km(km)} km"
-        how = "Goal race: start controlled, hold an even pace and fuel as rehearsed."
+        name = f"{'Tune-up race' if stype == 'Tune-up Race' else 'Race day'} {_fmt_km(km)} km"
+        how = ("Tune-up race: follow the plan's effort (race it or run controlled), then easy days to recover."
+               if stype == "Tune-up Race" else "Goal race: start controlled, hold an even pace and fuel as rehearsed.")
     else:
         prefer_pace = t["focus"] == "pace"
         value, ttype = (_round_m(km, 10), DIST) if km > 0 else (minutes * 60, TIME)

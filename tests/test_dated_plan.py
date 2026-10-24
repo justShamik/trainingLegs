@@ -64,8 +64,10 @@ def test_periodisation_and_guardrails_hold_across_weeks(db):
             assert len(vols) == 5
             # 3:1 pattern: build, build, build, deload, build
             assert vols[1] > vols[0] and vols[2] > vols[1] and vols[3] < vols[2] and vols[4] > vols[3]
-            for prev, cur in zip(vols, vols[1:]):
-                assert cur <= prev * 1.10 + 0.1
+            # 10% rule vs the higher of the previous two weeks (returning after a deload is not an increase)
+            for i in range(1, len(vols)):
+                ref = max(vols[i - 1], vols[i - 2] if i >= 2 else vols[i - 1])
+                assert vols[i] <= ref * 1.10 + 0.1
 
 
 def test_available_days_and_niggles_respected(db):

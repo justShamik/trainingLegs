@@ -11,7 +11,7 @@ from playwright.sync_api import expect
 
 from tests.e2e.seed import FULL_ACTIVITY_ID
 
-PAGES = ["/", "/dashboard", "/plan", "/strength", "/block-summary", "/profile", "/chat",
+PAGES = ["/", "/dashboard", "/plan", "/strength", "/zones", "/profile", "/chat",
          f"/activity/{FULL_ACTIVITY_ID}", "/analytics"]
 
 VALUES = ".card-value, .kpi-value, .kpi__value, .dial__value"
@@ -188,8 +188,8 @@ def test_plan_week_toggles_reveal_their_cards(page):
     page.get_by_role("button", name=re.compile(r"Week 3 -")).click()
     expect(body).to_be_visible()
     page.wait_for_function(ALL_OPAQUE, arg="#week-body-3 .session-card", timeout=4000)
-    # a <details> log form inside an opened card still opens
-    det = body.locator("details.disclosure").first
+    # a <details> log form (only on days that have happened: the current week) still opens
+    det = page.locator("#week-body-1 details.disclosure").first
     det.locator("summary").click()
     expect(det.locator("form")).to_be_visible()
     scroll_through(page)

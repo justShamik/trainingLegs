@@ -95,11 +95,12 @@
         <div>
             <span class="eyebrow">Today</span>
             <h2>How today is going</h2>
+            <p class="text-muted" style="margin-top: 4px;">Each ring compares today with your own average of the previous {{ today.baseline_days }} days.</p>
         </div>
         <a href="{{ url_for('index') }}" class="link-arrow">Open dashboard <span class="arrow" aria-hidden="true">&rarr;</span></a>
     </div>
 
-    {%- set goals = today.goals -%}
+    {%- set base = today.baseline -%}
     {%- set pct = today.pct or {} -%}
     <div class="dial-group home-dials" data-reveal-stagger="110">
         {# ---- Sleep #}
@@ -113,7 +114,7 @@
             </div>
             <figcaption class="dial-tile__caption">
                 {% if has_sleep %}
-                    <span class="dial-tile__goal">Goal {{ hmm(goals.sleep_minutes) }} h</span>
+                    <span class="dial-tile__goal">{% if base.sleep_minutes %}7-day avg {{ hmm(base.sleep_minutes) }} h{% else %}No 7-day average yet{% endif %}</span>
                     {% if s.deep_minutes is not none %}<span class="text-muted">Deep {{ hmm(s.deep_minutes) }} · REM {{ hmm(s.rem_minutes or 0) }}</span>{% else %}<span class="text-muted">Last night</span>{% endif %}
                 {% else %}
                     <span class="dial-tile__reason">{{ today.sleep_reason or 'No sleep data' }}</span>
@@ -131,7 +132,7 @@
             </div>
             <figcaption class="dial-tile__caption">
                 {% if act_known %}
-                    <span class="dial-tile__goal">Goal {{ goals.activity_minutes }} min</span>
+                    <span class="dial-tile__goal">{% if base.activity_minutes is not none %}7-day avg {{ base.activity_minutes|round|int }} min{% else %}No 7-day average yet{% endif %}</span>
                     <span class="text-muted">{% if today.activity_count %}{{ today.activity_count }} {{ 'activity' if today.activity_count == 1 else 'activities' }}{% else %}{{ today.activity_reason or 'No activities recorded today' }}{% endif %}</span>
                 {% else %}
                     <span class="dial-tile__reason">{{ today.daily_activity_reason }}</span>
@@ -148,7 +149,7 @@
             </div>
             <figcaption class="dial-tile__caption">
                 {% if today.steps is not none %}
-                    <span class="dial-tile__goal">Goal {{ thousands(goals.steps) }}</span>
+                    <span class="dial-tile__goal">{% if base.steps %}7-day avg {{ thousands(base.steps) }}{% else %}No 7-day average yet{% endif %}</span>
                 {% else %}
                     <span class="dial-tile__reason">{{ today.daily_activity_reason or 'No step data' }}</span>
                 {% endif %}
@@ -164,7 +165,7 @@
             </div>
             <figcaption class="dial-tile__caption">
                 {% if today.calories_kcal is not none %}
-                    <span class="dial-tile__goal">Goal {{ thousands(goals.calories_kcal) }} kcal</span>
+                    <span class="dial-tile__goal">{% if base.calories_kcal %}7-day avg {{ thousands(base.calories_kcal) }} kcal{% else %}No 7-day average yet{% endif %}</span>
                 {% else %}
                     <span class="dial-tile__reason">{{ today.daily_activity_reason or 'No calorie data' }}</span>
                 {% endif %}

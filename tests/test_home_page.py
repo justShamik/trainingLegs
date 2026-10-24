@@ -117,6 +117,7 @@ def test_home_renders_with_empty_db(client):
     assert vals == {"Sleep": "—", "Activity time": "—", "Steps": "—", "Calories": "—"}
     assert "Not synced yet today" in html
     assert 'data-pct="0"' in html
+    assert 'dial-tile__goal">Goal' not in html
     assert "Never" in html  # last sync
     assert "No sync attempts yet" in html
 
@@ -146,8 +147,9 @@ def test_home_dials_show_real_values(client, db):
     assert vals["Steps"] == "8,421"
     assert vals["Calories"] == "1,850kcal"
     assert "1 activity" in html
-    assert "Goal 8:00 h" in html and "Goal 10,000" in html
-    assert 'data-pct="94' in html  # sleep 452/480
+    assert "Goal 8:00" not in html and "Goal 10,000" not in html   # no invented goals
+    assert "No 7-day average yet" in html          # nothing synced before today
+    assert "compares today with your own average" in html
     assert "Not synced yet today" not in html
 
 

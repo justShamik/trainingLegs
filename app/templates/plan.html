@@ -14,14 +14,7 @@
             <button type="submit" class="btn btn-secondary">Auto-Match COROS Runs</button>
         </form>
         {% if plan %}<a href="/plan/push" class="btn btn-secondary" id="sendToCorosBtn">Send to COROS</a>{% endif %}
-        <form method="POST" action="/plan/generate">
-            <input type="hidden" name="is_deload" value="0">
-            <button type="submit" class="btn btn-primary">Generate Build Week</button>
-        </form>
-        <form method="POST" action="/plan/generate">
-            <input type="hidden" name="is_deload" value="1">
-            <button type="submit" class="btn btn-secondary">Generate Deload Week</button>
-        </form>
+        {% if plan %}<a href="/plan?new=1#plan-setup" class="btn btn-primary" id="newPlanBtn">New plan</a>{% endif %}
         {% if plan %}
         <form method="POST" action="/plan/discard" onsubmit="return confirm('Are you sure you want to discard the current training plan?');">
             <button type="submit" class="btn btn-danger">Discard Plan</button>
@@ -66,6 +59,46 @@
 </div>
 {% endif %}
 
+{% if page_error %}<div class="callout callout--danger" id="planError"><span>{{ page_error }}</span></div>{% endif %}
+{% if created_msg %}<div class="callout callout--success" id="planCreated"><span>Your season plan is ready, with S&amp;C scheduled alongside. Send a month at a time to COROS when you're ready.</span></div>{% endif %}
+{% if refreshed_msg is not none %}<div class="callout callout--success" id="planRefreshed"><span>Upcoming days refreshed from your training. Completed and adjusted sessions were kept.</span></div>{% endif %}
+
+{% if show_setup %}
+{% include '_plan_setup.html' %}
+{% endif %}
+
+{% if plan and plan_state %}
+{% set bf = plan_state.built_from %}
+<div class="card plan-basis" id="planBasis" style="margin-bottom: var(--space-md); padding: 16px 22px;">
+    <div class="row-between" style="gap: 12px; flex-wrap: wrap;">
+        <span class="text-secondary"><span class="eyebrow eyebrow--plain">Built from</span>
+            {% if bf %}{{ bf.race_distance_type }} on {{ bf.race_date }} · target {{ bf.target_time_str }} · {{ bf.available_days }} · {{ bf.weekly_hours_available }} h/week · history: {{ bf.injury_history or 'none' }}{% else %}an older plan without a saved profile snapshot{% endif %}</span>
+        <a href="/profile?next=/plan" class="link-arrow">Edit Goal Profile <span class="arrow" aria-hidden="true">&rarr;</span></a>
+    </div>
+    {% if plan_state.profile_changed %}
+    <div class="callout callout--warning" id="profileChanged" style="margin: 12px 0 0;">
+        <span>Your Goal Profile changed since this plan was built ({{ plan_state.profile_changed|join(', ')|replace('_', ' ') }}). <a href="/plan?new=1#plan-setup">Create a new plan</a> to use it.</span>
+    </div>
+    {% endif %}
+    {% if plan_state.season %}
+    <div class="row-between" style="gap: 12px; flex-wrap: wrap; margin-top: 10px;">
+        <span class="text-muted" id="refreshInfo">{% if plan_state.refresh_due %}Last refreshed {{ plan_state.days_since_refresh }} days ago: refresh so the coming weeks follow what you actually ran.{% else %}Upcoming days last refreshed {{ plan_state.last_refresh }}. Refresh weekly so paces and volume follow your real training.{% endif %}</span>
+        <form method="POST" action="/plan/refresh">
+            <button type="submit" class="btn {{ 'btn-primary' if plan_state.refresh_due else 'btn-secondary' }} btn-sm" id="refreshPlanBtn">Refresh upcoming weeks</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<nav class="segmented plan-tabs" role="tablist" aria-label="Training plan view" style="margin-bottom: var(--space-lg);">
+    <a href="/plan" role="tab" id="tab-plan" class="segmented__item {% if tab != 'history' %}is-active{% endif %}" aria-selected="{{ 'true' if tab != 'history' else 'false' }}">This plan</a>
+    <a href="/plan?tab=history" role="tab" id="tab-history" class="segmented__item {% if tab == 'history' %}is-active{% endif %}" aria-selected="{{ 'true' if tab == 'history' else 'false' }}">History</a>
+</nav>
+
+{% if tab == 'history' %}
+{% include '_plan_history.html' %}
+{% else %}
 {% if plan %}
 <style>.week-body[hidden] { display: none !important; }</style>
 <!-- Plan period banner -->
@@ -200,16 +233,44 @@
 </div>
 {% endif %}
 
-<!-- Sessions List Grid -->
+<!-- Season outline: phases -> weeks -> workouts -->
 <div class="section-head">
     <div>
-        <span class="eyebrow">Schedule</span>
-        <h2>Five weeks, day by day</h2>
+        <span class="eyebrow">{% if plan.plan_kind == 'season' %}Season outline{% else %}Schedule{% endif %}</span>
+        <h2>{% if plan.plan_kind == 'season' %}Your season, phase by phase{% else %}{{ plan_vm.total_weeks }} weeks, day by day{% endif %}</h2>
+        <p class="text-muted">Open a phase to see its weeks, and a week to see each workout.</p>
     </div>
 </div>
-<div class="stack" style="margin-bottom: var(--space-xl);">
-    {% for w in plan_vm.weeks %}
-    {% set week_open = w.is_current or (plan_vm.ended and loop.last) %}
+{% if plan_vm.phases|length > 1 %}
+<div class="phase-timeline" id="phaseTimeline" aria-hidden="true">
+    {% for ph in plan_vm.phases %}
+    <div class="phase-timeline__seg phase--{{ ph.key }}{% if ph.is_current %} is-current{% endif %}" style="flex: {{ ph.n_weeks }};" title="{{ ph.name }}: {{ ph.range_label }}">
+        <span>{{ ph.name }}</span><small>{{ ph.n_weeks }} wk</small>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<div class="stack" id="phaseList" style="margin-bottom: var(--space-xl);">
+    {% for ph in plan_vm.phases %}
+    <details class="card phase-card phase--{{ ph.key }}" data-phase="{{ ph.key }}" {% if ph.is_current or (plan_vm.ended and loop.last) or plan_vm.phases|length == 1 %}open{% endif %}>
+        <summary class="phase-card__head">
+            <span class="phase-card__title">
+                <strong class="phase-card__name">{{ ph.name }}</strong>
+                {% if ph.is_current %}<span class="chip chip--orange">Now</span>{% elif ph.is_past %}<span class="chip chip--neutral">Done</span>{% endif %}
+                <span class="text-muted">Week{{ 's' if ph.n_weeks > 1 else '' }} {{ ph.first_week }}{% if ph.n_weeks > 1 %}–{{ ph.last_week }}{% endif %} · {{ ph.range_label }}</span>
+            </span>
+            <span class="phase-card__meta">
+                <span class="num">{% if ph.km_min == ph.km_max %}{{ ph.km_min }}{% else %}{{ ph.km_min }}–{{ ph.km_max }}{% endif %} km/week</span>
+                <span class="num">{{ ph.runs_done }}/{{ ph.runs_total }} runs done</span>
+            </span>
+            <span class="phase-card__purpose text-secondary">{{ ph.purpose }}</span>
+            {% if ph.sessions_by_type %}
+            <span class="phase-card__keys">{% for t, c in ph.sessions_by_type.items() %}<span class="chip chip--neutral chip--raw">{{ c }} × {{ t }}</span>{% endfor %}</span>
+            {% endif %}
+        </summary>
+        <div class="stack phase-card__weeks">
+    {% for w in ph.weeks %}
+    {% set week_open = w.is_current or (plan_vm.ended and w.number == plan_vm.total_weeks) or (ph.n_weeks == 1 and not plan_vm.phases|length == 1) %}
     <div class="week-section stack" data-week="{{ w.number }}">
         <button type="button" class="week-toggle {% if w.is_current %}is-current{% endif %}" aria-expanded="{{ 'true' if week_open else 'false' }}" aria-controls="week-body-{{ w.number }}">
             <span class="week-toggle__title">Week {{ w.number }}{% if w.is_current %} (current){% endif %} - {{ w.range_label }} - {{ w.volume_km }} km</span>
@@ -222,7 +283,7 @@
         </button>
         <div class="week-body stack" id="week-body-{{ w.number }}" {% if not week_open %}hidden{% endif %}>
     {% for sess in w.sessions %}
-    <div class="card session-card {% if sess.session_type in ['Threshold', 'VO2max', 'Long Run', 'Vert/Time-on-Feet', 'Marathon Pace', 'Race', 'LTHR Test'] %}is-key{% endif %} {% if sess.is_today %}is-today{% endif %}" {% if sess.is_today %}id="today-session"{% endif %}>
+    <div class="card session-card {% if sess.session_type in ['Threshold', 'VO2max', 'Long Run', 'Vert/Time-on-Feet', 'Marathon Pace', 'Race', 'LTHR Test', 'Tune-up Race'] %}is-key{% endif %} {% if sess.is_today %}is-today{% endif %}" {% if sess.is_today %}id="today-session"{% endif %}>
         <div class="session-grid">
             <div>
                 <div class="session-date">{{ sess.date_label }}</div>
@@ -256,6 +317,7 @@
             </div>
             <div class="session-purpose">
                 <div style="font-size: 0.9rem; color: var(--text-secondary);">{{ sess.stated_purpose }}</div>
+                {% for w in sc_by_date.get(sess.session_date, []) %}<a href="/strength?session={{ w.db_id }}" class="chip chip--lavender chip--raw sc-chip" style="margin-top: 6px; display: inline-flex;">+ S&amp;C · {{ w.phase }} {{ w.total_duration_min }} min{% if w.status == 'Completed' %} ✓{% endif %}</a>{% endfor %}
                 {% if sess.session_type == 'LTHR Test' %}<a href="/zones#protocol" class="link-arrow zone-test-link" style="font-size: 0.88rem;">Test protocol &amp; analysis <span class="arrow" aria-hidden="true">&rarr;</span></a>{% endif %}
             </div>
             <div class="session-status">
@@ -303,8 +365,8 @@
         </div>
         {% endif %}
 
-        <!-- Inline Update Controls -->
-        {% if sess.session_type != 'Rest' %}
+        <!-- Inline Update Controls: only for days that have happened (future days can't be logged yet) -->
+        {% if sess.session_type != 'Rest' and (sess.is_past or sess.is_today or sess.status not in (none, 'Pending')) %}
         <details class="disclosure">
             <summary>Log / Update Workout Status</summary>
             <form method="POST" action="/session/update" class="panel log-form disclosure__body">
@@ -351,6 +413,9 @@
         </div>
     </div>
     {% endfor %}
+        </div>
+    </details>
+    {% endfor %}
 </div>
 <script>
 document.querySelectorAll('.week-toggle').forEach(function (btn) {
@@ -366,7 +431,8 @@ document.querySelectorAll('.week-toggle').forEach(function (btn) {
 {% else %}
 <div class="card card--center">
     <h3 style="margin-bottom: 12px; font-family: var(--font-serif); font-size: 2rem; font-weight: 400;">No Active Training Plan Generated</h3>
-    <p style="color: var(--text-secondary); max-width: 52ch; margin: 0 auto;">Click a generate button above to create a dated 5-week running plan (current week + next 4) tailored to your profile.</p>
+    <p style="color: var(--text-secondary); max-width: 52ch; margin: 0 auto;">Use "Set up your plan" above: answer a few Goal Profile questions, pick your race distance and target time, preview the season and create it.</p>
 </div>
+{% endif %}
 {% endif %}
 {% endblock %}

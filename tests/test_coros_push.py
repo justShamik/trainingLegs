@@ -1,6 +1,8 @@
 """Send to COROS: course building against the MCP rules, preview-only reads, confirmed writes, no duplicates."""
 from datetime import date, timedelta
 
+import re
+
 import pytest
 
 from app.coros_push import service as ps
@@ -290,7 +292,7 @@ def web(db, monkeypatch):
 
 def test_preview_page_then_confirm(web):
     client, fake = web
-    html = client.get("/plan/push").get_data(as_text=True)
+    html = client.get("/plan/push?days=14").get_data(as_text=True)
     assert "Put your plan on the watch" in html and 'name="token"' in html and "Send to COROS" in html
     assert fake.writes == []
     import re
@@ -310,3 +312,19 @@ def test_confirm_without_selection_sends_nothing(web):
     client, fake = web
     body = client.post("/plan/push", data={"token": "x", "days": "14"}).get_data(as_text=True)
     assert "Tick at least one workout" in body and fake.writes == []
+
+
+
+def test_month_windows_and_month_preview(web, db):
+    from app.web.push_routes import month_windows
+    ms = month_windows(date(2026, 10, 24))
+    assert [m["key"] for m in ms] == ["2026-10", "2026-11", "2026-12", "2027-01"]
+    assert ms[0]["partial"] and ms[-1]["partial"] and not ms[1]["partial"]
+    client, fake = web
+    html = client.get("/plan/push").get_data(as_text=True)                  # default: this month
+    month = f"{TODAY:%Y-%m}"
+    assert f'name="month" value="{month}"' in html
+    dates = re.findall(r'data-date="([0-9-]+)"', html)
+    assert dates and all(d.startswith(month) for d in dates)
+    nxt = client.get(f"/plan/push?month={ms[1]['key'] if TODAY.month == 10 else month}").get_data(as_text=True)
+    assert fake.writes == [] and "Send:" in nxt

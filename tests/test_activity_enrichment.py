@@ -137,7 +137,7 @@ def test_activity_page_shows_values_and_reasons(tmp_path):
     assert "Not Available" in html2 and "Detail data not synced yet" in html2
 
 
-@pytest.mark.parametrize("path", ["/activity/1000", "/chat", "/profile", "/strength", "/block-summary"])
+@pytest.mark.parametrize("path", ["/activity/1000", "/chat", "/profile", "/strength", "/plan?tab=history", "/zones"])
 def test_navbar_badge_connected_on_all_pages(tmp_path, monkeypatch, path):
     token = tmp_path / "token.json"
     token.write_text(json.dumps({"access_token": "x"}), encoding="utf-8")

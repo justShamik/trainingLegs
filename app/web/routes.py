@@ -1,7 +1,7 @@
 """Flask Application Factory & Web Routes."""
 import logging
 import os
-from datetime import date
+from datetime import date, timedelta
 from urllib.parse import urlsplit, urlencode, parse_qsl, urlunsplit
 from flask import Flask, render_template, request, jsonify, redirect, url_for, abort
 from werkzeug.exceptions import HTTPException
@@ -12,7 +12,7 @@ from app.data.queries import (
     get_activity_detail, get_user_profile, save_user_profile,
     save_training_plan, get_active_training_plan, delete_active_training_plan,
     update_session_status, calculate_weekly_compliance, auto_match_activities_to_sessions,
-    save_block_summary, get_block_summaries, save_strength_workout,
+    save_strength_workout, get_strength_workout, get_plan_strength_sessions,
     get_active_strength_workout, update_strength_workout_status, save_gemini_api_key,
     get_plan_session, get_today_summary, get_sync_status
 )
@@ -67,6 +67,14 @@ def create_app(db_path: str = None) -> Flask:
     app.cli.add_command(races_refresh_command)
     from app.analytics import init_analytics; init_analytics(app)  # self-hosted analytics (ADR-006)
     app.jinja_env.filters["describe_target"] = describe_target
+
+    def nice_date(value):
+        try:
+            d = date.fromisoformat(str(value)[:10])
+        except (TypeError, ValueError):
+            return value
+        return f"{d:%a} {d.day} {d:%b}"
+    app.jinja_env.filters["nice_date"] = nice_date
 
     @app.context_processor
     def inject_coros_auth():
@@ -182,9 +190,34 @@ def create_app(db_path: str = None) -> Flask:
         plan_vm = build_plan_view(active_plan)
         from app.engine.reschedule import adjustable_sessions
         adjustable = adjustable_sessions(active_plan, app.config.get("TODAY") or date.today())
+        tab = "history" if request.args.get("tab") == "history" else "plan"
+        from app.data.history import get_training_history
+        history = get_training_history(db_path=current_db, today=app.config.get("TODAY")) if tab == "history" else None
+        sc_by_date = {}
+        for w in get_plan_strength_sessions(active_plan["id"] if active_plan else None, db_path=current_db):
+            sc_by_date.setdefault(w["session_date"], []).append(w)
+        from app.web.season_routes import GOAL_DISTANCES, setup_checklist
+        from app.engine.plan_bundle import plan_status
+        from app.data.queries import get_tune_up_races
+        today_d = app.config.get("TODAY") or date.today()
+        user_profile = get_user_profile(db_path=current_db)
+        tune_ups = get_tune_up_races(db_path=current_db, from_date=today_d.isoformat())
+        plan_vm = build_plan_view(active_plan, today=today_d) if active_plan else plan_vm
 
         return render_template(
             "plan.html",
+            setup=setup_checklist(user_profile, tune_ups, today_d),
+            show_setup=(not active_plan) or request.args.get("new") == "1",
+            goal_distances=GOAL_DISTANCES,
+            user_profile=user_profile,
+            tune_ups=tune_ups,
+            plan_state=plan_status(active_plan, db_path=current_db, today=today_d),
+            created_msg=request.args.get("created"),
+            refreshed_msg=request.args.get("refreshed"),
+            page_error=request.args.get("error"),
+            tab=tab,
+            history=history,
+            sc_by_date=sc_by_date,
             plan=active_plan,
             plan_vm=plan_vm,
             compliance=compliance,
@@ -201,13 +234,13 @@ def create_app(db_path: str = None) -> Flask:
     def plan_generate():
         current_db = app.config.get("DATABASE_PATH")
         is_deload = request.form.get("is_deload") == "1"
-        planner = TrainingPlanner(db_path=current_db)
+        from app.engine.plan_bundle import create_training_plan
         try:
-            generated_plan = planner.generate_plan(is_deload=is_deload, today=app.config.get("TODAY"))
+            # running plan + its S&C schedule
+            create_training_plan(db_path=current_db, is_deload=is_deload, today=app.config.get("TODAY"))
         except ProfileIncompleteError:
             # Never plan from invented goals (NFR-4.1): /plan lists exactly what is missing and links to /profile
             return redirect(url_for("plan_view", profile_incomplete=1))
-        save_training_plan(generated_plan, db_path=current_db)
         return redirect(url_for("plan_view"))
 
     @app.route("/plan/discard", methods=["POST"])
@@ -272,30 +305,34 @@ def create_app(db_path: str = None) -> Flask:
 
     @app.route("/block-summary", methods=["GET"])
     def block_summary():
-        current_db = app.config.get("DATABASE_PATH")
-        blocks = get_block_summaries(db_path=current_db)
-        compliance = calculate_weekly_compliance(db_path=current_db)
-        overtraining = detect_overtraining_risk(db_path=current_db)
-        active_plan = get_active_training_plan(db_path=current_db)
-        return render_template(
-            "block_summary.html",
-            blocks=blocks,
-            compliance=compliance,
-            overtraining=overtraining,
-            plan=active_plan,
-            active_page="block_summary"
-        )
+        # Block Summary was folded into the plan page's History tab
+        return redirect(url_for("plan_view", tab="history"), code=301)
 
     @app.route("/strength", methods=["GET"])
     def strength_view():
         current_db = app.config.get("DATABASE_PATH")
-        workout = get_active_strength_workout(db_path=current_db)
+        today = (app.config.get("TODAY") or date.today()).isoformat()
+        plan = get_active_training_plan(db_path=current_db)
+        schedule = get_plan_strength_sessions(plan["id"] if plan else None, db_path=current_db)
+        workout = None
+        selected = request.args.get("session")
+        if selected:
+            workout = get_strength_workout(selected, db_path=current_db)
+        if not workout:
+            latest = get_active_strength_workout(db_path=current_db)
+            if latest and not latest.get("plan_id"):
+                workout = latest                      # a one-off generated after the plan's schedule
+            elif schedule:
+                workout = next((w for w in schedule if w["session_date"] >= today and w["status"] != "Completed"),
+                               schedule[-1])
+            else:
+                workout = latest
         if not workout:
             engine = StrengthEngine(db_path=current_db)
-            workout = engine.generate_workout()
-            save_strength_workout(workout, db_path=current_db)
+            save_strength_workout(engine.generate_workout(), db_path=current_db)
             workout = get_active_strength_workout(db_path=current_db)
-        return render_template("strength.html", workout=workout, active_page="strength")
+        return render_template("strength.html", workout=workout, schedule=schedule, today=today,
+                               active_page="strength")
 
     @app.route("/strength/generate", methods=["POST"])
     def strength_generate():
@@ -313,6 +350,7 @@ def create_app(db_path: str = None) -> Flask:
         status = request.form.get("status", "Completed")
         if workout_id:
             update_strength_workout_status(workout_id, status, db_path=current_db)
+            return redirect(url_for("strength_view", session=workout_id))
         return redirect(url_for("strength_view"))
 
 
@@ -339,10 +377,20 @@ def create_app(db_path: str = None) -> Flask:
             }
             save_user_profile(profile_data, db_path=current_db)
             saved_success = True
+            nxt = request.form.get("next")
+            if nxt:
+                return redirect(safe_next(nxt, url_for("profile")))
 
         user_profile = get_user_profile(db_path=current_db)
+        from app.data.queries import get_tune_up_races
+        from app.web.season_routes import TUNE_UP_DISTANCES
         return render_template("profile.html", profile=user_profile, saved_success=saved_success,
-                               profile_gaps=profile_gaps(user_profile), active_page="profile")
+                               profile_gaps=profile_gaps(user_profile), active_page="profile",
+                               next_url=safe_next(request.args.get("next"), "") or None,
+                               tune_ups=get_tune_up_races(db_path=current_db),
+                               tune_up_distances=TUNE_UP_DISTANCES, race_error=request.args.get("race_error"),
+                               race_saved=request.args.get("race_saved"),
+                               min_race_date=((app.config.get("TODAY") or date.today()) + timedelta(days=1)).isoformat())
 
     @app.route("/chat", methods=["GET", "POST"])
     def chat():
@@ -366,6 +414,8 @@ def create_app(db_path: str = None) -> Flask:
     register_zone_routes(app)  # /zones: LTHR field test -> COROS heart-rate zones
     from app.web.push_routes import register_push_routes
     register_push_routes(app)  # /plan/push: preview, then send confirmed runs to the COROS calendar
+    from app.web.season_routes import register_season_routes
+    register_season_routes(app)  # /plan/preview, /plan/create, /plan/refresh, /profile/races
 
     @app.errorhandler(404)
     def handle_not_found(e):

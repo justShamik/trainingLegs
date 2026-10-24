@@ -91,6 +91,13 @@ def init_db(db_path: Optional[str] = None) -> None:
             """)
         _backfill_plan_dates(conn)
 
+        # S&C sessions scheduled with a running plan (NULL plan_id = one-off workout from the S&C page)
+        cursor.execute("PRAGMA table_info(strength_workouts)")
+        sw_cols = {row["name"] for row in cursor.fetchall()}
+        for col_name, col_def in (("plan_id", "TEXT"), ("session_date", "TEXT"), ("week_number", "INTEGER")):
+            if col_name not in sw_cols:
+                cursor.execute(f"ALTER TABLE strength_workouts ADD COLUMN {col_name} {col_def}")
+
         cursor.execute("PRAGMA table_info(user_profile)")
         profile_cols = {row["name"] for row in cursor.fetchall()}
         if "gemini_api_key" not in profile_cols:
@@ -137,6 +144,22 @@ def init_db(db_path: Optional[str] = None) -> None:
                 entered_in_coros_at TEXT,
                 created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )""")
+
+        # Tune-up races (B/C priority) on the way to the goal race (the A race lives in user_profile)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS tune_up_races (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                race_date TEXT NOT NULL,
+                distance TEXT NOT NULL,
+                priority TEXT NOT NULL DEFAULT 'B',
+                target_time_str TEXT,
+                mode TEXT NOT NULL DEFAULT 'auto',
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )""")
+        cursor.execute("PRAGMA table_info(training_plans)")
+        if "plan_kind" not in {row["name"] for row in cursor.fetchall()}:
+            cursor.execute("ALTER TABLE training_plans ADD COLUMN plan_kind TEXT")
 
         # Workouts this app put on the COROS calendar: at most one per date (plans have one run a day)
         cursor.execute("""

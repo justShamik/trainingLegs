@@ -1,0 +1,107 @@
+{# Training history tab of /plan: week-by-week planned vs done (last 12 weeks) and every plan generated #}
+{%- macro pct_chip(p) -%}
+{%- if p is none -%}<span class="chip chip--neutral">—</span>
+{%- else -%}<span class="chip {{ 'chip--success' if p >= 85 else 'chip--warning' if p >= 70 else 'chip--danger' }} chip--raw">{{ p|round|int }}%</span>{%- endif -%}
+{%- endmacro -%}
+
+<section id="history" class="history">
+    <div class="kpi-grid" style="margin-bottom: var(--space-xl);">
+        <div class="kpi-card tone-peach">
+            <div class="kpi-label">Running, last 12 weeks</div>
+            <div class="kpi-value" id="histTotalKm">{{ history.totals.actual_km }}<span class="card-unit">km</span></div>
+            <div class="kpi-subtitle">{{ history.totals.runs }} runs synced from COROS</div>
+        </div>
+        <div class="kpi-card tone-sky">
+            <div class="kpi-label">Average week</div>
+            <div class="kpi-value">{{ history.totals.avg_week_km }}<span class="card-unit">km</span></div>
+            <div class="kpi-subtitle">Completed weeks only (this week excluded)</div>
+        </div>
+        <div class="kpi-card tone-mint">
+            <div class="kpi-label">Average plan compliance</div>
+            <div class="kpi-value" id="histCompliance">{% if history.totals.avg_compliance_pct is not none %}{{ history.totals.avg_compliance_pct }}%{% else %}<span class="badge-na">Not Available</span>{% endif %}</div>
+            <div class="kpi-subtitle">Volume done vs planned, completed weeks that had a plan</div>
+        </div>
+    </div>
+
+    <div class="chart-card" style="margin-bottom: var(--space-xl);">
+        <div class="chart-title"><h3>Planned vs run, per week</h3></div>
+        <div class="chart-canvas"><canvas id="historyChart"></canvas></div>
+    </div>
+
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Week by week</span>
+            <h2>Training weeks</h2>
+            <p class="text-muted">Planned figures come from the plan you were following that week; "Run" counts every synced run.</p>
+        </div>
+    </div>
+    <div class="table-container" style="margin-bottom: var(--space-2xl);">
+        <table class="data-table" id="historyWeeks">
+            <thead>
+                <tr><th>Week</th><th>Planned</th><th>Run</th><th>Plan done</th><th>Sessions</th><th>Long run</th><th>Longest run</th></tr>
+            </thead>
+            <tbody>
+            {% for w in history.weeks %}
+            <tr data-week="{{ w.start }}" {% if w.is_current %}class="is-current"{% endif %}>
+                <td><strong>{{ w.label }}</strong>{% if w.is_current %} <span class="chip chip--orange">This week</span>{% endif %}</td>
+                <td class="num">{% if w.planned_km is not none %}{{ w.planned_km }} km{% else %}<span class="text-muted">No plan</span>{% endif %}</td>
+                <td class="num">{{ w.actual_km }} km <span class="text-muted">({{ w.runs }} run{{ '' if w.runs == 1 else 's' }})</span></td>
+                <td>{% if w.compliance %}{{ pct_chip(w.compliance.volume_compliance_pct) }} <span class="text-muted num">{{ w.compliance.completed_total_km }}/{{ w.compliance.prescribed_total_km }} km</span>{% else %}—{% endif %}</td>
+                <td class="num">{% if w.compliance %}{{ w.compliance.completed_sessions + w.compliance.modified_sessions }}/{{ w.compliance.total_sessions }}{% if w.skipped %} <span class="text-muted">· {{ w.skipped }} skipped</span>{% endif %}{% else %}—{% endif %}</td>
+                <td>{% if w.long_run %}{{ '%g'|format(w.long_run.planned_km) }} km → {% if w.long_run.actual_km is not none %}{{ '%g'|format(w.long_run.actual_km) }} km{% else %}<span class="text-muted">{{ w.long_run.status|lower }}</span>{% endif %}{% else %}—{% endif %}</td>
+                <td class="num">{% if w.longest_km %}{{ w.longest_km }} km{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-head">
+        <div>
+            <span class="eyebrow">Plans</span>
+            <h2>Every plan you've generated</h2>
+        </div>
+    </div>
+    {% if history.plans %}
+    <div class="table-container">
+        <table class="data-table" id="historyPlans">
+            <thead><tr><th>Created</th><th>Period</th><th>Goal</th><th>Status</th><th>Planned</th><th>Done so far</th></tr></thead>
+            <tbody>
+            {% for p in history.plans %}
+            <tr data-plan="{{ p.id }}">
+                <td>{{ p.created }}</td>
+                <td>{{ p.start }} → {{ p.end }}</td>
+                <td>{{ p.goal or '—' }}</td>
+                <td><span class="chip {{ {'active': 'chip--success', 'superseded': 'chip--neutral', 'discarded': 'chip--danger'}.get(p.status, 'chip--neutral') }}">{{ p.status|capitalize }}</span></td>
+                <td class="num">{{ p.planned_km }} km</td>
+                <td>{% if p.compliance %}{{ pct_chip(p.compliance.volume_compliance_pct) }} <span class="text-muted num">{{ p.compliance.completed_sessions + p.compliance.modified_sessions }}/{{ p.compliance.total_sessions }} sessions</span>{% else %}<span class="text-muted">Not started</span>{% endif %}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card card--center"><p class="text-secondary">No plans yet. Generate one on the "This plan" tab.</p></div>
+    {% endif %}
+</section>
+
+<script>
+(function () {
+    var data = {{ history.chart | tojson }};
+    var el = document.getElementById('historyChart');
+    if (!el || typeof Chart === 'undefined') return;
+    var pal = window.CoachPalette || {};
+    new Chart(el, {
+        data: {
+            labels: data.labels,
+            datasets: [
+                { type: 'bar', label: 'Run (km)', data: data.actual, backgroundColor: pal.peach || '#ffb89a', borderRadius: 6 },
+                { type: 'line', label: 'Planned (km)', data: data.planned, borderColor: pal.sky || '#a6d0f5',
+                  backgroundColor: 'transparent', spanGaps: false, tension: 0.3, pointRadius: 3 }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false,
+                   scales: { y: { beginAtZero: true, title: { display: true, text: 'km' } } } }
+    });
+})();
+</script>

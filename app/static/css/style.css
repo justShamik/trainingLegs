@@ -1344,3 +1344,37 @@ html.lenis { scroll-behavior: auto; }
   .js-motion [data-reveal]:not(.is-in) .bar__fill { transform: none; }
   [data-parallax] { transform: none !important; opacity: 1 !important; }
 }
+
+/* Season plan: set-up checklist, phase timeline and phase cards */
+.setup-checklist { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+.setup-checklist li { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--radius-sm);
+  background: var(--bg-surface-elevated); border: 1px solid var(--border-color); flex-wrap: wrap; }
+.setup-checklist li > span:nth-child(2) { flex: 1; min-width: 200px; }
+.setup-checklist__mark { width: 24px; height: 24px; border-radius: 50%; display: inline-grid; place-items: center;
+  font-size: 0.8rem; font-weight: 700; color: var(--text-on-accent); background: var(--status-success); flex: none; }
+.setup-checklist li.is-missing .setup-checklist__mark { background: var(--status-danger); }
+.phase--base { --phase: var(--pastel-sky); }
+.phase--build { --phase: var(--pastel-peach); }
+.phase--peak { --phase: var(--accent-orange); }
+.phase--taper { --phase: var(--pastel-lavender); }
+.phase--race { --phase: var(--pastel-mint); }
+.phase--recovery { --phase: var(--pastel-butter); }
+.phase-timeline { display: flex; gap: 4px; margin-bottom: var(--space-md); border-radius: var(--radius-sm); overflow: hidden; }
+.phase-timeline__seg { min-width: 0; padding: 8px 10px; background: color-mix(in srgb, var(--phase) 22%, transparent);
+  border-top: 3px solid var(--phase); display: flex; flex-direction: column; gap: 2px; font-size: 0.82rem; }
+.phase-timeline__seg span { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phase-timeline__seg small { color: var(--text-muted); }
+.phase-timeline__seg.is-current { box-shadow: inset 0 0 0 1px var(--phase); }
+.phase-card { border-left: 4px solid var(--phase, var(--border-color)); padding: 18px 22px; }
+.phase-card > summary { list-style: none; cursor: pointer; }
+.phase-card > summary::-webkit-details-marker { display: none; }
+.phase-card__head { display: grid; gap: 6px; }
+.phase-card__title { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.phase-card__name { font-family: var(--font-display); font-size: 1.25rem; color: var(--phase, var(--text-primary)); }
+.phase-card__meta { display: flex; gap: 16px; flex-wrap: wrap; color: var(--text-secondary); font-size: 0.9rem; }
+.phase-card__keys { display: flex; gap: 6px; flex-wrap: wrap; }
+.phase-card__weeks { margin-top: 14px; }
+@media (max-width: 640px) {
+  .phase-timeline__seg small { display: none; }
+  .phase-timeline__seg { padding: 6px; font-size: 0.72rem; }
+}
